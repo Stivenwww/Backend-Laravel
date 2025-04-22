@@ -11,36 +11,38 @@ class SolicitudAsignaturaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Obtener las solicitudes recién creadas
-        $solicitudes = Solicitud::all()->keyBy('usuario_id');
+        $solicitudes = Solicitud::all();
 
-        // Vincular asignaturas realistas según cada institución
-        $mapa = [
-            // usuario_id => [array de códigos de asignaturas origen]
-            1 => ['FUP001', 'FUP002'],       // Laura (Autónoma del Cauca)
-            2 => ['CM001', 'CM002'],         // Carlos (FUP)
-            3 => ['SENA001', 'SENA002'],     // Andrea (Colegio Mayor)
-            4 => ['CM001', 'FUP002'],        // Luis (Unicauca)
-            5 => ['FUP001', 'CM002'],        // Miguel (extranjero)
-            6 => ['SENA001', 'SENA002'],     // Juliana (SENA)
-        ];
+        foreach ($solicitudes as $solicitud) {
+            // 2 asignaturas de origen (SENA: programa_id 16–23)
+            $asignaturasOrigen = Asignatura::whereBetween('programa_id', [16, 23])
+                ->inRandomOrder()
+                ->limit(2)
+                ->get();
 
-        foreach ($mapa as $usuarioId => $codigos) {
-            $solicitudId = $solicitudes[$usuarioId]->id_solicitud;
+            // 2 asignaturas de destino (Ingeniería de Software: programa_id = 12)
+            $asignaturasDestino = Asignatura::where('programa_id', 12)
+                ->inRandomOrder()
+                ->limit(2)
+                ->get();
 
-            foreach ($codigos as $codigo) {
-                $asignatura = Asignatura::where('codigo_asignatura', $codigo)->first();
-
-                if (!$asignatura) continue;
-
-                // SENA tiene programas_id == 3
-                $esSena = $asignatura->programas_id === 3;
-
+            // Para cada SENA: guardamos horas_sena, nota_origen = null
+            foreach ($asignaturasOrigen as $asigSena) {
                 SolicitudAsignatura::create([
-                    'solicitud_id' => $solicitudId,
-                    'asignatura_id' => $asignatura->id_asignatura,
-                    'nota_origen' => $esSena ? null : number_format(rand(30, 50) / 10, 1), // nota entre 3.0 y 5.0 con 1 decimal
-                    'horas_sena' => $esSena ? rand(40, 120) : null, // horas realistas si es SENA
+                    'solicitud_id'   => $solicitud->id_solicitud,
+                    'asignatura_id'  => $asigSena->id_asignatura,
+                    'nota_origen'    => null,
+                    'horas_sena'     => $asigSena->horas_sena,
+                ]);
+            }
+
+            // Para cada no-SENA: guardamos nota_origen, horas_sena = null
+            foreach ($asignaturasDestino as $asigDestino) {
+                SolicitudAsignatura::create([
+                    'solicitud_id'   => $solicitud->id_solicitud,
+                    'asignatura_id'  => $asigDestino->id_asignatura,
+                    'nota_origen'    => rand(30, 50) / 10, // 3.0 – 5.0
+                    'horas_sena'     => null,
                 ]);
             }
         }

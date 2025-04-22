@@ -441,7 +441,7 @@ END;
 
 
 
-                        -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUDES)
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUDES)
             DROP PROCEDURE IF EXISTS ActualizarSolicitud;
             DROP PROCEDURE IF EXISTS EliminarSolicitud;
             DROP PROCEDURE IF EXISTS InsertarSolicitud;
@@ -554,7 +554,8 @@ END;
                     inst.nombre AS institucion_origen_nombre
 
                 FROM solicitudes s
-                INNER JOIN user u ON s.usuario_id = u.id_usuario
+                INNER JOIN users
+                 u ON s.usuario_id = u.id_usuario
                 INNER JOIN programas prog ON s.programa_destino_id = prog.id_programa
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
@@ -607,14 +608,16 @@ END;
 
 
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (USERS)
+           -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (users)
             DROP PROCEDURE IF EXISTS ObtenerUsuarios;
             DROP PROCEDURE IF EXISTS ObtenerUsuarioPorId;
             DROP PROCEDURE IF EXISTS InsertarUsuario;
             DROP PROCEDURE IF EXISTS ActualizarUsuario;
             DROP PROCEDURE IF EXISTS EliminarUsuario;
 
-            -- PROCEDIMIENTOS PARA USERS
+
+            -- PROCEDIMIENTOS PARA users
+
             CREATE PROCEDURE ObtenerUsuarios()
             BEGIN
                 SELECT
@@ -635,7 +638,8 @@ END;
                     m.nombre AS municipio,
                     u.created_at,
                     u.updated_at
-                FROM users u
+                FROM users
+                 u
                 LEFT JOIN instituciones i ON u.institucion_origen_id = i.id_institucion
                 LEFT JOIN facultades f ON u.facultad_id = f.id_facultad
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
@@ -664,7 +668,8 @@ END;
                     m.nombre AS municipio,
                     u.created_at,
                     u.updated_at
-                FROM users u
+                FROM users
+                 u
                 LEFT JOIN instituciones i ON u.institucion_origen_id = i.id_institucion
                 LEFT JOIN facultades f ON u.facultad_id = f.id_facultad
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
@@ -673,7 +678,6 @@ END;
                 WHERE u.id_usuario = usuarioId;
             END;
 
-           DROP PROCEDURE IF EXISTS InsertarUsuario;
             CREATE PROCEDURE InsertarUsuario(
                 IN p_primer_nombre VARCHAR(50),
                 IN p_segundo_nombre VARCHAR(50),
@@ -694,7 +698,8 @@ END;
                 IN p_activo BOOLEAN -- AÑADIDO
             )
             BEGIN
-                INSERT INTO users (
+                INSERT INTO users
+                 (
                     primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
                     email, password, tipo_identificacion, numero_identificacion,
                     institucion_origen_id, facultad_id, telefono, direccion,
@@ -711,7 +716,6 @@ END;
             END;
 
 
-            DROP PROCEDURE IF EXISTS ActualizarUsuario;
             CREATE PROCEDURE ActualizarUsuario(
                 IN usuarioId INT,
                 IN p_primer_nombre VARCHAR(50),
@@ -734,6 +738,7 @@ END;
             )
             BEGIN
                 UPDATE users
+
                 SET primer_nombre = p_primer_nombre,
                     segundo_nombre = p_segundo_nombre,
                     primer_apellido = p_primer_apellido,
@@ -757,17 +762,18 @@ END;
 
             CREATE PROCEDURE EliminarUsuario(IN usuarioId INT)
             BEGIN
-                DELETE FROM users WHERE id_usuario = usuarioId;
+                DELETE FROM users
+                 WHERE id_usuario = usuarioId;
             END;
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (DOCUMENTS)
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (documentos)
             DROP PROCEDURE IF EXISTS ObtenerDocumentos;
             DROP PROCEDURE IF EXISTS ObtenerDocumentoPorId;
             DROP PROCEDURE IF EXISTS InsertarDocumento;
             DROP PROCEDURE IF EXISTS ActualizarDocumento;
             DROP PROCEDURE IF EXISTS EliminarDocumento;
 
-            -- PROCEDIMIENTOS PARA DOCUMENTS
+            -- PROCEDIMIENTOS PARA documentos
             CREATE PROCEDURE ObtenerDocumentos()
             BEGIN
                 SELECT
@@ -779,8 +785,9 @@ END;
                     d.fecha_subida,
                     d.created_at,
                     d.updated_at
-                FROM documents d
-                LEFT JOIN users u ON d.usuario_id = u.id_usuario
+                FROM documentos d
+                LEFT JOIN users
+                 u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 ORDER BY d.fecha_subida DESC;
             END;
@@ -796,8 +803,9 @@ END;
                     d.fecha_subida,
                     d.created_at,
                     d.updated_at
-                FROM documents d
-                LEFT JOIN users u ON d.usuario_id = u.id_usuario
+                FROM documentos d
+                LEFT JOIN users
+                 u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 WHERE d.id_documento = documentoId;
             END;
@@ -809,7 +817,7 @@ END;
                 IN p_ruta VARCHAR(255)
             )
             BEGIN
-                INSERT INTO documents (
+                INSERT INTO documentos (
                     solicitud_id, usuario_id, tipo, ruta, fecha_subida,
                     created_at, updated_at
                 )
@@ -827,7 +835,7 @@ END;
                 IN p_ruta VARCHAR(255)
             )
             BEGIN
-                UPDATE documents
+                UPDATE documentos
                 SET solicitud_id = p_solicitud_id,
                     usuario_id = p_usuario_id,
                     tipo = p_tipo,
@@ -838,7 +846,7 @@ END;
 
             CREATE PROCEDURE EliminarDocumento(IN documentoId INT)
             BEGIN
-                DELETE FROM documents WHERE id_documento = documentoId;
+                DELETE FROM documentos WHERE id_documento = documentoId;
             END;
 
 
@@ -859,8 +867,8 @@ END;
                     f.nombre,
                     f.created_at,
                     f.updated_at
-                FROM faculties f
-                LEFT JOIN institutions i ON f.institucion_id = i.id_institucion
+                FROM facultades f
+                LEFT JOIN instituciones i ON f.institucion_id = i.id_institucion
                 ORDER BY f.nombre ASC;
             END;
 
@@ -872,8 +880,8 @@ END;
                     f.nombre,
                     f.created_at,
                     f.updated_at
-                FROM faculties f
-                LEFT JOIN institutions i ON f.institucion_id = i.id_institucion
+                FROM facultades f
+                LEFT JOIN instituciones i ON f.institucion_id = i.id_institucion
                 WHERE f.id_facultad = facultadId;
             END;
 
@@ -882,7 +890,7 @@ END;
                 IN p_nombre VARCHAR(255)
             )
             BEGIN
-                INSERT INTO faculties (institucion_id, nombre, created_at, updated_at)
+                INSERT INTO facultades (institucion_id, nombre, created_at, updated_at)
                 VALUES (p_institucion_id, p_nombre, NOW(), NOW());
             END;
 
@@ -892,7 +900,7 @@ END;
                 IN p_nombre VARCHAR(255)
             )
             BEGIN
-                UPDATE faculties
+                UPDATE facultades
                 SET institucion_id = p_institucion_id,
                     nombre = p_nombre,
                     updated_at = NOW()
@@ -901,7 +909,7 @@ END;
 
             CREATE PROCEDURE EliminarFacultad(IN facultadId INT)
             BEGIN
-                DELETE FROM faculties WHERE id_facultad = facultadId;
+                DELETE FROM facultades WHERE id_facultad = facultadId;
             END;
 
 
@@ -1064,7 +1072,8 @@ END;
                 FROM historial_homologaciones hh
                 INNER JOIN solicitudes s ON hh.solicitud_id = s.id_solicitud
                 INNER JOIN programas prog ON s.programa_destino_id = prog.id_programa
-                INNER JOIN users u ON hh.usuario_id = u.id_usuario
+                INNER JOIN users
+                 u ON hh.usuario_id = u.id_usuario
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
@@ -1110,7 +1119,8 @@ END;
                 FROM historial_homologaciones hh
                 INNER JOIN solicitudes s ON hh.solicitud_id = s.id_solicitud
                 INNER JOIN programas prog ON s.programa_destino_id = prog.id_programa
-                INNER JOIN users u ON hh.usuario_id = u.id_usuario
+                INNER JOIN users
+                 u ON hh.usuario_id = u.id_usuario
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
@@ -1185,7 +1195,8 @@ END;
                     sa.updated_at
                 FROM solicitud_asignaturas sa
                 LEFT JOIN solicitudes       s ON sa.solicitud_id        = s.id_solicitud
-                LEFT JOIN users          u ON s.usuario_id           = u.id_usuario
+                LEFT JOIN users
+                          u ON s.usuario_id           = u.id_usuario
                 LEFT JOIN asignaturas       a ON sa.asignatura_id       = a.id_asignatura
                 LEFT JOIN programas         p ON a.programa_id          = p.id_programa
                 LEFT JOIN instituciones     i ON p.institucion_id       = i.id_institucion
@@ -1208,7 +1219,8 @@ END;
                     sa.updated_at
                 FROM solicitud_asignaturas sa
                 LEFT JOIN solicitudes       s ON sa.solicitud_id        = s.id_solicitud
-                LEFT JOIN users          u ON s.usuario_id           = u.id_usuario
+                LEFT JOIN users
+                          u ON s.usuario_id           = u.id_usuario
                 LEFT JOIN asignaturas       a ON sa.asignatura_id       = a.id_asignatura
                 LEFT JOIN programas         p ON a.programa_id          = p.id_programa
                 LEFT JOIN instituciones     i ON p.institucion_id       = i.id_institucion
@@ -1305,7 +1317,8 @@ END;
                 JOIN asignaturas ao ON ha.asignatura_origen_id  = ao.id_asignatura
                 JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
                 JOIN solicitudes      s ON ha.solicitud_id       = s.id_solicitud
-                JOIN users            u ON s.usuario_id         = u.id_usuario
+                JOIN users
+                            u ON s.usuario_id         = u.id_usuario
                 LEFT JOIN solicitud_asignaturas sa
                     ON sa.solicitud_id = ha.solicitud_id
                     AND sa.asignatura_id = ha.asignatura_origen_id
@@ -1359,7 +1372,8 @@ END;
                 JOIN asignaturas ao ON ha.asignatura_origen_id  = ao.id_asignatura
                 JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
                 JOIN solicitudes      s ON ha.solicitud_id       = s.id_solicitud
-                JOIN users            u ON s.usuario_id         = u.id_usuario
+                JOIN users
+                            u ON s.usuario_id         = u.id_usuario
                 LEFT JOIN solicitud_asignaturas sa
                     ON sa.solicitud_id = ha.solicitud_id
                     AND sa.asignatura_id = ha.asignatura_origen_id
@@ -1504,14 +1518,15 @@ END;
             DROP PROCEDURE IF EXISTS ObtenerSolicitudPorId;
             DROP PROCEDURE IF EXISTS ObtenerSolicitudes;
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (USERS)
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (users)
+            )
             DROP PROCEDURE IF EXISTS ObtenerUsuarios;
             DROP PROCEDURE IF EXISTS ObtenerUsuarioPorId;
             DROP PROCEDURE IF EXISTS InsertarUsuario;
             DROP PROCEDURE IF EXISTS ActualizarUsuario;
             DROP PROCEDURE IF EXISTS EliminarUsuario;
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (DOCUMENTS)
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (documentos)
             DROP PROCEDURE IF EXISTS ObtenerDocumentos;
             DROP PROCEDURE IF EXISTS ObtenerDocumentoPorId;
             DROP PROCEDURE IF EXISTS InsertarDocumento;
