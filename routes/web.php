@@ -30,14 +30,3 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-
-
-// SOLO SE USA PARA MOSTRAR O SIMULAR LOS DOS FORMULARIOS
-Route::middleware('auth')->group(function(){
-    // GET para mostrar la vista
-    Route::get('/completar-nombre', fn() => view('completar-nombre'))->name('completar.nombre.form');
-
-    // POST para enviar al controlador
-    Route::post('/completar-nombre/{id}', [UserControllerApi::class, 'actualizarUsuario'])
-         ->name('completar.nombre');
-});
