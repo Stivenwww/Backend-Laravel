@@ -11,15 +11,12 @@ class HomologacionAsignatura extends Model
 
     protected $table = 'homologacion_asignaturas';
 
-
     protected $primaryKey = 'id_homologacion';
 
     protected $fillable = [
         'solicitud_id',
         'asignatura_origen_id',
         'asignatura_destino_id',
-        'nota_origen',
-        'horas_sena',
         'nota_destino',
         'fecha',
         'comentarios',

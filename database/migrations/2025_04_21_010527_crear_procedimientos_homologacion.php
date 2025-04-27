@@ -967,13 +967,14 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ActualizarDocumento;
             DROP PROCEDURE IF EXISTS EliminarDocumento;
 
-            -- PROCEDIMIENTOS PARA documentos
+            -- OBTENER TODOS LOS DOCUMENTOS
             CREATE PROCEDURE ObtenerDocumentos()
             BEGIN
                 SELECT
                     d.id_documento,
                     CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
                     s.id_solicitud,
+                    s.numero_radicado,  -- Incluyendo el número de radicado
                     d.tipo,
                     d.ruta,
                     d.fecha_subida,
@@ -986,12 +987,14 @@ return new class extends Migration {
                 ORDER BY d.fecha_subida DESC;
             END;
 
+            -- OBTENER DOCUMENTO POR ID
             CREATE PROCEDURE ObtenerDocumentoPorId(IN documentoId SMALLINT)
             BEGIN
                 SELECT
                     d.id_documento,
                     CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
                     s.id_solicitud,
+                    s.numero_radicado,  -- Incluyendo el número de radicado
                     d.tipo,
                     d.ruta,
                     d.fecha_subida,
@@ -1004,6 +1007,7 @@ return new class extends Migration {
                 WHERE d.id_documento = documentoId;
             END;
 
+            -- INSERTAR DOCUMENTO
             CREATE PROCEDURE InsertarDocumento(
                 IN p_solicitud_id SMALLINT,
                 IN p_usuario_id SMALLINT,
@@ -1021,6 +1025,7 @@ return new class extends Migration {
                 );
             END;
 
+            -- ACTUALIZAR DOCUMENTO
             CREATE PROCEDURE ActualizarDocumento(
                 IN documentoId SMALLINT,
                 IN p_solicitud_id SMALLINT,
@@ -1038,94 +1043,13 @@ return new class extends Migration {
                 WHERE id_documento = documentoId;
             END;
 
+            -- ELIMINAR DOCUMENTO
             CREATE PROCEDURE EliminarDocumento(IN documentoId SMALLINT)
             BEGIN
                 DELETE FROM documentos WHERE id_documento = documentoId;
             END;
 
 
-
-
-
-
-
-
-
-
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (CONTENIDOS PROGRAMÁTICOS)
-            DROP PROCEDURE IF EXISTS ObtenerContenidosProgramaticos;
-            DROP PROCEDURE IF EXISTS ObtenerContenidoProgramaticoPorId;
-            DROP PROCEDURE IF EXISTS InsertarContenidoProgramatico;
-            DROP PROCEDURE IF EXISTS ActualizarContenidoProgramatico;
-            DROP PROCEDURE IF EXISTS EliminarContenidoProgramatico;
-
-            -- PROCEDIMIENTOS PARA CONTENIDOS PROGRAMÁTICOS
-            CREATE PROCEDURE ObtenerContenidosProgramaticos()
-            BEGIN
-                SELECT
-                    cp.id_contenido,
-                    cp.tema,
-                    cp.resultados_aprendizaje,
-                    cp.descripcion,
-                    a.nombre AS nombre_asignatura,
-                    cp.created_at,
-                    cp.updated_at
-                FROM contenidos_programaticos cp
-                INNER JOIN asignaturas a ON cp.asignatura_id = a.id_asignatura
-                ORDER BY cp.tema ASC;
-            END;
-
-            CREATE PROCEDURE ObtenerContenidoProgramaticoPorId(IN contenidoId INT)
-            BEGIN
-                SELECT
-                    cp.id_contenido,
-                    cp.tema,
-                    cp.resultados_aprendizaje,
-                    cp.descripcion,
-                    a.nombre AS nombre_asignatura,
-                    cp.created_at,
-                    cp.updated_at
-                FROM contenidos_programaticos cp
-                INNER JOIN asignaturas a ON cp.asignatura_id = a.id_asignatura
-                WHERE cp.id_contenido = contenidoId;
-            END;
-
-            CREATE PROCEDURE InsertarContenidoProgramatico(
-                IN p_asignatura_id INT,
-                IN p_tema VARCHAR(255),
-                IN p_resultados_aprendizaje TEXT,
-                IN p_descripcion TEXT
-            )
-            BEGIN
-                INSERT INTO contenidos_programaticos (
-                    asignatura_id, tema, resultados_aprendizaje, descripcion, created_at, updated_at
-                )
-                VALUES (
-                    p_asignatura_id, p_tema, p_resultados_aprendizaje, p_descripcion, NOW(), NOW()
-                );
-            END;
-
-            CREATE PROCEDURE ActualizarContenidoProgramatico(
-                IN contenidoId INT,
-                IN p_asignatura_id INT,
-                IN p_tema VARCHAR(255),
-                IN p_resultados_aprendizaje TEXT,
-                IN p_descripcion TEXT
-            )
-            BEGIN
-                UPDATE contenidos_programaticos
-                SET asignatura_id = p_asignatura_id,
-                    tema = p_tema,
-                    resultados_aprendizaje = p_resultados_aprendizaje,
-                    descripcion = p_descripcion,
-                    updated_at = NOW()
-                WHERE id_contenido = contenidoId;
-            END;
-
-            CREATE PROCEDURE EliminarContenidoProgramatico(IN contenidoId INT)
-            BEGIN
-                DELETE FROM contenidos_programaticos WHERE id_contenido = contenidoId;
-            END;
 
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HISTORIAL HOMOLOGACIONES)
@@ -1176,7 +1100,7 @@ return new class extends Migration {
             END;
 
             -- OBTENER HISTORIAL POR ID
-            CREATE PROCEDURE ObtenerHistorialHomologacionPorId(IN p_id INT)
+            CREATE PROCEDURE ObtenerHistorialHomologacionPorId(IN p_id SMALLINT)
             BEGIN
                 SELECT
                     hh.id_historial,
@@ -1223,10 +1147,10 @@ return new class extends Migration {
                 WHERE hh.id_historial = p_id;
             END;
 
-            -- INSERTAR
+            -- INSERTAR HISTORIAL
             CREATE PROCEDURE InsertarHistorialHomologacion(
-                IN p_solicitud_id INT,
-                IN p_usuario_id INT,
+                IN p_solicitud_id SMALLINT,
+                IN p_usuario_id SMALLINT,
                 IN p_estado VARCHAR(20),
                 IN p_observaciones TEXT,
                 IN p_ruta_pdf_resolucion VARCHAR(255)
@@ -1242,9 +1166,9 @@ return new class extends Migration {
 
             -- ACTUALIZAR
             CREATE PROCEDURE ActualizarHistorialHomologacion(
-                IN historialId INT,
-                IN p_solicitud_id INT,
-                IN p_usuario_id INT,
+                IN historialId SMALLINT,
+                IN p_solicitud_id SMALLINT,
+                IN p_usuario_id SMALLINT,
                 IN p_estado VARCHAR(20),
                 IN p_observaciones TEXT,
                 IN p_ruta_pdf_resolucion VARCHAR(255)
@@ -1261,10 +1185,96 @@ return new class extends Migration {
             END;
 
             -- ELIMINAR
-            CREATE PROCEDURE EliminarHistorialHomologacion(IN historialId INT)
+            CREATE PROCEDURE EliminarHistorialHomologacion(IN historialId SMALLINT)
             BEGIN
                 DELETE FROM historial_homologaciones WHERE id_historial = historialId;
             END;
+
+
+
+
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (CONTENIDOS PROGRAMÁTICOS)
+            DROP PROCEDURE IF EXISTS ObtenerContenidosProgramaticos;
+            DROP PROCEDURE IF EXISTS ObtenerContenidoProgramaticoPorId;
+            DROP PROCEDURE IF EXISTS InsertarContenidoProgramatico;
+            DROP PROCEDURE IF EXISTS ActualizarContenidoProgramatico;
+            DROP PROCEDURE IF EXISTS EliminarContenidoProgramatico;
+
+            -- OBTENER TODOS CONTENIDOS PROGRAMATICOS
+            CREATE PROCEDURE ObtenerContenidosProgramaticos()
+            BEGIN
+                SELECT
+                    cp.id_contenido,
+                    cp.tema,
+                    cp.resultados_aprendizaje,
+                    cp.descripcion,
+                    a.nombre AS nombre_asignatura,
+                    cp.created_at,
+                    cp.updated_at
+                FROM contenidos_programaticos cp
+                INNER JOIN asignaturas a ON cp.asignatura_id = a.id_asignatura
+                ORDER BY cp.tema ASC;
+            END;
+
+            -- OBTENER CONTENIDO PROGRAMATICO POR ID
+            CREATE PROCEDURE ObtenerContenidoProgramaticoPorId(IN contenidoId SMALLINT)
+            BEGIN
+                SELECT
+                    cp.id_contenido,
+                    cp.tema,
+                    cp.resultados_aprendizaje,
+                    cp.descripcion,
+                    a.nombre AS nombre_asignatura,
+                    cp.created_at,
+                    cp.updated_at
+                FROM contenidos_programaticos cp
+                INNER JOIN asignaturas a ON cp.asignatura_id = a.id_asignatura
+                WHERE cp.id_contenido = contenidoId;
+            END;
+
+            -- INSERTAR CONTENIDO PROGRAMATICO
+            CREATE PROCEDURE InsertarContenidoProgramatico(
+                IN p_asignatura_id SMALLINT,
+                IN p_tema VARCHAR(255),
+                IN p_resultados_aprendizaje TEXT,
+                IN p_descripcion TEXT
+            )
+            BEGIN
+                INSERT INTO contenidos_programaticos (
+                    asignatura_id, tema, resultados_aprendizaje, descripcion, created_at, updated_at
+                )
+                VALUES (
+                    p_asignatura_id, p_tema, p_resultados_aprendizaje, p_descripcion, NOW(), NOW()
+                );
+            END;
+
+            -- ACTUALIZAR CONTENIDO PROGRAMATICO
+            CREATE PROCEDURE ActualizarContenidoProgramatico(
+                IN contenidoId SMALLINT,
+                IN p_asignatura_id SMALLINT,
+                IN p_tema VARCHAR(255),
+                IN p_resultados_aprendizaje TEXT,
+                IN p_descripcion TEXT
+            )
+            BEGIN
+                UPDATE contenidos_programaticos
+                SET asignatura_id = p_asignatura_id,
+                    tema = p_tema,
+                    resultados_aprendizaje = p_resultados_aprendizaje,
+                    descripcion = p_descripcion,
+                    updated_at = NOW()
+                WHERE id_contenido = contenidoId;
+            END;
+
+            -- ELIMINAR CONTENIDO PROGRAMATICO
+            CREATE PROCEDURE EliminarContenidoProgramatico(IN contenidoId SMALLINT)
+            BEGIN
+                DELETE FROM contenidos_programaticos WHERE id_contenido = contenidoId;
+            END;
+
+
+
 
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUD ASIGNATURAS)
@@ -1275,26 +1285,26 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS EliminarSolicitudAsignatura;
 
             -- OBTENER TODAS LAS SOLICITUDES DE ASIGNATURAS
-           CREATE PROCEDURE ObtenerSolicitudAsignaturas()
+            CREATE PROCEDURE ObtenerSolicitudAsignaturas()
             BEGIN
                 SELECT
                     sa.id_solicitud_asignatura,
                     s.id_solicitud,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido)       AS estudiante,
-                    i.nombre                                              AS institucion,
-                    a.nombre                                              AS asignatura,
-                    a.codigo_asignatura         AS codigo_asignatura,
+                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
+                    i.nombre AS institucion,
+                    a.nombre AS asignatura,
+                    a.codigo_asignatura AS codigo_asignatura,
+                    a.semestre AS semestre_asignatura,
                     sa.nota_origen,
-                    sa.horas_sena                  AS horas_sena,
+                    sa.horas_sena AS horas_sena,
                     sa.created_at,
                     sa.updated_at
                 FROM solicitud_asignaturas sa
-                LEFT JOIN solicitudes       s ON sa.solicitud_id        = s.id_solicitud
-                LEFT JOIN users
-                          u ON s.usuario_id           = u.id_usuario
-                LEFT JOIN asignaturas       a ON sa.asignatura_id       = a.id_asignatura
-                LEFT JOIN programas         p ON a.programa_id          = p.id_programa
-                LEFT JOIN instituciones     i ON p.institucion_id       = i.id_institucion
+                LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
+                LEFT JOIN users u ON s.usuario_id = u.id_usuario
+                LEFT JOIN asignaturas a ON sa.asignatura_id = a.id_asignatura
+                LEFT JOIN programas p ON a.programa_id = p.id_programa
+                LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
                 ORDER BY sa.id_solicitud_asignatura ASC;
             END;
 
@@ -1304,21 +1314,21 @@ return new class extends Migration {
                 SELECT
                     sa.id_solicitud_asignatura,
                     s.id_solicitud,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido)       AS estudiante,
-                    i.nombre                                              AS institucion,
-                    a.nombre                                              AS asignatura,
-                    a.codigo_asignatura         AS codigo_asignatura,
+                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
+                    i.nombre AS institucion,
+                    a.nombre AS asignatura,
+                    a.codigo_asignatura AS codigo_asignatura,
+                    a.semestre AS semestre_asignatura,
                     sa.nota_origen,
-                    sa.horas_sena                  AS horas_sena,
+                    sa.horas_sena AS horas_sena,
                     sa.created_at,
                     sa.updated_at
                 FROM solicitud_asignaturas sa
-                LEFT JOIN solicitudes       s ON sa.solicitud_id        = s.id_solicitud
-                LEFT JOIN users
-                          u ON s.usuario_id           = u.id_usuario
-                LEFT JOIN asignaturas       a ON sa.asignatura_id       = a.id_asignatura
-                LEFT JOIN programas         p ON a.programa_id          = p.id_programa
-                LEFT JOIN instituciones     i ON p.institucion_id       = i.id_institucion
+                LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
+                LEFT JOIN users u ON s.usuario_id = u.id_usuario
+                LEFT JOIN asignaturas a ON sa.asignatura_id = a.id_asignatura
+                LEFT JOIN programas p ON a.programa_id = p.id_programa
+                LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
                 WHERE sa.id_solicitud_asignatura = solicitudAsignaturaId;
             END;
 
@@ -1363,6 +1373,9 @@ return new class extends Migration {
             END;
 
 
+
+
+
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
             DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
             DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
@@ -1376,16 +1389,21 @@ return new class extends Migration {
                 SELECT
                     ha.id_homologacion,
                     ha.solicitud_id,
+                    s.numero_radicado,  -- Añadido número de radicado
 
                     -- Asignatura origen
                     ao.id_asignatura   AS asignatura_origen_id,
                     ao.nombre          AS asignatura_origen,
-                    i_origen.nombre    AS institucion_origen,   -- Universidad de la asignatura origen
+                    po.nombre          AS programa_origen,  -- Añadido nombre del programa origen
+                    ao.semestre        AS semestre_origen,  -- Añadido semestre origen
+                    i_origen.nombre    AS institucion_origen,
 
                     -- Asignatura destino
                     ad.id_asignatura   AS asignatura_destino_id,
                     ad.nombre          AS asignatura_destino,
-                    i_destino.nombre   AS institucion_destino,  -- Universidad de la asignatura destino
+                    pd.nombre          AS programa_destino,  -- Añadido nombre del programa destino
+                    ad.semestre        AS semestre_destino,  -- Añadido semestre destino
+                    i_destino.nombre   AS institucion_destino,
 
                     -- Nota y horas desde solicitud_asignaturas
                     sa.nota_origen,
@@ -1411,20 +1429,19 @@ return new class extends Migration {
                 FROM homologacion_asignaturas ha
                 JOIN asignaturas ao ON ha.asignatura_origen_id  = ao.id_asignatura
                 JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
-                JOIN solicitudes      s ON ha.solicitud_id       = s.id_solicitud
-                JOIN users
-                            u ON s.usuario_id         = u.id_usuario
+                JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
+                JOIN users u ON s.usuario_id = u.id_usuario
                 LEFT JOIN solicitud_asignaturas sa
                     ON sa.solicitud_id = ha.solicitud_id
                     AND sa.asignatura_id = ha.asignatura_origen_id
 
                 -- Para origen: asignatura → programa → institución
-                LEFT JOIN programas   po ON ao.programa_id       = po.id_programa
+                LEFT JOIN programas po ON ao.programa_id = po.id_programa
                 LEFT JOIN instituciones i_origen
                     ON po.institucion_id = i_origen.id_institucion
 
                 -- Para destino: asignatura → programa → institución
-                LEFT JOIN programas   pd ON ad.programa_id       = pd.id_programa
+                LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
                 LEFT JOIN instituciones i_destino
                     ON pd.institucion_id = i_destino.id_institucion
 
@@ -1437,15 +1454,20 @@ return new class extends Migration {
                 SELECT
                     ha.id_homologacion,
                     ha.solicitud_id,
+                    s.numero_radicado,  -- Añadido número de radicado
 
                     -- Origen
                     ao.id_asignatura   AS asignatura_origen_id,
                     ao.nombre          AS asignatura_origen,
+                    po.nombre          AS programa_origen,  -- Añadido nombre del programa origen
+                    ao.semestre        AS semestre_origen,  -- Añadido semestre origen
                     i_origen.nombre    AS institucion_origen,
 
                     -- Destino
                     ad.id_asignatura   AS asignatura_destino_id,
                     ad.nombre          AS asignatura_destino,
+                    pd.nombre          AS programa_destino,  -- Añadido nombre del programa destino
+                    ad.semestre        AS semestre_destino,  -- Añadido semestre destino
                     i_destino.nombre   AS institucion_destino,
 
                     sa.nota_origen,
@@ -1464,34 +1486,30 @@ return new class extends Migration {
                     ) AS estudiante
 
                 FROM homologacion_asignaturas ha
-                JOIN asignaturas ao ON ha.asignatura_origen_id  = ao.id_asignatura
+                JOIN asignaturas ao ON ha.asignatura_origen_id = ao.id_asignatura
                 JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
-                JOIN solicitudes      s ON ha.solicitud_id       = s.id_solicitud
-                JOIN users
-                            u ON s.usuario_id         = u.id_usuario
+                JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
+                JOIN users u ON s.usuario_id = u.id_usuario
                 LEFT JOIN solicitud_asignaturas sa
                     ON sa.solicitud_id = ha.solicitud_id
                     AND sa.asignatura_id = ha.asignatura_origen_id
 
-                LEFT JOIN programas   po ON ao.programa_id       = po.id_programa
+                LEFT JOIN programas po ON ao.programa_id = po.id_programa
                 LEFT JOIN instituciones i_origen
                     ON po.institucion_id = i_origen.id_institucion
 
-                LEFT JOIN programas   pd ON ad.programa_id       = pd.id_programa
+                LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
                 LEFT JOIN instituciones i_destino
                     ON pd.institucion_id = i_destino.id_institucion
 
                 WHERE ha.id_homologacion = homologacionId;
             END;
 
-
             -- INSERTAR HOMOLOGACIÓN
             CREATE PROCEDURE InsertarHomologacionAsignatura(
                 IN p_solicitud_id INT,
                 IN p_asignatura_origen_id INT,
                 IN p_asignatura_destino_id INT,
-                IN p_nota_origen DECIMAL(3,1),
-                IN p_horas_sena INT,
                 IN p_nota_destino DECIMAL(3,1),
                 IN p_comentarios TEXT
             )
@@ -1500,8 +1518,6 @@ return new class extends Migration {
                     solicitud_id,
                     asignatura_origen_id,
                     asignatura_destino_id,
-                    nota_origen,
-                    horas_sena,
                     nota_destino,
                     comentarios,
                     created_at,
@@ -1510,8 +1526,6 @@ return new class extends Migration {
                     p_solicitud_id,
                     p_asignatura_origen_id,
                     p_asignatura_destino_id,
-                    p_nota_origen,
-                    p_horas_sena,
                     p_nota_destino,
                     p_comentarios,
                     NOW(),
@@ -1525,8 +1539,6 @@ return new class extends Migration {
                 IN p_solicitud_id INT,
                 IN p_asignatura_origen_id INT,
                 IN p_asignatura_destino_id INT,
-                IN p_nota_origen DECIMAL(3,1),
-                IN p_horas_sena DECIMAL(3,1),
                 IN p_nota_destino DECIMAL(3,1),
                 IN p_comentarios TEXT
             )
@@ -1536,8 +1548,6 @@ return new class extends Migration {
                     solicitud_id = p_solicitud_id,
                     asignatura_origen_id = p_asignatura_origen_id,
                     asignatura_destino_id = p_asignatura_destino_id,
-                    nota_origen = p_nota_origen,
-                    horas_sena = p_horas_sena,
                     nota_destino = p_nota_destino,
                     comentarios = p_comentarios,
                     updated_at = NOW()

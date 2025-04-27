@@ -45,9 +45,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(DocumentoSeeder::class);
 
-        $this->call(ContenidoProgramaticoSeeder::class);
-
         $this->call(HistorialHomologacionSeeder::class);
+
+        $this->call(ContenidoProgramaticoSeeder::class);
 
         $this->call(SolicitudAsignaturaSeeder::class);
 

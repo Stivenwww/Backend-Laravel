@@ -52,6 +52,12 @@ class DocumentoControllerApi extends Controller
     {
         try {
             // Llamada al procedimiento almacenado para insertar un nuevo documento
+            $request->validate([
+                'solicitud_id' => 'required|integer',
+                'usuario_id' => 'required|integer',
+                'tipo' => 'required|string',
+                'ruta' => 'required|string|max:255',
+            ]);
             DB::statement('CALL InsertarDocumento(?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $request->usuario_id,
@@ -74,6 +80,12 @@ class DocumentoControllerApi extends Controller
     public function actualizarDocumento(Request $request, $id)
     {
         try {
+            $request->validate([
+                'solicitud_id' => 'sometimes|required|integer',
+                'usuario_id' => 'sometimes|required|integer',
+                'tipo' => 'sometimes|required|string',
+                'ruta' => 'sometimes|required|string|max:255',
+            ]);
             // Llamada al procedimiento almacenado para actualizar un documento
             DB::statement('CALL ActualizarDocumento(?, ?, ?, ?, ?)', [
                 $id,

@@ -56,8 +56,16 @@ class SolicitudAsignaturaControllerApi extends Controller
                 'solicitud_id' => 'required|integer',
                 'asignatura_id' => 'required|integer',
                 'nota_origen' => 'nullable|numeric',
-                'horas' => 'nullable|integer',
+                'horas_sena' => 'nullable|integer',
             ]);
+
+            // ¡Aquí falta la llamada al procedimiento
+        DB::statement('CALL InsertarSolicitudAsignatura(?, ?, ?, ?)', [
+            $request->solicitud_id,
+            $request->asignatura_id,
+            $request->nota_origen,
+            $request->horas_sena,
+        ]);
 
             return response()->json([
                 'mensaje' => 'Solicitud de asignatura insertada correctamente'
