@@ -52,6 +52,12 @@ class PaisControllerApi extends Controller
     {
         try {
             // Llamada al procedimiento almacenado para insertar un nuevo país
+
+            // Hacemos validaciones de entrada.
+            $request->validate([
+                'nombre' => 'required|string|max:100',
+            ]);
+
             DB::statement('CALL InsertarPais(?)', [
                 $request->nombre
             ]);
@@ -71,6 +77,11 @@ class PaisControllerApi extends Controller
     public function actualizarPais(Request $request, $id)
     {
         try {
+             // Hacemos validaciones de entrada.
+             $request->validate([
+                'nombre' => 'required|string|max:100',
+            ]);
+
             // Llamada al procedimiento almacenado para actualizar un país
             DB::statement('CALL ActualizarPais(?, ?)', [
                 $id,

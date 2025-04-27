@@ -31,6 +31,11 @@ class MunicipioControllerApi extends Controller
 
     public function insertarMunicipio(Request $request)
     {
+        $validated = $request->validate([
+            'nombre'           => 'required|string|max:255',
+            'departamento_id'  => 'required|integer|exists:departamentos,id_departamento',
+          ]);
+
         DB::statement('CALL InsertarMunicipio(?, ?)', [
             $request->nombre,
             $request->departamento_id
@@ -41,6 +46,11 @@ class MunicipioControllerApi extends Controller
 
     public function actualizarMunicipio(Request $request, $id)
     {
+        $validated = $request->validate([
+            'nombre'           => 'required|string|max:255',
+            'departamento_id'  => 'required|integer|exists:departamentos,id_departamento',
+          ]);
+
         DB::statement('CALL ActualizarMunicipio(?, ?, ?)', [
             $id,
             $request->nombre,

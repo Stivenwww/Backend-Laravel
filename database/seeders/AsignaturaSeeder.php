@@ -132,8 +132,12 @@ class AsignaturaSeeder extends Seeder
             ],
         ];
 
+        // Lista de IDs de programas del SENA (institución 2)
+        $programasSena = [16, 17, 18, 19, 20, 21, 22, 23];
+
         foreach ($pensum as $programaId => $asigs) {
-            $esSena = $programaId >= 16 && $programaId <= 23;
+            $esSena = in_array($programaId, $programasSena);
+
             foreach ($asigs as $index => $nombre) {
                 // Generar un código único combinando programa_id y un hash corto del nombre
                 $slug = Str::slug($nombre, '_');
@@ -146,33 +150,58 @@ class AsignaturaSeeder extends Seeder
                     $codigo = substr($codigo, 0, $maxLength);
                 }
 
-                Asignatura::updateOrCreate(
-                    ['codigo_asignatura' => $codigo],
-                    [
-                        'programa_id'             => $programaId,
-                        'nombre'                  => $nombre,
-                        'tipo'                    => $esSena ? 'Competencia' : 'Materia',
-                        // Los demás campos quedan igual
-                        'creditos'                => $esSena ? null : 3,
-                        'horas_sena'              => $esSena ? 160 : null,
-                        'semestre'                => $esSena
-                            ? ($index < 4 ? 1 : 2)
-                            : floor($index / 5) + 1,
-                        'tiempo_presencial'       => $esSena ? 4 : 2,
-                        'tiempo_independiente'    => $esSena ? 4 : 4,
-                        'horas_totales_semanales' => $esSena ? 8 : 6,
-                        'modalidad'               => $esSena ? 'Práctico' : 'Teórico-Práctico',
-                        'metodologia'             => 'Presencial',
-                        'created_at'              => now(),
-                        'updated_at'              => now(),
-                    ]
-                );
+                // Configuración para programas del SENA vs no-SENA
+                if ($esSena) {
+                    // Para programas del SENA
+                    Asignatura::updateOrCreate(
+                        ['codigo_asignatura' => $codigo],
+                        [
+                            'programa_id'             => $programaId,
+                            'nombre'                  => $nombre,
+                            'tipo'                    => 'Competencia',
+                            'creditos'                => null,
+                            'horas_sena'              => $this->calcularHorasSena($nombre),
+                            'semestre'                => null, // No se asigna semestre al SENA
+                            'tiempo_presencial'       => null,
+                            'tiempo_independiente'    => null,
+                            'horas_totales_semanales' => null,
+                            'modalidad'               => 'Práctico',
+                            'metodologia'             => 'Presencial',
+                            'created_at'              => now(),
+                            'updated_at'              => now(),
+                        ]
+                    );
+                } else {
+                    // Para programas que no son del SENA
+                    $creditos = $this->calcularCreditos($nombre);
+                    $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
+                    $tiempoIndependiente = $creditos * 2;
+                    $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
+
+                    Asignatura::updateOrCreate(
+                        ['codigo_asignatura' => $codigo],
+                        [
+                            'programa_id'             => $programaId,
+                            'nombre'                  => $nombre,
+                            'tipo'                    => 'Materia',
+                            'creditos'                => $creditos,
+                            'horas_sena'              => null,
+                            'semestre'                => floor($index / 3) + 1,
+                            'tiempo_presencial'       => $tiempoPresencial,
+                            'tiempo_independiente'    => $tiempoIndependiente,
+                            'horas_totales_semanales' => $horasTotalesSemanales,
+                            'modalidad'               => $this->determinarModalidad($nombre),
+                            'metodologia'             => 'Presencial',
+                            'created_at'              => now(),
+                            'updated_at'              => now(),
+                        ]
+                    );
+                }
             }
         }
 
         // AUTÓNOMA DEL CAUCA - Ingeniería de Software
         $programaId = 12; // ID del programa de Ingeniería de Software en la Autónoma
-
         $codigoBase = 'IS'; // Prefijo base para Ingeniería de Software
 
         $pensum = [
@@ -197,19 +226,25 @@ class AsignaturaSeeder extends Seeder
                     $codigo = substr($codigo, 0, $maxLength);
                 }
 
+                // Calcular créditos y tiempos más realistas
+                $creditos = $this->calcularCreditos($nombre);
+                $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
+                $tiempoIndependiente = $creditos * 2;
+                $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
+
                 Asignatura::updateOrCreate(
                     ['codigo_asignatura' => $codigo],
                     [
                         'programa_id' => $programaId,
                         'nombre' => $nombre,
                         'tipo' => 'Materia',
-                        'creditos' => 3,
+                        'creditos' => $creditos,
                         'semestre' => $semestre,
                         'horas_sena' => null,
-                        'tiempo_presencial' => 2,
-                        'tiempo_independiente' => 4,
-                        'horas_totales_semanales' => 6,
-                        'modalidad' => 'Teórico-Práctico',
+                        'tiempo_presencial' => $tiempoPresencial,
+                        'tiempo_independiente' => $tiempoIndependiente,
+                        'horas_totales_semanales' => $horasTotalesSemanales,
+                        'modalidad' => $this->determinarModalidad($nombre),
                         'metodologia' => 'Presencial',
                         'created_at' => now(),
                         'updated_at' => now(),
@@ -217,5 +252,130 @@ class AsignaturaSeeder extends Seeder
                 );
             }
         }
+    }
+
+    /**
+     * Calcula el número de créditos basado en el nombre de la asignatura
+     */
+    private function calcularCreditos($nombre)
+    {
+        // Materias con mayor intensidad académica
+        $materiasAvanzadas = [
+            'Proyecto', 'Trabajo de Grado', 'Práctica', 'Tesis', 'Laboratorio',
+            'Diseño', 'Arquitectura', 'Inteligencia Artificial', 'Bases de Datos',
+            'Desarrollo Web', 'Computación en la Nube', 'Desarrollo de Aplicaciones'
+        ];
+
+        // Materias básicas o introductorias
+        $materiasBasicas = [
+            'Fundamentos', 'Introducción', 'Comunicación', 'Oral', 'Escrita',
+            'Ética', 'Emprendimiento'
+        ];
+
+        // Verificar si el nombre contiene palabras clave
+        foreach ($materiasAvanzadas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return rand(4, 5); // Materias avanzadas: 4-5 créditos
+            }
+        }
+
+        foreach ($materiasBasicas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return rand(2, 3); // Materias básicas: 2-3 créditos
+            }
+        }
+
+        return rand(3, 4); // Materias regulares: 3-4 créditos
+    }
+
+    /**
+     * Calcula el tiempo presencial basado en los créditos y el nombre de la asignatura
+     */
+    private function calcularTiempoPresencial($creditos, $nombre)
+    {
+        // Palabras clave para materias con mayor componente práctico
+        $componentePractico = [
+            'Laboratorio', 'Práctica', 'Proyecto', 'Taller', 'Desarrollo',
+            'Implementación', 'Diseño', 'Programación', 'DevOps', 'Front-end'
+        ];
+
+        // Verificar si la materia tiene componente práctico
+        foreach ($componentePractico as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                // Para materias prácticas: más tiempo presencial
+                return ceil($creditos * 0.75);
+            }
+        }
+
+        // Para materias más teóricas
+        return ceil($creditos * 0.5);
+    }
+
+    /**
+     * Determina la modalidad basado en el nombre de la asignatura
+     */
+    private function determinarModalidad($nombre)
+    {
+        // Palabras clave para materias principalmente teóricas
+        $materiasTeoricas = [
+            'Matemáticas', 'Física', 'Historia', 'Teoría', 'Lógica',
+            'Ética', 'Normatividad', 'Probabilidad', 'Estadística'
+        ];
+
+        // Palabras clave para materias principalmente prácticas
+        $materiasPracticas = [
+            'Laboratorio', 'Taller', 'Práctica', 'Desarrollo', 'Implementación',
+            'Pruebas', 'Programación', 'Diseño', 'DevOps', 'Front-end'
+        ];
+
+        // Verificar si la materia es principalmente teórica
+        foreach ($materiasTeoricas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return 'Teórico';
+            }
+        }
+
+        // Verificar si la materia es principalmente práctica
+        foreach ($materiasPracticas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return 'Práctico';
+            }
+        }
+
+        // Por defecto, se considera teórico-práctico
+        return 'Teórico-Práctico';
+    }
+
+    /**
+     * Calcula las horas SENA basado en el nombre de la competencia
+     */
+    private function calcularHorasSena($nombre)
+    {
+        // Competencias más complejas generalmente tienen más horas
+        $competenciasComplejas = [
+            'Desarrollar', 'Implementar', 'Gestionar', 'Diseñar', 'Administrar',
+            'Liderar', 'Desplegar', 'Virtualización', 'Optimizar'
+        ];
+
+        // Competencias básicas o más simples
+        $competenciasBasicas = [
+            'Instalar', 'Configurar', 'Documentar', 'Monitorear', 'Reportar',
+            'Mantener', 'Asistir'
+        ];
+
+        // Verificar complejidad de la competencia
+        foreach ($competenciasComplejas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return rand(160, 240); // Competencias complejas: 160-240 horas
+            }
+        }
+
+        foreach ($competenciasBasicas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return rand(80, 140); // Competencias básicas: 80-140 horas
+            }
+        }
+
+        return rand(120, 200); // Competencias estándar: 120-200 horas
     }
 }

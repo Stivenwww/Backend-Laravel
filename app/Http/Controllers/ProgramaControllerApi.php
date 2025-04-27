@@ -51,6 +51,14 @@ class ProgramaControllerApi extends Controller
     public function insertarPrograma(Request $request)
     {
         try {
+            $request->validate([
+                'institucion_id'  => 'required|integer|exists:instituciones,id_institucion',
+                'facultad_id'     => 'nullable|integer|exists:facultades,id_facultad',
+                'nombre'          => 'required|string|max:255',
+                'codigo_snies'    => 'nullable|string|max:20',
+                'tipo_formacion'  => 'required|in:Técnico,Tecnólogo,Profesional',
+                'metodologia'     => 'required|in:Presencial,Virtual,Híbrido',
+            ]);
             // Llamada al procedimiento almacenado para insertar un nuevo programa
             DB::statement('CALL InsertarPrograma(?, ?, ?, ?, ?, ?)', [
                 $request->institucion_id,
@@ -76,6 +84,14 @@ class ProgramaControllerApi extends Controller
     public function actualizarPrograma(Request $request, $id)
     {
         try {
+            $request->validate([
+                'institucion_id'  => 'required|integer|exists:instituciones,id_institucion',
+                'facultad_id'     => 'nullable|integer|exists:facultades,id_facultad',
+                'nombre'          => 'required|string|max:255',
+                'codigo_snies'    => 'nullable|string|max:20',
+                'tipo_formacion'  => 'required|in:Técnico,Tecnólogo,Profesional',
+                'metodologia'     => 'required|in:Presencial,Virtual,Híbrido',
+            ]);
             // Llamada al procedimiento almacenado para actualizar un programa
             DB::statement('CALL ActualizarPrograma(?, ?, ?, ?, ?, ?, ?)', [
                 $id,

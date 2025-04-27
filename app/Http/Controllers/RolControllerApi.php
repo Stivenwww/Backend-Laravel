@@ -12,7 +12,7 @@ class RolControllerApi extends Controller
     {
         try {
             // Consulta para obtener todos los roles
-            $roles = DB::select('SELECT * FROM roles ORDER BY id_rol ASC');
+            $roles = DB::select('CALL ObtenerRoles()');
             return response()->json($roles);
         } catch (\Exception $e) {
             return response()->json([
@@ -27,7 +27,7 @@ class RolControllerApi extends Controller
     {
         try {
             // Consulta para obtener un rol por ID
-            $rol = DB::select('SELECT * FROM roles WHERE id_rol = ?', [$id]);
+            $rol = DB::select('CALL ObtenerRolPorId(?)', [$id]);
 
             if (!empty($rol)) {
                 return response()->json([
@@ -51,8 +51,11 @@ class RolControllerApi extends Controller
     public function insertarRol(Request $request)
     {
         try {
+            $request->validate([
+                'nombre' => 'required|string|max:50',
+              ]);
             // Consulta para insertar un nuevo rol
-            DB::insert('INSERT INTO roles (nombre) VALUES (?)', [
+            DB::insert('CALL InsertarRol(?)', [
                 $request->nombre
             ]);
 
@@ -71,10 +74,13 @@ class RolControllerApi extends Controller
     public function actualizarRol(Request $request, $id)
     {
         try {
+            $request->validate([
+                'nombre' => 'required|string|max:50',
+              ]);
             // Consulta para actualizar un rol
-            DB::update('UPDATE roles SET nombre = ? WHERE id_rol = ?', [
+            DB::update('CALL ActualizarRol(?, ?)', [
+                $id,
                 $request->nombre,
-                $id
             ]);
 
             return response()->json([
@@ -93,7 +99,7 @@ class RolControllerApi extends Controller
     {
         try {
             // Consulta para eliminar un rol
-            DB::delete('DELETE FROM roles WHERE id_rol = ?', [$id]);
+            DB::delete('CALL EliminarRol(?)', [$id]);
 
             return response()->json([
                 'mensaje' => 'Rol eliminado correctamente'

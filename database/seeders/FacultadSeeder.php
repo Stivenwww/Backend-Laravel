@@ -23,11 +23,15 @@ class FacultadSeeder extends Seeder
             'nombre' => 'Facultad de Ingeniería Electrónica y Telecomunicaciones',
         ]);
 
+
+
         /* Facultades de la FUP */
         Facultad::create([
             'institucion_id' => 4,
             'nombre' => 'Facultad de Ingeniería y Arquitectura',
         ]);
+
+
 
         /* Colegio mayor */
 
@@ -36,6 +40,8 @@ class FacultadSeeder extends Seeder
             'nombre' => 'Facultad de Ingeniería',
         ]);
 
+
+        
         /* Uniautonoma */
 
         Facultad::create([

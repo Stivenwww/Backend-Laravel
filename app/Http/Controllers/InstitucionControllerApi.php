@@ -51,10 +51,18 @@ class InstitucionControllerApi extends Controller
     public function insertarInstitucion(Request $request)
     {
         try {
+
+            $request->validate([
+                'nombre'       => 'required|string|max:255',
+                'codigo_ies'   => 'nullable|string|max:20|unique:instituciones,codigo_ies',
+                'municipio_id' => 'nullable|exists:municipios,id_municipio',
+                'tipo'         => 'required|in:Universitaria,SENA,Mixta',
+            ]);
+
             // Llamada al procedimiento almacenado para insertar una nueva institución
             DB::statement('CALL InsertarInstitucion(?, ?, ?, ?)', [
                 $request->nombre,
-                $request->codigo_nies,
+                $request->codigo_ies,
                 $request->municipio_id,
                 $request->tipo,
             ]);
@@ -74,6 +82,13 @@ class InstitucionControllerApi extends Controller
     public function actualizarInstitucion(Request $request, $id)
     {
         try {
+
+            $request->validate([
+                'nombre'       => 'required|string|max:255',
+                'codigo_ies'   => 'nullable|string|max:20|',
+                'municipio_id' => 'nullable|exists:municipios,id_municipio',
+                'tipo'         => 'required|in:Universitaria,SENA,Mixta',
+            ]);
             // Llamada al procedimiento almacenado para actualizar una institución
             DB::statement('CALL ActualizarInstitucion(?, ?, ?, ?, ?)', [
                 $id,

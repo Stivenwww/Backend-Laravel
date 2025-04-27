@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Solicitud;
 
 class SolicitudControllerApi extends Controller
 {
@@ -51,20 +52,20 @@ class SolicitudControllerApi extends Controller
     public function insertarSolicitud(Request $request)
     {
         try {
-            // Llamada al procedimiento almacenado para insertar una nueva solicitud
-            DB::statement('CALL InsertarSolicitud(?, ?, ?, ?, ?, ?, ?, ?)', [
-                $request->usuario_id,
-                $request->programa_destino_id,
-                $request->finalizo_estudios,
-                $request->fecha_finalizacion_estudios,
-                $request->fecha_ultimo_semestre_cursado,
-                $request->estado,
-                $request->numero_radicado,
-                $request->ruta_pdf_resolucion
-            ]);
+            // Utilizamos el modelo para aprovechar la generación automática del número de radicado
+            $solicitud = new Solicitud();
+            $solicitud->usuario_id = $request->usuario_id;
+            $solicitud->programa_destino_id = $request->programa_destino_id;
+            $solicitud->finalizo_estudios = $request->finalizo_estudios;
+            $solicitud->fecha_finalizacion_estudios = $request->fecha_finalizacion_estudios;
+            $solicitud->fecha_ultimo_semestre_cursado = $request->fecha_ultimo_semestre_cursado;
+            $solicitud->estado = $request->estado ?? 'Radicado'; // Valor predeterminado si no se proporciona
+            $solicitud->ruta_pdf_resolucion = $request->ruta_pdf_resolucion;
+            $solicitud->save();
 
             return response()->json([
-                'mensaje' => 'Solicitud insertada correctamente'
+                'mensaje' => 'Solicitud insertada correctamente',
+                'numero_radicado' => $solicitud->numero_radicado
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -78,18 +79,24 @@ class SolicitudControllerApi extends Controller
     public function actualizarSolicitud(Request $request, $id)
     {
         try {
-            // Llamada al procedimiento almacenado para actualizar una solicitud
-            DB::statement('CALL ActualizarSolicitud(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-                $id,
-                $request->usuario_id,
-                $request->programa_destino_id,
-                $request->finalizo_estudios,
-                $request->fecha_finalizacion_estudios,
-                $request->fecha_ultimo_semestre_cursado,
-                $request->estado,
-                $request->numero_radicado,
-                $request->ruta_pdf_resolucion
-            ]);
+            // Primero obtenemos la solicitud existente
+            $solicitud = Solicitud::find($id);
+
+            if (!$solicitud) {
+                return response()->json([
+                    'mensaje' => 'Solicitud no encontrada'
+                ], 404);
+            }
+
+            // Actualizamos los campos
+            $solicitud->usuario_id = $request->usuario_id;
+            $solicitud->programa_destino_id = $request->programa_destino_id;
+            $solicitud->finalizo_estudios = $request->finalizo_estudios;
+            $solicitud->fecha_finalizacion_estudios = $request->fecha_finalizacion_estudios;
+            $solicitud->fecha_ultimo_semestre_cursado = $request->fecha_ultimo_semestre_cursado;
+            $solicitud->estado = $request->estado;
+            $solicitud->ruta_pdf_resolucion = $request->ruta_pdf_resolucion;
+            $solicitud->save();
 
             return response()->json([
                 'mensaje' => 'Solicitud actualizada correctamente'
@@ -106,13 +113,33 @@ class SolicitudControllerApi extends Controller
     public function eliminarSolicitud($id)
     {
         try {
-            // Llamada al procedimiento almacenado para eliminar una solicitud
-            DB::statement('CALL EliminarSolicitud(?)', [$id]);
+            // Usamos una transacción para asegurar que todo se ejecute o nada
+            DB::beginTransaction();
+
+            // Primero verificamos si la solicitud existe
+            $solicitud = Solicitud::find($id);
+
+            if (!$solicitud) {
+                return response()->json([
+                    'mensaje' => 'Solicitud no encontrada'
+                ], 404);
+            }
+
+            // Eliminamos primero los registros del historial
+            DB::table('historial_homologaciones')
+                ->where('solicitud_id', $id)
+                ->delete();
+
+            // Ahora eliminamos la solicitud
+            $solicitud->delete();
+
+            DB::commit();
 
             return response()->json([
                 'mensaje' => 'Solicitud eliminada correctamente'
             ], 200);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'mensaje' => 'Error al eliminar la solicitud',
                 'error' => $e->getMessage()

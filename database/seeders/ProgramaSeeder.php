@@ -59,6 +59,8 @@ class ProgramaSeeder extends Seeder
             'metodologia' => 'Presencial',
         ]);
 
+
+
         // Fundación Universitaria de Popayán (FUP)
         Programa::create([
             'institucion_id' => 4,
@@ -87,6 +89,8 @@ class ProgramaSeeder extends Seeder
             'metodologia' => 'Presencial',
         ]);
 
+
+
         // Institución Universitaria Colegio Mayor del Cauca (Unimayor)
         Programa::create([
             'institucion_id' => 3,
@@ -114,6 +118,8 @@ class ProgramaSeeder extends Seeder
             'tipo_formacion' => 'Tecnólogo',
             'metodologia' => 'Presencial',
         ]);
+
+
 
         // Corporación Universitaria Autónoma del Cauca (Uniautónoma)
         Programa::create([
@@ -152,6 +158,8 @@ class ProgramaSeeder extends Seeder
             'metodologia' => 'Presencial',
         ]);
 
+
+        
         // SENA Regional Cauca
         Programa::create([
             'institucion_id' => 2,

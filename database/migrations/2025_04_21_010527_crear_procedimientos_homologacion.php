@@ -17,35 +17,41 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerPaisPorId;
             DROP PROCEDURE IF EXISTS ObtenerPaises;
 
-            -- PROCEDIMIENTOS PARA PAISES
-            CREATE PROCEDURE ActualizarPais(IN paisId INT, IN nombrePais VARCHAR(100))
+            -- ACTUALIZAR PAIS
+            CREATE PROCEDURE ActualizarPais(IN paisId SMALLINT, IN nombrePais VARCHAR(100))
             BEGIN
                 UPDATE paises SET nombre = nombrePais WHERE id_pais = paisId;
             END;
 
-            CREATE PROCEDURE EliminarPais(IN paisId INT)
+            -- ELIMINAR PAIS
+            CREATE PROCEDURE EliminarPais(IN paisId SMALLINT)
             BEGIN
                 DELETE FROM paises WHERE id_pais = paisId;
             END;
 
+            -- INSERTAR PAIS
             CREATE PROCEDURE InsertarPais(IN nombrePais VARCHAR(100))
             BEGIN
                 INSERT INTO paises (nombre) VALUES (nombrePais);
             END;
 
-            CREATE PROCEDURE ObtenerPaisPorId(IN paisId INT)
+            -- OBTENER PAIS POR ID
+            CREATE PROCEDURE ObtenerPaisPorId(IN paisId SMALLINT)
             BEGIN
                 SELECT p.id_pais, p.nombre AS pais
                 FROM paises p
                 WHERE p.id_pais = paisId;
             END;
 
+            -- OBTENER TODOS LOS PAISES
             CREATE PROCEDURE ObtenerPaises()
             BEGIN
                 SELECT p.id_pais, p.nombre AS pais
                 FROM paises p
                 ORDER BY p.nombre ASC;
             END;
+
+
 
 
 
@@ -56,33 +62,37 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerDepartamentoPorId;
             DROP PROCEDURE IF EXISTS ObtenerDepartamentos;
 
-            -- PROCEDIMIENTOS PARA DEPARTAMENTOS
+            -- ACTUALIZAR DEPARTAMENTO
             CREATE PROCEDURE ActualizarDepartamento(
-                IN departamentoId INT,
+                IN departamentoId SMALLINT,
                 IN nombreDepartamento VARCHAR(255),
-                IN paisId INT
+                IN paisId SMALLINT
             )
             BEGIN
                 UPDATE departamentos
-                SET nombre = nombreDepartamento, pais_id = paisId
+                SET nombre = nombreDepartamento,
+                    pais_id = paisId
                 WHERE id_departamento = departamentoId;
             END;
 
-            CREATE PROCEDURE EliminarDepartamento(IN departamentoId INT)
+            -- ELIMINAR DEPARTAMENTO
+            CREATE PROCEDURE EliminarDepartamento(IN departamentoId SMALLINT)
             BEGIN
                 DELETE FROM departamentos WHERE id_departamento = departamentoId;
             END;
 
+            -- INSERTAR DEPARTAMENTO
             CREATE PROCEDURE InsertarDepartamento(
                 IN nombreDepartamento VARCHAR(255),
-                IN paisId INT
+                IN paisId SMALLINT
             )
             BEGIN
                 INSERT INTO departamentos (nombre, pais_id)
                 VALUES (nombreDepartamento, paisId);
             END;
 
-            CREATE PROCEDURE ObtenerDepartamentoPorId(IN departamentoId INT)
+            -- OBTENER DEPARTAMENTO POR ID
+            CREATE PROCEDURE ObtenerDepartamentoPorId(IN departamentoId SMALLINT)
             BEGIN
                 SELECT d.id_departamento, d.nombre AS departamento, p.nombre AS pais
                 FROM departamentos d
@@ -90,6 +100,7 @@ return new class extends Migration {
                 WHERE d.id_departamento = departamentoId;
             END;
 
+            -- OBTENER TODOS LOS DEPARTAMENTOS
             CREATE PROCEDURE ObtenerDepartamentos()
             BEGIN
                 SELECT d.id_departamento, d.nombre AS departamento, p.nombre AS pais
@@ -100,6 +111,8 @@ return new class extends Migration {
 
 
 
+
+
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (MUNICIPIOS)
             DROP PROCEDURE IF EXISTS ActualizarMunicipio;
             DROP PROCEDURE IF EXISTS EliminarMunicipio;
@@ -107,11 +120,11 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerMunicipioPorId;
             DROP PROCEDURE IF EXISTS ObtenerMunicipios;
 
-            -- PROCEDIMIENTOS PARA MUNICIPIOS
+            -- ACTUALIZAR MUNICIPIO
             CREATE PROCEDURE ActualizarMunicipio(
-                IN municipioId INT,
+                IN municipioId SMALLINT,
                 IN nombreMunicipio VARCHAR(255),
-                IN departamentoId INT
+                IN departamentoId SMALLINT
             )
             BEGIN
                 UPDATE municipios
@@ -119,21 +132,23 @@ return new class extends Migration {
                 WHERE id_municipio = municipioId;
             END;
 
-            CREATE PROCEDURE EliminarMunicipio(IN municipioId INT)
+            -- ELIMINAR MUNICIPIO
+            CREATE PROCEDURE EliminarMunicipio(IN municipioId SMALLINT)
             BEGIN
                 DELETE FROM municipios WHERE id_municipio = municipioId;
             END;
 
             CREATE PROCEDURE InsertarMunicipio(
                 IN nombreMunicipio VARCHAR(255),
-                IN departamentoId INT
+                IN departamentoId SMALLINT
             )
             BEGIN
                 INSERT INTO municipios (nombre, departamento_id)
                 VALUES (nombreMunicipio, departamentoId);
             END;
 
-            CREATE PROCEDURE ObtenerMunicipioPorId(IN municipioId INT)
+            -- OBTENER MUNICIPIO POR ID
+            CREATE PROCEDURE ObtenerMunicipioPorId(IN municipioId SMALLINT)
             BEGIN
                 SELECT m.id_municipio, m.nombre AS municipio, d.nombre AS departamento, p.nombre AS pais
                 FROM municipios m
@@ -142,6 +157,7 @@ return new class extends Migration {
                 WHERE m.id_municipio = municipioId;
             END;
 
+            -- OBTENER TODOS LOS MUNICIPIOS
             CREATE PROCEDURE ObtenerMunicipios()
             BEGIN
                 SELECT m.id_municipio, m.nombre AS municipio, d.nombre AS departamento, p.nombre AS pais
@@ -152,6 +168,9 @@ return new class extends Migration {
             END;
 
 
+
+
+
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (INSTITUCIONES)
             DROP PROCEDURE IF EXISTS ActualizarInstitucion;
             DROP PROCEDURE IF EXISTS EliminarInstitucion;
@@ -159,12 +178,12 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerInstitucionPorId;
             DROP PROCEDURE IF EXISTS ObtenerInstituciones;
 
-            -- PROCEDIMIENTOS PARA INSTITUCIONES
+            -- ACTUALIZAR INSTITUCION
             CREATE PROCEDURE ActualizarInstitucion(
-                IN institucionId INT,
+                IN institucionId SMALLINT,
                 IN p_nombre VARCHAR(255),
                 IN p_codigo_ies VARCHAR(50),
-                IN p_municipio_id INT,
+                IN p_municipio_id SMALLINT,
                 IN p_tipo VARCHAR(50)
             )
             BEGIN
@@ -176,7 +195,8 @@ return new class extends Migration {
                 WHERE id_institucion = institucionId;
             END;
 
-            CREATE PROCEDURE EliminarInstitucion(IN institucionId INT)
+            -- ELIMINAR INSTITUCION
+            CREATE PROCEDURE EliminarInstitucion(IN institucionId SMALLINT)
             BEGIN
                 DELETE FROM instituciones WHERE id_institucion = institucionId;
             END;
@@ -184,7 +204,7 @@ return new class extends Migration {
             CREATE PROCEDURE InsertarInstitucion(
                 IN nombreInstitucion VARCHAR(255),
                 IN codigoIes VARCHAR(20),
-                IN municipioId INT,
+                IN municipioId SMALLINT,
                 IN tipoInstitucion VARCHAR(100)
             )
             BEGIN
@@ -192,7 +212,8 @@ return new class extends Migration {
                 VALUES (nombreInstitucion, codigoIes, municipioId, tipoInstitucion);
             END;
 
-            CREATE PROCEDURE ObtenerInstitucionPorId(IN institucionId INT)
+            -- OBTENER INSTITUCION POR ID
+            CREATE PROCEDURE ObtenerInstitucionPorId(IN institucionId SMALLINT)
             BEGIN
                 SELECT i.id_institucion,
                        i.nombre,
@@ -206,6 +227,7 @@ return new class extends Migration {
                 WHERE i.id_institucion = institucionId;
             END;
 
+            -- OBTENER TODAS LAS INSTITUCIONES
             CREATE PROCEDURE ObtenerInstituciones()
             BEGIN
                 SELECT i.id_institucion,
@@ -222,100 +244,405 @@ return new class extends Migration {
 
 
 
-                        -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (PROGRAMAS)
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (FACULTADES)
+            DROP PROCEDURE IF EXISTS ObtenerFacultades;
+            DROP PROCEDURE IF EXISTS ObtenerFacultadPorId;
+            DROP PROCEDURE IF EXISTS InsertarFacultad;
+            DROP PROCEDURE IF EXISTS ActualizarFacultad;
+            DROP PROCEDURE IF EXISTS EliminarFacultad;
+
+            -- OBTENER TODAS LAS FACULTADES
+            CREATE PROCEDURE ObtenerFacultades()
+            BEGIN
+                SELECT
+                    f.id_facultad,
+                    i.nombre AS institucion,
+                    f.nombre
+                FROM facultades f
+                LEFT JOIN instituciones i ON f.institucion_id = i.id_institucion
+                ORDER BY f.nombre ASC;
+            END;
+
+            -- OBTENER FACULTADES POR ID
+            CREATE PROCEDURE ObtenerFacultadPorId(IN facultadId SMALLINT)
+            BEGIN
+                SELECT
+                    f.id_facultad,
+                    i.nombre AS institucion,
+                    f.nombre
+                FROM facultades f
+                LEFT JOIN instituciones i ON f.institucion_id = i.id_institucion
+                WHERE f.id_facultad = facultadId;
+            END;
+
+            -- INSERTAR FACULTAD
+            CREATE PROCEDURE InsertarFacultad(
+                IN p_institucion_id SMALLINT,
+                IN p_nombre VARCHAR(255)
+            )
+            BEGIN
+                INSERT INTO facultades (institucion_id, nombre)
+                VALUES (p_institucion_id, p_nombre);
+            END;
+
+            -- ACTUALIZAR FACULTAD
+            CREATE PROCEDURE ActualizarFacultad(
+                IN facultadId SMALLINT,
+                IN p_institucion_id SMALLINT,
+                IN p_nombre VARCHAR(255)
+            )
+            BEGIN
+                UPDATE facultades
+                SET institucion_id = p_institucion_id,
+                    nombre = p_nombre
+                WHERE id_facultad = facultadId;
+            END;
+
+            -- ELIMINAR FACULTAD
+            CREATE PROCEDURE EliminarFacultad(IN facultadId SMALLINT)
+            BEGIN
+                DELETE FROM facultades WHERE id_facultad = facultadId;
+            END;
+
+
+
+
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN
             DROP PROCEDURE IF EXISTS ActualizarPrograma;
             DROP PROCEDURE IF EXISTS EliminarPrograma;
             DROP PROCEDURE IF EXISTS InsertarPrograma;
             DROP PROCEDURE IF EXISTS ObtenerProgramaPorId;
             DROP PROCEDURE IF EXISTS ObtenerProgramas;
 
-            -- PROCEDIMIENTOS PARA PROGRAMAS
+            -- ACTUALIZAR PROGRAMA
             CREATE PROCEDURE ActualizarPrograma(
-                IN programaId INT,
-                IN p_institucion_id INT,
-                IN p_facultad_id INT,
-                IN p_nombre VARCHAR(255),
-                IN p_codigo_snies VARCHAR(20),
-                IN p_tipo_formacion ENUM('Técnico', 'Tecnólogo', 'Profesional'),
-                IN p_metodologia ENUM('Presencial','Virtual','Híbrido')
+                IN programaId        SMALLINT,
+                IN p_institucion_id  SMALLINT,
+                IN p_facultad_id     SMALLINT,
+                IN p_nombre          VARCHAR(255),
+                IN p_codigo_snies    VARCHAR(20),
+                IN p_tipo_formacion  ENUM('Técnico','Tecnólogo','Profesional'),
+                IN p_metodologia     ENUM('Presencial','Virtual','Híbrido')
             )
             BEGIN
                 UPDATE programas
-                SET institucion_id = p_institucion_id,
-                    facultad_id = p_facultad_id,
-                    nombre = p_nombre,
-                    codigo_snies = p_codigo_snies,
-                    tipo_formacion = p_tipo_formacion,
-                    metodologia = p_metodologia
+                SET institucion_id   = p_institucion_id,
+                    facultad_id      = p_facultad_id,
+                    nombre           = p_nombre,
+                    codigo_snies     = p_codigo_snies,
+                    tipo_formacion   = p_tipo_formacion,
+                    metodologia      = p_metodologia
                 WHERE id_programa = programaId;
             END;
 
-            CREATE PROCEDURE EliminarPrograma(IN programaId INT)
-            BEGIN
-                DELETE FROM programas WHERE id_programa = programaId;
-            END;
-
-            CREATE PROCEDURE InsertarPrograma(
-                IN p_institucion_id INT,
-                IN p_facultad_id INT,
-                IN p_nombre VARCHAR(255),
-                IN p_codigo_snies VARCHAR(20),
-                IN p_tipo_formacion ENUM('Técnico', 'Tecnólogo', 'Profesional'),
-                IN p_metodologia ENUM('Presencial','Virtual','Híbrido')
+            -- ELIMINAR PROGRAMA
+            CREATE PROCEDURE EliminarPrograma(
+                IN programaId SMALLINT
             )
             BEGIN
-                INSERT INTO programas (institucion_id, facultad_id, nombre, codigo_snies, tipo_formacion, metodologia)
-                VALUES (p_institucion_id, p_facultad_id, p_nombre, p_codigo_snies, p_tipo_formacion, p_metodologia);
+                DELETE FROM programas
+                WHERE id_programa = programaId;
             END;
 
-            CREATE PROCEDURE ObtenerProgramaPorId(IN programaId INT)
+            -- INSERTAR PROGRAMA
+            CREATE PROCEDURE InsertarPrograma(
+                IN p_institucion_id SMALLINT,
+                IN p_facultad_id    SMALLINT,
+                IN p_nombre         VARCHAR(255),
+                IN p_codigo_snies   VARCHAR(20),
+                IN p_tipo_formacion ENUM('Técnico','Tecnólogo','Profesional'),
+                IN p_metodologia    ENUM('Presencial','Virtual','Híbrido')
+            )
             BEGIN
-                SELECT pr.id_programa,
-                       pr.nombre AS programa,
-                       i.nombre AS institucion,
-                       pr.codigo_snies,
-                       pr.tipo_formacion,
-                       pr.metodologia
+                INSERT INTO programas (
+                    institucion_id,
+                    facultad_id,
+                    nombre,
+                    codigo_snies,
+                    tipo_formacion,
+                    metodologia
+                ) VALUES (
+                    p_institucion_id,
+                    p_facultad_id,
+                    p_nombre,
+                    p_codigo_snies,
+                    p_tipo_formacion,
+                    p_metodologia
+                );
+            END;
+
+            -- OBTENER PROGRAMA POR ID
+            CREATE PROCEDURE ObtenerProgramaPorId(
+                IN programaId SMALLINT
+            )
+            BEGIN
+                SELECT
+                    pr.id_programa,
+                    pr.nombre          AS programa,
+                    i.nombre           AS institucion,
+                    f.nombre           AS facultad,
+                    pr.codigo_snies,
+                    pr.tipo_formacion,
+                    pr.metodologia
                 FROM programas pr
                 JOIN instituciones i ON pr.institucion_id = i.id_institucion
+                LEFT JOIN facultades   f ON pr.facultad_id    = f.id_facultad
                 WHERE pr.id_programa = programaId;
             END;
 
+            -- OBTENER TODOS LOS PROGRAMAS
             CREATE PROCEDURE ObtenerProgramas()
             BEGIN
-                SELECT pr.id_programa,
-                       pr.nombre AS programa,
-                       i.nombre AS institucion,
-                       pr.codigo_snies,
-                       pr.tipo_formacion,
-                       pr.metodologia
+                SELECT
+                    pr.id_programa,
+                    pr.nombre          AS programa,
+                    i.nombre           AS institucion,
+                    f.nombre           AS facultad,
+                    pr.codigo_snies,
+                    pr.tipo_formacion,
+                    pr.metodologia
                 FROM programas pr
                 JOIN instituciones i ON pr.institucion_id = i.id_institucion
+                LEFT JOIN facultades   f ON pr.facultad_id    = f.id_facultad
                 ORDER BY pr.nombre ASC;
             END;
 
 
 
-                        -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (ASIGNATURAS)
+
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (ROLES)
+            DROP PROCEDURE IF EXISTS ObtenerRoles;
+            DROP PROCEDURE IF EXISTS ObtenerRolPorId;
+            DROP PROCEDURE IF EXISTS InsertarRol;
+            DROP PROCEDURE IF EXISTS ActualizarRol;
+            DROP PROCEDURE IF EXISTS EliminarRol;
+
+            -- OBTENER TODOS LOS ROLES
+            CREATE PROCEDURE ObtenerRoles()
+            BEGIN
+                SELECT * FROM roles ORDER BY id_rol ASC;
+            END;
+
+            -- OBTENER ROL POR ID
+            CREATE PROCEDURE ObtenerRolPorId(IN rolId SMALLINT)
+            BEGIN
+                SELECT * FROM roles WHERE id_rol = rolId;
+            END;
+
+            -- INSERTAR ROL
+            CREATE PROCEDURE InsertarRol(
+                IN p_nombre VARCHAR(50)
+            )
+            BEGIN
+                INSERT INTO roles (nombre)
+                VALUES (p_nombre);
+            END;
+
+            -- ACTUALIZAR ROL
+            CREATE PROCEDURE ActualizarRol(
+                IN rolId SMALLINT,
+                IN p_nombre VARCHAR(50)
+            )
+            BEGIN
+                UPDATE roles
+                SET nombre = p_nombre
+                WHERE id_rol = rolId;
+            END;
+
+            -- ELIMINAR ROL
+            CREATE PROCEDURE EliminarRol(IN rolId SMALLINT)
+            BEGIN
+                DELETE FROM roles WHERE id_rol = rolId;
+            END;
+
+
+
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (users)
+            DROP PROCEDURE IF EXISTS ObtenerUsuarios;
+            DROP PROCEDURE IF EXISTS ObtenerUsuarioPorId;
+            DROP PROCEDURE IF EXISTS InsertarUsuario;
+            DROP PROCEDURE IF EXISTS ActualizarUsuario;
+            DROP PROCEDURE IF EXISTS EliminarUsuario;
+
+            -- OBTENER TODOS LOS USUARIOS ACTIVOS
+            CREATE PROCEDURE ObtenerUsuarios()
+            BEGIN
+                SELECT
+                    u.id_usuario,
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.email,
+                    u.tipo_identificacion,
+                    u.numero_identificacion,
+                    i.nombre AS institucion_origen,
+                    f.nombre AS facultad,
+                    u.telefono,
+                    u.direccion,
+                    p.nombre AS pais,
+                    d.nombre AS departamento,
+                    m.nombre AS municipio,
+                    u.created_at,
+                    u.updated_at
+                FROM users u
+                LEFT JOIN instituciones i ON u.institucion_origen_id = i.id_institucion
+                LEFT JOIN facultades f ON u.facultad_id = f.id_facultad
+                LEFT JOIN paises p ON u.pais_id = p.id_pais
+                LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
+                LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                WHERE u.activo = 1
+                ORDER BY u.primer_nombre ASC;
+            END;
+
+            -- OBTENER LOS USUARIOS ACTIVOS POR ID
+            CREATE PROCEDURE ObtenerUsuarioPorId(IN usuarioId SMALLINT)
+            BEGIN
+                SELECT
+                    u.id_usuario,
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.email,
+                    u.tipo_identificacion,
+                    u.numero_identificacion,
+                    i.nombre AS institucion_origen,
+                    f.nombre AS facultad,
+                    u.telefono,
+                    u.direccion,
+                    p.nombre AS pais,
+                    d.nombre AS departamento,
+                    m.nombre AS municipio,
+                    u.created_at,
+                    u.updated_at
+                FROM users u
+                LEFT JOIN instituciones i ON u.institucion_origen_id = i.id_institucion
+                LEFT JOIN facultades f ON u.facultad_id = f.id_facultad
+                LEFT JOIN paises p ON u.pais_id = p.id_pais
+                LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
+                LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                WHERE u.id_usuario = usuarioId
+                AND u.activo = 1;
+            END;
+
+            CREATE PROCEDURE InsertarUsuario(
+                IN p_primer_nombre VARCHAR(50),
+                IN p_segundo_nombre VARCHAR(50),
+                IN p_primer_apellido VARCHAR(50),
+                IN p_segundo_apellido VARCHAR(50),
+                IN p_email VARCHAR(100),
+                IN p_password VARCHAR(255), -- AÑADIDO
+                IN p_tipo_identificacion ENUM('Tarjeta de Identidad', 'Cédula de Ciudadanía', 'Cédula de Extranjería'),
+                IN p_numero_identificacion VARCHAR(20),
+                IN p_institucion_origen_id SMALLINT,
+                IN p_facultad_id SMALLINT,
+                IN p_telefono VARCHAR(20),
+                IN p_direccion VARCHAR(255),
+                IN p_pais_id SMALLINT,
+                IN p_departamento_id SMALLINT,
+                IN p_municipio_id SMALLINT,
+                IN p_rol_id SMALLINT,
+                IN p_activo BOOLEAN -- AÑADIDO
+            )
+            BEGIN
+                INSERT INTO users
+                 (
+                    primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+                    email, password, tipo_identificacion, numero_identificacion,
+                    institucion_origen_id, facultad_id, telefono, direccion,
+                    pais_id, departamento_id, municipio_id, rol_id,
+                    activo, created_at, updated_at
+                )
+                VALUES (
+                    p_primer_nombre, p_segundo_nombre, p_primer_apellido, p_segundo_apellido,
+                    p_email, p_password, p_tipo_identificacion, p_numero_identificacion,
+                    p_institucion_origen_id, p_facultad_id, p_telefono, p_direccion,
+                    p_pais_id, p_departamento_id, p_municipio_id, p_rol_id,
+                    p_activo, NOW(), NOW()
+                );
+            END;
+
+            -- ACTUALIZAR USUARIO
+            CREATE PROCEDURE ActualizarUsuario(
+                IN usuarioId SMALLINT,
+                IN p_primer_nombre VARCHAR(50),
+                IN p_segundo_nombre VARCHAR(50),
+                IN p_primer_apellido VARCHAR(50),
+                IN p_segundo_apellido VARCHAR(50),
+                IN p_email VARCHAR(100),
+                IN p_password VARCHAR(255),
+                IN p_tipo_identificacion ENUM('Tarjeta de Identidad', 'Cédula de Ciudadanía', 'Cédula de Extranjería'),
+                IN p_numero_identificacion VARCHAR(20),
+                IN p_institucion_origen_id SMALLINT,
+                IN p_facultad_id SMALLINT,
+                IN p_telefono VARCHAR(20),
+                IN p_direccion VARCHAR(255),
+                IN p_pais_id SMALLINT,
+                IN p_departamento_id SMALLINT,
+                IN p_municipio_id SMALLINT,
+                IN p_rol_id SMALLINT,
+                IN p_activo BOOLEAN
+            )
+            BEGIN
+                UPDATE users
+
+                SET primer_nombre = p_primer_nombre,
+                    segundo_nombre = p_segundo_nombre,
+                    primer_apellido = p_primer_apellido,
+                    segundo_apellido = p_segundo_apellido,
+                    email = p_email,
+                    password = IFNULL(p_password, password),
+                    tipo_identificacion = p_tipo_identificacion,
+                    numero_identificacion = p_numero_identificacion,
+                    institucion_origen_id = p_institucion_origen_id,
+                    facultad_id = p_facultad_id,
+                    telefono = p_telefono,
+                    direccion = p_direccion,
+                    pais_id = p_pais_id,
+                    departamento_id = p_departamento_id,
+                    municipio_id = p_municipio_id,
+                    rol_id = p_rol_id,
+                    activo = p_activo,
+                    updated_at = NOW()
+                WHERE id_usuario = usuarioId;
+            END;
+
+            -- ELIMINAR USUARIO
+            CREATE PROCEDURE EliminarUsuario(IN usuarioId SMALLINT)
+            BEGIN
+                DELETE FROM users
+                 WHERE id_usuario = usuarioId;
+            END;
+
+
+
+
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (ASIGNATURAS)
             DROP PROCEDURE IF EXISTS ActualizarAsignatura;
             DROP PROCEDURE IF EXISTS EliminarAsignatura;
             DROP PROCEDURE IF EXISTS InsertarAsignatura;
             DROP PROCEDURE IF EXISTS ObtenerAsignaturas;
             DROP PROCEDURE IF EXISTS ObtenerAsignaturaPorId;
 
-            -- PROCEDIMIENTOS PARA ASIGNATURAS
+            -- ACTUALIZAR ASIGNATURA
             CREATE PROCEDURE ActualizarAsignatura(
-                IN p_id_asignatura INT,
-                IN p_programa_id INT,
+                IN p_id_asignatura SMALLINT,
+                IN p_programa_id SMALLINT,
                 IN p_nombre VARCHAR(255),
                 IN p_tipo ENUM('Materia', 'Competencia'),
                 IN p_codigo_asignatura VARCHAR(30),
-                IN p_creditos INT,
-                IN p_semestre INT,
-                IN p_horas_sena INT,
-                IN p_tiempo_presencial INT,
-                IN p_tiempo_independiente INT,
-                IN p_horas_totales_semanales INT,
+                IN p_creditos SMALLINT,
+                IN p_semestre SMALLINT,
+                IN p_horas_sena SMALLINT,
+                IN p_tiempo_presencial SMALLINT,
+                IN p_tiempo_independiente SMALLINT,
+                IN p_horas_totales_semanales SMALLINT,
                 IN p_modalidad ENUM('Teórico', 'Práctico', 'Teórico-Práctico'),
                 IN p_metodologia ENUM('Presencial', 'Virtual', 'Híbrido')
             )
@@ -337,22 +664,24 @@ return new class extends Migration {
                 WHERE id_asignatura = p_id_asignatura;
             END;
 
-            CREATE PROCEDURE EliminarAsignatura(IN asignaturaId INT)
+            -- ELIMINAR ASIGNATURA
+            CREATE PROCEDURE EliminarAsignatura(IN asignaturaId SMALLINT)
             BEGIN
                 DELETE FROM asignaturas WHERE id_asignatura = asignaturaId;
             END;
 
+            -- INSERTAR ASIGNATURA
             CREATE PROCEDURE InsertarAsignatura(
-                IN p_programa_id INT,
+                IN p_programa_id SMALLINT,
                 IN p_nombre VARCHAR(255),
                 IN p_tipo ENUM('Materia', 'Competencia'),
                 IN p_codigo_asignatura VARCHAR(30),
-                IN p_creditos INT,
-                IN p_semestre INT,
-                IN p_horas_sena INT,
-                IN p_tiempo_presencial INT,
-                IN p_tiempo_independiente INT,
-                IN p_horas_totales_semanales INT,
+                IN p_creditos SMALLINT,
+                IN p_semestre SMALLINT,
+                IN p_horas_sena SMALLINT,
+                IN p_tiempo_presencial SMALLINT,
+                IN p_tiempo_independiente SMALLINT,
+                IN p_horas_totales_semanales SMALLINT,
                 IN p_modalidad ENUM('Teórico', 'Práctico', 'Teórico-Práctico'),
                 IN p_metodologia ENUM('Presencial', 'Virtual', 'Híbrido')
             )
@@ -390,54 +719,57 @@ return new class extends Migration {
                 );
             END;
 
-
+            -- OBTENER TODAS LAS ASIGNATURAS
             CREATE PROCEDURE ObtenerAsignaturas()
-BEGIN
-    SELECT a.id_asignatura,
-           a.nombre,
-           a.tipo,
-           a.codigo_asignatura,
-           a.creditos,
-           a.semestre,
-           a.horas_sena,
-           a.tiempo_presencial,
-           a.tiempo_independiente,
-           a.horas_totales_semanales,
-           a.modalidad,
-           a.metodologia,
-           a.created_at,
-           a.updated_at,
-           p.nombre AS programa,
-           i.nombre AS institucion
-    FROM asignaturas a
-    JOIN programas p ON a.programa_id = p.id_programa
-    JOIN instituciones i ON p.institucion_id = i.id_institucion
-    ORDER BY a.nombre ASC;
-END;
+            BEGIN
+                SELECT a.id_asignatura,
+                    a.nombre,
+                    a.tipo,
+                    a.codigo_asignatura,
+                    a.creditos,
+                    a.semestre,
+                    a.horas_sena,
+                    a.tiempo_presencial,
+                    a.tiempo_independiente,
+                    a.horas_totales_semanales,
+                    a.modalidad,
+                    a.metodologia,
+                    a.created_at,
+                    a.updated_at,
+                    p.nombre AS programa,
+                    i.nombre AS institucion
+                FROM asignaturas a
+                JOIN programas p ON a.programa_id = p.id_programa
+                JOIN instituciones i ON p.institucion_id = i.id_institucion
+                ORDER BY a.nombre ASC;
+            END;
 
-CREATE PROCEDURE ObtenerAsignaturaPorId(IN asignaturaId INT)
-BEGIN
-    SELECT a.id_asignatura,
-           a.nombre,
-           a.tipo,
-           a.codigo_asignatura,
-           a.creditos,
-           a.semestre,
-           a.horas_sena,
-           a.tiempo_presencial,
-           a.tiempo_independiente,
-           a.horas_totales_semanales,
-           a.modalidad,
-           a.metodologia,
-           a.created_at,
-           a.updated_at,
-           p.nombre AS programa,
-           i.nombre AS institucion
-    FROM asignaturas a
-    JOIN programas p ON a.programa_id = p.id_programa
-    JOIN instituciones i ON p.institucion_id = i.id_institucion
-    WHERE a.id_asignatura = asignaturaId;
-END;
+            -- OBTENER ASIGNATURA POR ID
+            CREATE PROCEDURE ObtenerAsignaturaPorId(IN asignaturaId SMALLINT)
+            BEGIN
+                SELECT a.id_asignatura,
+                    a.nombre,
+                    a.tipo,
+                    a.codigo_asignatura,
+                    a.creditos,
+                    a.semestre,
+                    a.horas_sena,
+                    a.tiempo_presencial,
+                    a.tiempo_independiente,
+                    a.horas_totales_semanales,
+                    a.modalidad,
+                    a.metodologia,
+                    a.created_at,
+                    a.updated_at,
+                    p.nombre AS programa,
+                    i.nombre AS institucion
+                FROM asignaturas a
+                JOIN programas p ON a.programa_id = p.id_programa
+                JOIN instituciones i ON p.institucion_id = i.id_institucion
+                WHERE a.id_asignatura = asignaturaId;
+            END;
+
+
 
 
 
@@ -448,7 +780,7 @@ END;
             DROP PROCEDURE IF EXISTS ObtenerSolicitudPorId;
             DROP PROCEDURE IF EXISTS ObtenerSolicitudes;
 
-            -- PROCEDIMIENTOS PARA SOLICITUDES
+            -- ACTUALIZAR SOLICITUD
             CREATE PROCEDURE ActualizarSolicitud(
                 IN p_id_solicitud SMALLINT,
                 IN p_usuario_id SMALLINT,
@@ -457,7 +789,6 @@ END;
                 IN p_fecha_finalizacion_estudios DATE,
                 IN p_fecha_ultimo_semestre_cursado DATE,
                 IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'),
-                IN p_numero_radicado VARCHAR(50),
                 IN p_ruta_pdf_resolucion VARCHAR(255)
             )
             BEGIN
@@ -469,12 +800,12 @@ END;
                     fecha_finalizacion_estudios = p_fecha_finalizacion_estudios,
                     fecha_ultimo_semestre_cursado = p_fecha_ultimo_semestre_cursado,
                     estado = p_estado,
-                    numero_radicado = p_numero_radicado,
                     ruta_pdf_resolucion = p_ruta_pdf_resolucion,
                     updated_at = NOW()
                 WHERE id_solicitud = p_id_solicitud;
             END;
 
+            -- ELIMINAR SOLICITUD
             CREATE PROCEDURE EliminarSolicitud(
                 IN p_id_solicitud SMALLINT
             )
@@ -482,6 +813,7 @@ END;
                 DELETE FROM solicitudes WHERE id_solicitud = p_id_solicitud;
             END;
 
+            -- INSERTAR SOLICITUD (Modificado para permitir la generación automática del número de radicado)
             CREATE PROCEDURE InsertarSolicitud(
                 IN p_usuario_id SMALLINT,
                 IN p_programa_destino_id SMALLINT,
@@ -489,10 +821,29 @@ END;
                 IN p_fecha_finalizacion_estudios DATE,
                 IN p_fecha_ultimo_semestre_cursado DATE,
                 IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'),
-                IN p_numero_radicado VARCHAR(50),
                 IN p_ruta_pdf_resolucion VARCHAR(255)
             )
             BEGIN
+                DECLARE v_year INT;
+                DECLARE v_ultimo_consecutivo INT;
+                DECLARE v_nuevo_radicado VARCHAR(50);
+
+                -- Obtener el año actual
+                SET v_year = YEAR(CURDATE());
+
+                -- Obtener el último consecutivo del año actual
+                SELECT IFNULL(MAX(CAST(SUBSTRING_INDEX(numero_radicado, '-', -1) AS UNSIGNED)), 0)
+                INTO v_ultimo_consecutivo
+                FROM solicitudes
+                WHERE numero_radicado LIKE CONCAT('HOM-', v_year, '-%');
+
+                -- Incrementar el consecutivo
+                SET v_ultimo_consecutivo = v_ultimo_consecutivo + 1;
+
+                -- Formar el nuevo número de radicado
+                SET v_nuevo_radicado = CONCAT('HOM-', v_year, '-', LPAD(v_ultimo_consecutivo, 4, '0'));
+
+                -- Insertar la solicitud con el número de radicado generado
                 INSERT INTO solicitudes (
                     usuario_id,
                     programa_destino_id,
@@ -511,20 +862,20 @@ END;
                     p_fecha_finalizacion_estudios,
                     p_fecha_ultimo_semestre_cursado,
                     p_estado,
-                    p_numero_radicado,
+                    v_nuevo_radicado,
                     p_ruta_pdf_resolucion,
                     NOW(),
                     NOW()
                 );
             END;
 
+            -- OBTENER SOLICITUD POR ID
             CREATE PROCEDURE ObtenerSolicitudPorId(
                 IN p_id_solicitud SMALLINT
             )
             BEGIN
                 SELECT
                     s.id_solicitud,
-                    s.usuario_id,
                     s.finalizo_estudios,
                     s.fecha_finalizacion_estudios,
                     s.fecha_ultimo_semestre_cursado,
@@ -554,8 +905,7 @@ END;
                     inst.nombre AS institucion_origen_nombre
 
                 FROM solicitudes s
-                INNER JOIN users
-                 u ON s.usuario_id = u.id_usuario
+                INNER JOIN users u ON s.usuario_id = u.id_usuario
                 INNER JOIN programas prog ON s.programa_destino_id = prog.id_programa
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
@@ -564,11 +914,11 @@ END;
                 WHERE s.id_solicitud = p_id_solicitud;
             END;
 
+            -- OBTENER TODAS LAS SOLICITUDES
             CREATE PROCEDURE ObtenerSolicitudes()
             BEGIN
                 SELECT
                     s.id_solicitud,
-                    s.usuario_id,
                     s.finalizo_estudios,
                     s.fecha_finalizacion_estudios,
                     s.fecha_ultimo_semestre_cursado,
@@ -608,163 +958,7 @@ END;
 
 
 
-           -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (users)
-            DROP PROCEDURE IF EXISTS ObtenerUsuarios;
-            DROP PROCEDURE IF EXISTS ObtenerUsuarioPorId;
-            DROP PROCEDURE IF EXISTS InsertarUsuario;
-            DROP PROCEDURE IF EXISTS ActualizarUsuario;
-            DROP PROCEDURE IF EXISTS EliminarUsuario;
 
-
-            -- PROCEDIMIENTOS PARA users
-
-            CREATE PROCEDURE ObtenerUsuarios()
-            BEGIN
-                SELECT
-                    u.id_usuario,
-                    u.primer_nombre,
-                    u.segundo_nombre,
-                    u.primer_apellido,
-                    u.segundo_apellido,
-                    u.email,
-                    u.tipo_identificacion,
-                    u.numero_identificacion,
-                    i.nombre AS institucion_origen,
-                    f.nombre AS facultad,
-                    u.telefono,
-                    u.direccion,
-                    p.nombre AS pais,
-                    d.nombre AS departamento,
-                    m.nombre AS municipio,
-                    u.created_at,
-                    u.updated_at
-                FROM users
-                 u
-                LEFT JOIN instituciones i ON u.institucion_origen_id = i.id_institucion
-                LEFT JOIN facultades f ON u.facultad_id = f.id_facultad
-                LEFT JOIN paises p ON u.pais_id = p.id_pais
-                LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
-                LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
-                ORDER BY u.primer_nombre ASC;
-            END;
-
-            CREATE PROCEDURE ObtenerUsuarioPorId(IN usuarioId INT)
-            BEGIN
-                SELECT
-                    u.id_usuario,
-                    u.primer_nombre,
-                    u.segundo_nombre,
-                    u.primer_apellido,
-                    u.segundo_apellido,
-                    u.email,
-                    u.tipo_identificacion,
-                    u.numero_identificacion,
-                    i.nombre AS institucion_origen,
-                    f.nombre AS facultad,
-                    u.telefono,
-                    u.direccion,
-                    p.nombre AS pais,
-                    d.nombre AS departamento,
-                    m.nombre AS municipio,
-                    u.created_at,
-                    u.updated_at
-                FROM users
-                 u
-                LEFT JOIN instituciones i ON u.institucion_origen_id = i.id_institucion
-                LEFT JOIN facultades f ON u.facultad_id = f.id_facultad
-                LEFT JOIN paises p ON u.pais_id = p.id_pais
-                LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
-                LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
-                WHERE u.id_usuario = usuarioId;
-            END;
-
-            CREATE PROCEDURE InsertarUsuario(
-                IN p_primer_nombre VARCHAR(50),
-                IN p_segundo_nombre VARCHAR(50),
-                IN p_primer_apellido VARCHAR(50),
-                IN p_segundo_apellido VARCHAR(50),
-                IN p_email VARCHAR(100),
-                IN p_password VARCHAR(255), -- AÑADIDO
-                IN p_tipo_identificacion ENUM('Tarjeta de Identidad', 'Cédula de Ciudadanía', 'Cédula de Extranjería'),
-                IN p_numero_identificacion VARCHAR(20),
-                IN p_institucion_origen_id INT,
-                IN p_facultad_id INT,
-                IN p_telefono VARCHAR(20),
-                IN p_direccion VARCHAR(255),
-                IN p_pais_id INT,
-                IN p_departamento_id INT,
-                IN p_municipio_id INT,
-                IN p_rol_id INT,
-                IN p_activo BOOLEAN -- AÑADIDO
-            )
-            BEGIN
-                INSERT INTO users
-                 (
-                    primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
-                    email, password, tipo_identificacion, numero_identificacion,
-                    institucion_origen_id, facultad_id, telefono, direccion,
-                    pais_id, departamento_id, municipio_id, rol_id,
-                    activo, created_at, updated_at
-                )
-                VALUES (
-                    p_primer_nombre, p_segundo_nombre, p_primer_apellido, p_segundo_apellido,
-                    p_email, p_password, p_tipo_identificacion, p_numero_identificacion,
-                    p_institucion_origen_id, p_facultad_id, p_telefono, p_direccion,
-                    p_pais_id, p_departamento_id, p_municipio_id, p_rol_id,
-                    p_activo, NOW(), NOW()
-                );
-            END;
-
-
-            CREATE PROCEDURE ActualizarUsuario(
-                IN usuarioId INT,
-                IN p_primer_nombre VARCHAR(50),
-                IN p_segundo_nombre VARCHAR(50),
-                IN p_primer_apellido VARCHAR(50),
-                IN p_segundo_apellido VARCHAR(50),
-                IN p_email VARCHAR(100),
-                IN p_password VARCHAR(255),
-                IN p_tipo_identificacion ENUM('Tarjeta de Identidad', 'Cédula de Ciudadanía', 'Cédula de Extranjería'),
-                IN p_numero_identificacion VARCHAR(20),
-                IN p_institucion_origen_id INT,
-                IN p_facultad_id INT,
-                IN p_telefono VARCHAR(20),
-                IN p_direccion VARCHAR(255),
-                IN p_pais_id INT,
-                IN p_departamento_id INT,
-                IN p_municipio_id INT,
-                IN p_rol_id INT,
-                IN p_activo BOOLEAN
-            )
-            BEGIN
-                UPDATE users
-
-                SET primer_nombre = p_primer_nombre,
-                    segundo_nombre = p_segundo_nombre,
-                    primer_apellido = p_primer_apellido,
-                    segundo_apellido = p_segundo_apellido,
-                    email = p_email,
-                    password = IFNULL(p_password, password), -- solo se actualiza si viene valor
-                    tipo_identificacion = p_tipo_identificacion,
-                    numero_identificacion = p_numero_identificacion,
-                    institucion_origen_id = p_institucion_origen_id,
-                    facultad_id = p_facultad_id,
-                    telefono = p_telefono,
-                    direccion = p_direccion,
-                    pais_id = p_pais_id,
-                    departamento_id = p_departamento_id,
-                    municipio_id = p_municipio_id,
-                    rol_id = p_rol_id,
-                    activo = p_activo,
-                    updated_at = NOW()
-                WHERE id_usuario = usuarioId;
-            END;
-
-            CREATE PROCEDURE EliminarUsuario(IN usuarioId INT)
-            BEGIN
-                DELETE FROM users
-                 WHERE id_usuario = usuarioId;
-            END;
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (documentos)
             DROP PROCEDURE IF EXISTS ObtenerDocumentos;
@@ -792,7 +986,7 @@ END;
                 ORDER BY d.fecha_subida DESC;
             END;
 
-            CREATE PROCEDURE ObtenerDocumentoPorId(IN documentoId INT)
+            CREATE PROCEDURE ObtenerDocumentoPorId(IN documentoId SMALLINT)
             BEGIN
                 SELECT
                     d.id_documento,
@@ -811,8 +1005,8 @@ END;
             END;
 
             CREATE PROCEDURE InsertarDocumento(
-                IN p_solicitud_id INT,
-                IN p_usuario_id INT,
+                IN p_solicitud_id SMALLINT,
+                IN p_usuario_id SMALLINT,
                 IN p_tipo VARCHAR(255),
                 IN p_ruta VARCHAR(255)
             )
@@ -828,9 +1022,9 @@ END;
             END;
 
             CREATE PROCEDURE ActualizarDocumento(
-                IN documentoId INT,
-                IN p_solicitud_id INT,
-                IN p_usuario_id INT,
+                IN documentoId SMALLINT,
+                IN p_solicitud_id SMALLINT,
+                IN p_usuario_id SMALLINT,
                 IN p_tipo VARCHAR(255),
                 IN p_ruta VARCHAR(255)
             )
@@ -844,117 +1038,18 @@ END;
                 WHERE id_documento = documentoId;
             END;
 
-            CREATE PROCEDURE EliminarDocumento(IN documentoId INT)
+            CREATE PROCEDURE EliminarDocumento(IN documentoId SMALLINT)
             BEGIN
                 DELETE FROM documentos WHERE id_documento = documentoId;
             END;
 
 
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (FACULTIES)
-            DROP PROCEDURE IF EXISTS ObtenerFacultades;
-            DROP PROCEDURE IF EXISTS ObtenerFacultadPorId;
-            DROP PROCEDURE IF EXISTS InsertarFacultad;
-            DROP PROCEDURE IF EXISTS ActualizarFacultad;
-            DROP PROCEDURE IF EXISTS EliminarFacultad;
-
-            -- PROCEDIMIENTOS PARA FACULTIES
-            CREATE PROCEDURE ObtenerFacultades()
-            BEGIN
-                SELECT
-                    f.id_facultad,
-                    i.nombre AS institucion,
-                    f.nombre,
-                    f.created_at,
-                    f.updated_at
-                FROM facultades f
-                LEFT JOIN instituciones i ON f.institucion_id = i.id_institucion
-                ORDER BY f.nombre ASC;
-            END;
-
-            CREATE PROCEDURE ObtenerFacultadPorId(IN facultadId INT)
-            BEGIN
-                SELECT
-                    f.id_facultad,
-                    i.nombre AS institucion,
-                    f.nombre,
-                    f.created_at,
-                    f.updated_at
-                FROM facultades f
-                LEFT JOIN instituciones i ON f.institucion_id = i.id_institucion
-                WHERE f.id_facultad = facultadId;
-            END;
-
-            CREATE PROCEDURE InsertarFacultad(
-                IN p_institucion_id INT,
-                IN p_nombre VARCHAR(255)
-            )
-            BEGIN
-                INSERT INTO facultades (institucion_id, nombre, created_at, updated_at)
-                VALUES (p_institucion_id, p_nombre, NOW(), NOW());
-            END;
-
-            CREATE PROCEDURE ActualizarFacultad(
-                IN facultadId INT,
-                IN p_institucion_id INT,
-                IN p_nombre VARCHAR(255)
-            )
-            BEGIN
-                UPDATE facultades
-                SET institucion_id = p_institucion_id,
-                    nombre = p_nombre,
-                    updated_at = NOW()
-                WHERE id_facultad = facultadId;
-            END;
-
-            CREATE PROCEDURE EliminarFacultad(IN facultadId INT)
-            BEGIN
-                DELETE FROM facultades WHERE id_facultad = facultadId;
-            END;
 
 
 
-                        -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (ROLES)
-            DROP PROCEDURE IF EXISTS ObtenerRoles;
-            DROP PROCEDURE IF EXISTS ObtenerRolPorId;
-            DROP PROCEDURE IF EXISTS InsertarRol;
-            DROP PROCEDURE IF EXISTS ActualizarRol;
-            DROP PROCEDURE IF EXISTS EliminarRol;
 
-            -- PROCEDIMIENTOS PARA ROLES
-            CREATE PROCEDURE ObtenerRoles()
-            BEGIN
-                SELECT * FROM roles ORDER BY id_rol ASC;
-            END;
 
-            CREATE PROCEDURE ObtenerRolPorId(IN rolId INT)
-            BEGIN
-                SELECT * FROM roles WHERE id_rol = rolId;
-            END;
-
-            CREATE PROCEDURE InsertarRol(
-                IN p_nombre VARCHAR(50)
-            )
-            BEGIN
-                INSERT INTO roles (nombre, created_at, updated_at)
-                VALUES (p_nombre, NOW(), NOW());
-            END;
-
-            CREATE PROCEDURE ActualizarRol(
-                IN rolId INT,
-                IN p_nombre VARCHAR(50)
-            )
-            BEGIN
-                UPDATE roles
-                SET nombre = p_nombre,
-                    updated_at = NOW()
-                WHERE id_rol = rolId;
-            END;
-
-            CREATE PROCEDURE EliminarRol(IN rolId INT)
-            BEGIN
-                DELETE FROM roles WHERE id_rol = rolId;
-            END;
 
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (CONTENIDOS PROGRAMÁTICOS)

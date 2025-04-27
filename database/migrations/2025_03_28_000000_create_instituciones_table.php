@@ -15,7 +15,7 @@ return new class extends Migration
             $table->smallIncrements('id_institucion');
             $table->unsignedSmallInteger('municipio_id')->nullable();
             $table->string('nombre', 255);
-            $table->string('codigo_ies', 20)->unique()->nullable();
+            $table->string('codigo_ies', 20)->nullable();
             $table->enum('tipo', ['Universitaria', 'SENA','Mixta']);
             $table->timestamps();
 

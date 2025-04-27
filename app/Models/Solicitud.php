@@ -28,7 +28,7 @@ class Solicitud extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'usuario_id', 'id');
+        return $this->belongsTo(User::class, 'usuario_id', 'id_usuario');
     }
 
     public function programaDestino()
@@ -86,7 +86,4 @@ class Solicitud extends Model
             }
         });
     }
-
-
 }
-

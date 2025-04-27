@@ -51,6 +51,12 @@ class FacultadControllerApi extends Controller
     public function insertarFacultad(Request $request)
     {
         try {
+
+            $request->validate([
+                'institucion_id' => 'required|integer|exists:instituciones,id_institucion',
+                'nombre'         => 'required|string|max:255',
+              ]);
+
             // Llamada al procedimiento almacenado para insertar una nueva facultad
             DB::statement('CALL InsertarFacultad(?, ?)', [
                 $request->institucion_id,
@@ -72,6 +78,11 @@ class FacultadControllerApi extends Controller
     public function actualizarFacultad(Request $request, $id)
     {
         try {
+
+            $request->validate([
+                'institucion_id' => 'required|integer|exists:instituciones,id_institucion',
+                'nombre'         => 'required|string|max:255',
+              ]);
             // Llamada al procedimiento almacenado para actualizar una facultad
             DB::statement('CALL ActualizarFacultad(?, ?, ?)', [
                 $id,

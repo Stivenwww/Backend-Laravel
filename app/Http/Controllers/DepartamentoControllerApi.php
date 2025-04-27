@@ -52,6 +52,14 @@ class DepartamentoControllerApi extends Controller
     {
         try {
             // Llamada al procedimiento almacenado para insertar un nuevo departamento
+
+            // Validación de parámetros
+            $request->validate([
+                'nombre'  => 'required|string|max:255',
+                'pais_id' => 'required|exists:paises,id_pais',
+              ]);
+
+
             DB::statement('CALL InsertarDepartamento(?, ?)', [
                 $request->nombre,
                 $request->pais_id
@@ -72,8 +80,16 @@ class DepartamentoControllerApi extends Controller
     public function actualizarDepartamento(Request $request, $id)
     {
         try {
+
             // Llamada al procedimiento almacenado para actualizar un departamento
-            DB::statement('CALL ActualizarDepartamento(?, ?, ?, ?)', [
+
+            // Validación de parámetros
+            $request->validate([
+                'nombre'  => 'required|string|max:255',
+                'pais_id' => 'required|exists:paises,id_pais',
+              ]);
+
+            DB::statement('CALL ActualizarDepartamento(?, ?, ?)', [
                 $id,
                 $request->nombre,
                 $request->pais_id
