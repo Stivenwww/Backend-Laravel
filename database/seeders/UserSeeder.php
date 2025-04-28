@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        // Aspirante 1 - Colombiano - Autónoma del Cauca
+        // Aspirante 1 - Colombiano - del Cauca
         User::create([
             'primer_nombre' => 'Laura',
             'segundo_nombre' => 'Isabel',
@@ -23,8 +23,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password123'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '1122334455',
-            'institucion_origen_id' => 1,
-            'facultad_id' => 5, // Facultad de Ingeniería
+            'institucion_origen_id' => 5,
+            'facultad_id' => 2, // Facultad de Ingeniería
             'telefono' => '3123456789',
             'direccion' => 'Calle 10 #5-45',
             'pais_id' => 1,
