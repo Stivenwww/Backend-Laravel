@@ -186,7 +186,7 @@ class AsignaturaSeeder extends Seeder
                             'tipo'                    => 'Materia',
                             'creditos'                => $creditos,
                             'horas_sena'              => null,
-                            'semestre'                => floor($index / 3) + 1,
+                            'semestre'                => floor($index / 2) + 1,
                             'tiempo_presencial'       => $tiempoPresencial,
                             'tiempo_independiente'    => $tiempoIndependiente,
                             'horas_totales_semanales' => $horasTotalesSemanales,

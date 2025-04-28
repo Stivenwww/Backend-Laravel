@@ -106,19 +106,27 @@ class HomologacionAsignaturaSeeder extends Seeder
                 $origen = $origenSeleccionadas[$i];
                 $destino = $destinoSeleccionadas[$i];
 
-                // Si es del SENA, algunas homologaciones pueden no tener nota
-                $asignarNota = !$esSena || rand(0, 1) == 1;
+                // Si es del SENA o la universidad, asignar null a los campos respectivos
+                if ($esSena || $usuario->institucion_origen_id != 2) {
+                    $notaDestino = null;
+                    $comentarios = null;
+                    $asignaturaDestinoId = null; // Asignar null también a la asignatura de destino
+                } else {
+                    $notaDestino = $this->generarNotaDestino(); // Solo si no es SENA
+                    $comentarios = $this->generarComentario($esSena); // Solo si no es SENA
+                    $asignaturaDestinoId = $destino->id_asignatura; // Asignar la asignatura de destino normalmente
+                }
 
                 HomologacionAsignatura::create([
                     'solicitud_id'          => $solicitudId,
                     'asignatura_origen_id'  => $origen->id_asignatura,
-                    'asignatura_destino_id' => $destino->id_asignatura,
-                    'nota_destino'          => $asignarNota ? $this->generarNotaDestino() : null,
-                    'comentarios'           => $this->generarComentario($esSena),
+                    'asignatura_destino_id' => $asignaturaDestinoId, // Aquí se asigna null si es SENA
+                    'nota_destino'          => $notaDestino,
+                    'comentarios'           => $comentarios,
                     'fecha'                 => now()->subDays(rand(1, 30)),
                 ]);
 
-                echo "Creada homologación para solicitud $solicitudId: {$origen->nombre} → {$destino->nombre}\n";
+                echo "Creada homologación para solicitud $solicitudId: {$origen->nombre} → " . ($asignaturaDestinoId ? $destino->nombre : "No Asignada") . "\n";
             }
 
             echo "Completadas $cantidadHomologar homologaciones para usuario $usuarioId\n";

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class HomologacionAsignaturaControllerApi extends Controller
 {
@@ -11,7 +12,6 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function traerHomologacionAsignaturas()
     {
         try {
-            // Llamada al procedimiento almacenado para obtener todas las homologaciones
             $homologaciones = DB::select('CALL ObtenerHomologacionesAsignaturas()');
             return response()->json($homologaciones);
         } catch (\Exception $e) {
@@ -26,13 +26,12 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function llevarHomologacionAsignatura($id)
     {
         try {
-            // Llamada al procedimiento almacenado para obtener una homologación por ID
             $homologacion = DB::select('CALL ObtenerHomologacionAsignaturaPorId(?)', [$id]);
 
             if (!empty($homologacion)) {
                 return response()->json([
                     'mensaje' => 'Homologación de asignatura encontrada',
-                    'datos' => $homologacion[0] // Accedemos al primer resultado
+                    'datos' => $homologacion[0]
                 ], 200);
             } else {
                 return response()->json([
@@ -51,13 +50,23 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function insertarHomologacionAsignatura(Request $request)
     {
         try {
-            // Llamada al procedimiento almacenado para insertar una nueva homologación
-            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?, ?)', [
+            // Opcional: validaciones simples
+            $request->validate([
+                'solicitud_id' => 'required|integer',
+                'asignatura_origen_id' => 'required|integer',
+                'asignatura_destino_id' => 'nullable|integer',
+                'nota_destino' => 'nullable|numeric',
+                'comentarios' => 'nullable|string',
+            ]);
+
+            // Insertar llamando al procedimiento almacenado
+            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $request->asignatura_origen_id,
                 $request->asignatura_destino_id,
                 $request->nota_destino,
-                $request->comentarios
+                $request->comentarios,
+                Carbon::now()->toDateString() // Insertamos la fecha actual
             ]);
 
             return response()->json([
@@ -75,7 +84,14 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function actualizarHomologacionAsignatura(Request $request, $id)
     {
         try {
-            // Llamada al procedimiento almacenado para actualizar una homologación
+            $request->validate([
+                'solicitud_id' => 'required|integer',
+                'asignatura_origen_id' => 'required|integer',
+                'asignatura_destino_id' => 'nullable|integer',
+                'nota_destino' => 'nullable|numeric',
+                'comentarios' => 'nullable|string',
+            ]);
+
             DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?, ?)', [
                 $id,
                 $request->solicitud_id,
@@ -100,7 +116,6 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function eliminarHomologacionAsignatura($id)
     {
         try {
-            // Llamada al procedimiento almacenado para eliminar una homologación
             DB::statement('CALL EliminarHomologacionAsignatura(?)', [$id]);
 
             return response()->json([

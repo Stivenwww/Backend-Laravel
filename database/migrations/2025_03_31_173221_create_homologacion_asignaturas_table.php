@@ -15,7 +15,7 @@ return new class extends Migration
             $table->smallIncrements('id_homologacion');
             $table->unsignedSmallInteger('solicitud_id');
             $table->unsignedSmallInteger('asignatura_origen_id');
-            $table->unsignedSmallInteger('asignatura_destino_id');
+            $table->unsignedSmallInteger('asignatura_destino_id')->nullable();
             $table->decimal('nota_destino', 3, 1)->nullable();
             $table->timestamp('fecha')->useCurrent();
             $table->text('comentarios')->nullable();

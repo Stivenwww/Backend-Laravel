@@ -1384,154 +1384,118 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
 
             -- OBTENER TODAS LAS HOMOLOGACIONES
-            CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
-            BEGIN
-                SELECT
-                    ha.id_homologacion,
-                    ha.solicitud_id,
-                    s.numero_radicado,  -- Añadido número de radicado
+           CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
+BEGIN
+    SELECT
+        ha.id_homologacion,
+        ha.solicitud_id,
+        s.numero_radicado,
 
-                    -- Asignatura origen
-                    ao.id_asignatura   AS asignatura_origen_id,
-                    ao.nombre          AS asignatura_origen,
-                    po.nombre          AS programa_origen,  -- Añadido nombre del programa origen
-                    ao.semestre        AS semestre_origen,  -- Añadido semestre origen
-                    i_origen.nombre    AS institucion_origen,
+        -- Asignatura origen
+        ao.id_asignatura   AS asignatura_origen_id,
+        ao.nombre          AS asignatura_origen,
+        po.nombre          AS programa_origen,
+        ao.semestre        AS semestre_origen,
+        i_origen.nombre    AS institucion_origen,
 
-                    -- Asignatura destino
-                    ad.id_asignatura   AS asignatura_destino_id,
-                    ad.nombre          AS asignatura_destino,
-                    pd.nombre          AS programa_destino,  -- Añadido nombre del programa destino
-                    ad.semestre        AS semestre_destino,  -- Añadido semestre destino
-                    i_destino.nombre   AS institucion_destino,
+        -- Asignatura destino (puede ser NULL)
+        ad.id_asignatura   AS asignatura_destino_id,
+        ad.nombre          AS asignatura_destino,
+        pd.nombre          AS programa_destino,
+        ad.semestre        AS semestre_destino,
+        i_destino.nombre   AS institucion_destino,
 
-                    -- Nota y horas desde solicitud_asignaturas
-                    sa.nota_origen,
-                    sa.horas_sena,
+        -- Nota y horas
+        sa.nota_origen,
+        sa.horas_sena,
 
-                    -- Nota destino
-                    ha.nota_destino,
+        -- Datos de homologación
+        ha.nota_destino,
+        ha.fecha,
+        ha.comentarios,
+        ha.created_at,
+        ha.updated_at,
 
-                    -- Datos adicionales
-                    ha.fecha,
-                    ha.comentarios,
-                    ha.created_at,
-                    ha.updated_at,
+        -- Datos del estudiante
+        CONCAT(
+            u.primer_nombre, ' ',
+            IFNULL(u.segundo_nombre, ''), ' ',
+            u.primer_apellido, ' ',
+            IFNULL(u.segundo_apellido, '')
+        ) AS estudiante
 
-                    -- Estudiante
-                    CONCAT(
-                    u.primer_nombre, ' ',
-                    IFNULL(u.segundo_nombre, ''), ' ',
-                    u.primer_apellido, ' ',
-                    IFNULL(u.segundo_apellido, '')
-                    ) AS estudiante
+    FROM homologacion_asignaturas ha
+    JOIN asignaturas ao ON ha.asignatura_origen_id = ao.id_asignatura
+    LEFT JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
+    JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
+    JOIN users u ON s.usuario_id = u.id_usuario
+    LEFT JOIN solicitud_asignaturas sa
+        ON sa.solicitud_id = ha.solicitud_id
+        AND sa.asignatura_id = ha.asignatura_origen_id
+    LEFT JOIN programas po ON ao.programa_id = po.id_programa
+    LEFT JOIN instituciones i_origen ON po.institucion_id = i_origen.id_institucion
+    LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
+    LEFT JOIN instituciones i_destino ON pd.institucion_id = i_destino.id_institucion
 
-                FROM homologacion_asignaturas ha
-                JOIN asignaturas ao ON ha.asignatura_origen_id  = ao.id_asignatura
-                JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
-                JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
-                JOIN users u ON s.usuario_id = u.id_usuario
-                LEFT JOIN solicitud_asignaturas sa
-                    ON sa.solicitud_id = ha.solicitud_id
-                    AND sa.asignatura_id = ha.asignatura_origen_id
-
-                -- Para origen: asignatura → programa → institución
-                LEFT JOIN programas po ON ao.programa_id = po.id_programa
-                LEFT JOIN instituciones i_origen
-                    ON po.institucion_id = i_origen.id_institucion
-
-                -- Para destino: asignatura → programa → institución
-                LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
-                LEFT JOIN instituciones i_destino
-                    ON pd.institucion_id = i_destino.id_institucion
-
-                ORDER BY ha.id_homologacion ASC;
-            END;
+    ORDER BY ha.id_homologacion ASC;
+END;
 
             -- OBTENER UNA HOMOLOGACIÓN POR ID
             CREATE PROCEDURE ObtenerHomologacionAsignaturaPorId(IN homologacionId INT)
-            BEGIN
-                SELECT
-                    ha.id_homologacion,
-                    ha.solicitud_id,
-                    s.numero_radicado,  -- Añadido número de radicado
+BEGIN
+    SELECT
+        ha.id_homologacion,
+        ha.solicitud_id,
+        s.numero_radicado,
 
-                    -- Origen
-                    ao.id_asignatura   AS asignatura_origen_id,
-                    ao.nombre          AS asignatura_origen,
-                    po.nombre          AS programa_origen,  -- Añadido nombre del programa origen
-                    ao.semestre        AS semestre_origen,  -- Añadido semestre origen
-                    i_origen.nombre    AS institucion_origen,
+        -- Asignatura origen
+        ao.id_asignatura   AS asignatura_origen_id,
+        ao.nombre          AS asignatura_origen,
+        po.nombre          AS programa_origen,
+        ao.semestre        AS semestre_origen,
+        i_origen.nombre    AS institucion_origen,
 
-                    -- Destino
-                    ad.id_asignatura   AS asignatura_destino_id,
-                    ad.nombre          AS asignatura_destino,
-                    pd.nombre          AS programa_destino,  -- Añadido nombre del programa destino
-                    ad.semestre        AS semestre_destino,  -- Añadido semestre destino
-                    i_destino.nombre   AS institucion_destino,
+        -- Asignatura destino (puede ser NULL)
+        ad.id_asignatura   AS asignatura_destino_id,
+        ad.nombre          AS asignatura_destino,
+        pd.nombre          AS programa_destino,
+        ad.semestre        AS semestre_destino,
+        i_destino.nombre   AS institucion_destino,
 
-                    sa.nota_origen,
-                    sa.horas_sena,
-                    ha.nota_destino,
-                    ha.fecha,
-                    ha.comentarios,
-                    ha.created_at,
-                    ha.updated_at,
+        -- Nota y horas
+        sa.nota_origen,
+        sa.horas_sena,
 
-                    CONCAT(
-                    u.primer_nombre, ' ',
-                    IFNULL(u.segundo_nombre, ''), ' ',
-                    u.primer_apellido, ' ',
-                    IFNULL(u.segundo_apellido, '')
-                    ) AS estudiante
+        -- Datos de homologación
+        ha.nota_destino,
+        ha.fecha,
+        ha.comentarios,
+        ha.created_at,
+        ha.updated_at,
 
-                FROM homologacion_asignaturas ha
-                JOIN asignaturas ao ON ha.asignatura_origen_id = ao.id_asignatura
-                JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
-                JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
-                JOIN users u ON s.usuario_id = u.id_usuario
-                LEFT JOIN solicitud_asignaturas sa
-                    ON sa.solicitud_id = ha.solicitud_id
-                    AND sa.asignatura_id = ha.asignatura_origen_id
+        -- Datos del estudiante
+        CONCAT(
+            u.primer_nombre, ' ',
+            IFNULL(u.segundo_nombre, ''), ' ',
+            u.primer_apellido, ' ',
+            IFNULL(u.segundo_apellido, '')
+        ) AS estudiante
 
-                LEFT JOIN programas po ON ao.programa_id = po.id_programa
-                LEFT JOIN instituciones i_origen
-                    ON po.institucion_id = i_origen.id_institucion
+    FROM homologacion_asignaturas ha
+    JOIN asignaturas ao ON ha.asignatura_origen_id = ao.id_asignatura
+    LEFT JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
+    JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
+    JOIN users u ON s.usuario_id = u.id_usuario
+    LEFT JOIN solicitud_asignaturas sa
+        ON sa.solicitud_id = ha.solicitud_id
+        AND sa.asignatura_id = ha.asignatura_origen_id
+    LEFT JOIN programas po ON ao.programa_id = po.id_programa
+    LEFT JOIN instituciones i_origen ON po.institucion_id = i_origen.id_institucion
+    LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
+    LEFT JOIN instituciones i_destino ON pd.institucion_id = i_destino.id_institucion
 
-                LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
-                LEFT JOIN instituciones i_destino
-                    ON pd.institucion_id = i_destino.id_institucion
-
-                WHERE ha.id_homologacion = homologacionId;
-            END;
-
-            -- INSERTAR HOMOLOGACIÓN
-            CREATE PROCEDURE InsertarHomologacionAsignatura(
-                IN p_solicitud_id INT,
-                IN p_asignatura_origen_id INT,
-                IN p_asignatura_destino_id INT,
-                IN p_nota_destino DECIMAL(3,1),
-                IN p_comentarios TEXT
-            )
-            BEGIN
-                INSERT INTO homologacion_asignaturas (
-                    solicitud_id,
-                    asignatura_origen_id,
-                    asignatura_destino_id,
-                    nota_destino,
-                    comentarios,
-                    created_at,
-                    updated_at
-                ) VALUES (
-                    p_solicitud_id,
-                    p_asignatura_origen_id,
-                    p_asignatura_destino_id,
-                    p_nota_destino,
-                    p_comentarios,
-                    NOW(),
-                    NOW()
-                );
-            END;
+    WHERE ha.id_homologacion = homologacionId;
+END;
 
             -- ACTUALIZAR HOMOLOGACIÓN
             CREATE PROCEDURE ActualizarHomologacionAsignatura(

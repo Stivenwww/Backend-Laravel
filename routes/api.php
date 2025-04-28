@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\API\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AsignaturaControllerApi;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ContenidoProgramaticoControllerApi;
 use App\Http\Controllers\DocumentoControllerApi;
 use App\Http\Controllers\FacultadControllerApi;
@@ -15,6 +17,7 @@ use App\Http\Controllers\RolControllerApi;
 use App\Http\Controllers\SolicitudAsignaturaControllerApi;
 use App\Http\Controllers\SolicitudControllerApi;
 use App\Http\Controllers\UserControllerApi;
+use App\Mail\SendUserPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,8 +34,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Rutas públicas para autenticación
+Route::post('/register', [RegisteredUserController::class, 'store'])
+    ->name('api.register');
+
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+    ->name('api.login');
+
+// Rutas protegidas (requieren autenticación)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('api.logout');
+
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    })->name('api.user');
 });
 
 
