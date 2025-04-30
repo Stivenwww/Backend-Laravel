@@ -30,9 +30,10 @@ use App\Http\Controllers\Api\AuthController;
 
 // Rutas públicas
 Route::group(['prefix' => 'auth'], function () {
-    Route::post('/auth/login', [AuthController::class, 'login']);
-    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('login',    [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
 });
+
 
 // Rutas protegidas
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function () {
