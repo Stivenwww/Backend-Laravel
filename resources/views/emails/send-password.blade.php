@@ -41,8 +41,10 @@
         <h1>Credenciales de acceso</h1>
         <p>Estimado/a aspirante,</p>
         <p>Le informamos que se han generado sus credenciales de acceso a la plataforma de homologaciones de la Universidad Autónoma del Cauca.</p>
-        <p><strong>Email:</strong> {{ $email }}</p>
-        <p><strong>Contraseña:</strong> {{ $password }}</p>
+        <div class="credentials">
+            <p><strong>Correo electrónico:</strong> {{ $user->email }}</p>
+            <p><strong>Contraseña temporal:</strong> {{ $password }}</p>
+        </div>
         <p>Por favor, ingrese a la plataforma y valide sus credenciales.</p>
         <p>Si tiene alguna duda, no dude en contactarnos.</p>
         <div class="footer">
