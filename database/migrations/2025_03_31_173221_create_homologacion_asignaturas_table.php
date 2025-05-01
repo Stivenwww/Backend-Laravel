@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('homologacion_asignaturas', function (Blueprint $table) {
             $table->smallIncrements('id_homologacion');
-            $table->unsignedSmallInteger('solicitud_id');
-            $table->unsignedSmallInteger('asignatura_origen_id');
-            $table->unsignedSmallInteger('asignatura_destino_id')->nullable();
-            $table->decimal('nota_destino', 3, 1)->nullable();
+            $table->unsignedSmallInteger('solicitud_id')->unique(); // Hacemos único para asegurar un registro por solicitud
+            $table->json('homologaciones'); // Guardará un array con la estructura {asignatura_origen_id, asignatura_destino_id, nota_destino, comentarios}
             $table->timestamp('fecha')->useCurrent();
-            $table->text('comentarios')->nullable();
             $table->timestamps();
 
             $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes');
-            $table->foreign('asignatura_origen_id')->references('id_asignatura')->on('asignaturas');
-            $table->foreign('asignatura_destino_id')->references('id_asignatura')->on('asignaturas');
         });
     }
 

@@ -41,8 +41,8 @@ Route::group(['middleware' => ['jwt.verify'], 'prefix' => 'auth'], function () {
 });
 
 // Rutas protegidas de negocio (requieren JWT válido)
-Route::group(['middleware' => ['jwt.verify']], function () {
-    // Países
+/* Route::group(['middleware' => ['jwt.verify']], function () {
+    // Países */
     Route::get('paises',                [PaisControllerApi::class, 'traerPaises']);
     Route::get('paises/{id}',           [PaisControllerApi::class, 'llevarPais']);
     Route::post('paises',               [PaisControllerApi::class, 'insertarPais']);
@@ -146,4 +146,4 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::post('contenidos-programaticos',               [ContenidoProgramaticoControllerApi::class, 'insertarContenidoProgramatico']);
     Route::put('contenidos-programaticos/{id}',           [ContenidoProgramaticoControllerApi::class, 'actualizarContenidoProgramatico']);
     Route::delete('contenidos-programaticos/{id}',        [ContenidoProgramaticoControllerApi::class, 'eliminarContenidoProgramatico']);
-});
+

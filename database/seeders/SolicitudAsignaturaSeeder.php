@@ -31,6 +31,9 @@ class SolicitudAsignaturaSeeder extends Seeder
             // Determinar programa_id según la institución de origen
             $programaOrigenId = $this->obtenerProgramaOrigen($institucionOrigenId, $usuario->facultad_id);
 
+            // Array para almacenar todas las asignaturas para esta solicitud
+            $asignaturasData = [];
+
             // Obtener asignaturas de origen según institución
             if ($institucionOrigenId == 2) { // SENA (usuario 6)
                 // Para SENA, usar competencias (programa_id entre 16-23)
@@ -39,16 +42,13 @@ class SolicitudAsignaturaSeeder extends Seeder
                     ->limit(6)
                     ->get();
 
-                // Registrar asignaturas de origen del SENA (competencias)
+                // Preparar datos de asignaturas de origen del SENA (competencias)
                 foreach ($asignaturasOrigen as $asignatura) {
-                    SolicitudAsignatura::create([
-                        'solicitud_id'   => $solicitud->id_solicitud,
+                    $asignaturasData[] = [
                         'asignatura_id'  => $asignatura->id_asignatura,
                         'nota_origen'    => null,
-                        'horas_sena'     => $asignatura->horas_sena,
-                        'created_at'     => now(),
-                        'updated_at'     => now(),
-                    ]);
+                        'horas_sena'     => $asignatura->horas_sena
+                    ];
                 }
             } else {
                 // Para universidades, usar materias del programa correspondiente
@@ -57,18 +57,23 @@ class SolicitudAsignaturaSeeder extends Seeder
                     ->limit(6)
                     ->get();
 
-                // Registrar asignaturas de origen universitarias (con notas)
+                // Preparar datos de asignaturas de origen universitarias (con notas)
                 foreach ($asignaturasOrigen as $asignatura) {
-                    SolicitudAsignatura::create([
-                        'solicitud_id'   => $solicitud->id_solicitud,
+                    $asignaturasData[] = [
                         'asignatura_id'  => $asignatura->id_asignatura,
                         'nota_origen'    => $this->generarNotaAprobatoria(), // Nota superior a 3.5
-                        'horas_sena'     => null,
-                        'created_at'     => now(),
-                        'updated_at'     => now(),
-                    ]);
+                        'horas_sena'     => null
+                    ];
                 }
             }
+
+            // Crear un único registro para esta solicitud con todas sus asignaturas
+            SolicitudAsignatura::create([
+                'solicitud_id' => $solicitud->id_solicitud,
+                'asignaturas'  => $asignaturasData,
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]);
         }
     }
 

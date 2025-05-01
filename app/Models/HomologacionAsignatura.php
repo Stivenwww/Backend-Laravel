@@ -15,26 +15,18 @@ class HomologacionAsignatura extends Model
 
     protected $fillable = [
         'solicitud_id',
-        'asignatura_origen_id',
-        'asignatura_destino_id',
-        'nota_destino',
+        'homologaciones', // Ahora es un campo JSON
         'fecha',
-        'comentarios',
+    ];
+
+    protected $casts = [
+        'homologaciones' => 'array', // Automáticamente convierte JSON a array y viceversa
+        'fecha' => 'datetime',
     ];
 
     // Definir las relaciones
     public function solicitud()
     {
         return $this->belongsTo(Solicitud::class, 'solicitud_id', 'id_solicitud');
-    }
-
-    public function asignaturaOrigen()
-    {
-        return $this->belongsTo(Asignatura::class, 'asignatura_origen_id', 'id_asignatura');
-    }
-
-    public function asignaturaDestino()
-    {
-        return $this->belongsTo(Asignatura::class, 'asignatura_destino_id', 'id_asignatura');
     }
 }

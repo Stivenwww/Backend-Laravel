@@ -1,5 +1,5 @@
 <?php
-
+// Primera migración - solicitud_asignaturas
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,14 +13,11 @@ return new class extends Migration
     {
         Schema::create('solicitud_asignaturas', function (Blueprint $table) {
             $table->smallIncrements('id_solicitud_asignatura');
-            $table->unsignedSmallInteger('solicitud_id');
-            $table->unsignedSmallInteger('asignatura_id');
-            $table->decimal('nota_origen', 3, 1)->nullable();
-            $table->integer('horas_sena')->nullable();
+            $table->unsignedSmallInteger('solicitud_id')->unique(); // Hacemos único para asegurar un registro por solicitud
+            $table->json('asignaturas'); // Guardará un array de asignaturas con estructura {asignatura_id, nota_origen, horas_sena}
             $table->timestamps();
 
             $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes');
-            $table->foreign('asignatura_id')->references('id_asignatura')->on('asignaturas');
         });
     }
 

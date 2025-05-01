@@ -1277,254 +1277,212 @@ return new class extends Migration {
 
 
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUD ASIGNATURAS)
-            DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturas;
-            DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturaPorId;
-            DROP PROCEDURE IF EXISTS InsertarSolicitudAsignatura;
-            DROP PROCEDURE IF EXISTS ActualizarSolicitudAsignatura;
-            DROP PROCEDURE IF EXISTS EliminarSolicitudAsignatura;
+           -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUD ASIGNATURAS)
+DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturas;
+DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturaPorId;
+DROP PROCEDURE IF EXISTS InsertarSolicitudAsignatura;
+DROP PROCEDURE IF EXISTS ActualizarSolicitudAsignatura;
+DROP PROCEDURE IF EXISTS EliminarSolicitudAsignatura;
 
-            -- OBTENER TODAS LAS SOLICITUDES DE ASIGNATURAS
-            CREATE PROCEDURE ObtenerSolicitudAsignaturas()
-            BEGIN
-                SELECT
-                    sa.id_solicitud_asignatura,
-                    s.id_solicitud,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-                    i.nombre AS institucion,
-                    a.nombre AS asignatura,
-                    a.codigo_asignatura AS codigo_asignatura,
-                    a.semestre AS semestre_asignatura,
-                    sa.nota_origen,
-                    sa.horas_sena AS horas_sena,
-                    sa.created_at,
-                    sa.updated_at
-                FROM solicitud_asignaturas sa
-                LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
-                LEFT JOIN users u ON s.usuario_id = u.id_usuario
-                LEFT JOIN asignaturas a ON sa.asignatura_id = a.id_asignatura
-                LEFT JOIN programas p ON a.programa_id = p.id_programa
-                LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
-                ORDER BY sa.id_solicitud_asignatura ASC;
-            END;
+-- OBTENER TODAS LAS SOLICITUDES DE ASIGNATURAS
+CREATE PROCEDURE ObtenerSolicitudAsignaturas()
+BEGIN
+    SELECT
+        sa.id_solicitud_asignatura,
+        sa.solicitud_id,
+        s.numero_radicado,
+        CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
+        i.nombre AS institucion,
+        sa.asignaturas, -- Campo JSON con todas las asignaturas
+        sa.created_at,
+        sa.updated_at
+    FROM solicitud_asignaturas sa
+    LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
+    LEFT JOIN users u ON s.usuario_id = u.id_usuario
+    LEFT JOIN programas p ON s.programa_destino_id = p.id_programa
+    LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
+    ORDER BY sa.id_solicitud_asignatura ASC;
+END;
 
-            -- OBTENER POR ID
-            CREATE PROCEDURE ObtenerSolicitudAsignaturaPorId(IN solicitudAsignaturaId INT)
-            BEGIN
-                SELECT
-                    sa.id_solicitud_asignatura,
-                    s.id_solicitud,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-                    i.nombre AS institucion,
-                    a.nombre AS asignatura,
-                    a.codigo_asignatura AS codigo_asignatura,
-                    a.semestre AS semestre_asignatura,
-                    sa.nota_origen,
-                    sa.horas_sena AS horas_sena,
-                    sa.created_at,
-                    sa.updated_at
-                FROM solicitud_asignaturas sa
-                LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
-                LEFT JOIN users u ON s.usuario_id = u.id_usuario
-                LEFT JOIN asignaturas a ON sa.asignatura_id = a.id_asignatura
-                LEFT JOIN programas p ON a.programa_id = p.id_programa
-                LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
-                WHERE sa.id_solicitud_asignatura = solicitudAsignaturaId;
-            END;
+-- OBTENER POR ID
+CREATE PROCEDURE ObtenerSolicitudAsignaturaPorId(IN solicitudAsignaturaId INT)
+BEGIN
+    SELECT
+        sa.id_solicitud_asignatura,
+        sa.solicitud_id,
+        s.numero_radicado,
+        CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
+        i.nombre AS institucion,
+        sa.asignaturas, -- Campo JSON con todas las asignaturas
+        sa.created_at,
+        sa.updated_at
+    FROM solicitud_asignaturas sa
+    LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
+    LEFT JOIN users u ON s.usuario_id = u.id_usuario
+    LEFT JOIN programas p ON s.programa_destino_id = p.id_programa
+    LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
+    WHERE sa.id_solicitud_asignatura = solicitudAsignaturaId;
+END;
 
-            -- INSERTAR SOLICITUD ASIGNATURA
-            CREATE PROCEDURE InsertarSolicitudAsignatura(
-                IN p_solicitud_id INT,
-                IN p_asignatura_id INT,
-                IN p_nota_origen DECIMAL(3,1),
-                IN p_horas_sena INT
-            )
-            BEGIN
-                INSERT INTO solicitud_asignaturas (
-                    solicitud_id, asignatura_id, nota_origen, horas_sena, created_at, updated_at
-                )
-                VALUES (
-                    p_solicitud_id, p_asignatura_id, p_nota_origen, p_horas_sena, NOW(), NOW()
-                );
-            END;
+-- INSERTAR SOLICITUD ASIGNATURA (ahora recibe un JSON con las asignaturas)
+CREATE PROCEDURE InsertarSolicitudAsignatura(
+    IN p_solicitud_id INT,
+    IN p_asignaturas JSON
+)
+BEGIN
+    -- Primero verificamos si ya existe un registro para esta solicitud
+    DECLARE solicitud_exists INT;
 
-            -- ACTUALIZAR SOLICITUD ASIGNATURA
-            CREATE PROCEDURE ActualizarSolicitudAsignatura(
-                IN solicitudAsignaturaId INT,
-                IN p_solicitud_id INT,
-                IN p_asignatura_id INT,
-                IN p_nota_origen DECIMAL(3,1),
-                IN p_horas_sena INT
-            )
-            BEGIN
-                UPDATE solicitud_asignaturas
-                SET solicitud_id = p_solicitud_id,
-                    asignatura_id = p_asignatura_id,
-                    nota_origen = p_nota_origen,
-                    horas_sena = p_horas_sena,
-                    updated_at = NOW()
-                WHERE id_solicitud_asignatura = solicitudAsignaturaId;
-            END;
+    SELECT COUNT(*) INTO solicitud_exists
+    FROM solicitud_asignaturas
+    WHERE solicitud_id = p_solicitud_id;
 
-            -- ELIMINAR SOLICITUD ASIGNATURA
-            CREATE PROCEDURE EliminarSolicitudAsignatura(IN solicitudAsignaturaId INT)
-            BEGIN
-                DELETE FROM solicitud_asignaturas WHERE id_solicitud_asignatura = solicitudAsignaturaId;
-            END;
+    IF solicitud_exists > 0 THEN
+        -- Si existe, actualizamos
+        UPDATE solicitud_asignaturas
+        SET asignaturas = p_asignaturas,
+            updated_at = NOW()
+        WHERE solicitud_id = p_solicitud_id;
+    ELSE
+        -- Si no existe, insertamos nuevo
+        INSERT INTO solicitud_asignaturas (
+            solicitud_id, asignaturas, created_at, updated_at
+        )
+        VALUES (
+            p_solicitud_id, p_asignaturas, NOW(), NOW()
+        );
+    END IF;
+END;
+
+-- ACTUALIZAR SOLICITUD ASIGNATURA
+CREATE PROCEDURE ActualizarSolicitudAsignatura(
+    IN solicitudAsignaturaId INT,
+    IN p_solicitud_id INT,
+    IN p_asignaturas JSON
+)
+BEGIN
+    UPDATE solicitud_asignaturas
+    SET solicitud_id = p_solicitud_id,
+        asignaturas = p_asignaturas,
+        updated_at = NOW()
+    WHERE id_solicitud_asignatura = solicitudAsignaturaId;
+END;
+
+-- ELIMINAR SOLICITUD ASIGNATURA
+CREATE PROCEDURE EliminarSolicitudAsignatura(IN solicitudAsignaturaId INT)
+BEGIN
+    DELETE FROM solicitud_asignaturas WHERE id_solicitud_asignatura = solicitudAsignaturaId;
+END;
 
 
 
 
 
-            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
-            DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
-            DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
-            DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
-            DROP PROCEDURE IF EXISTS ActualizarHomologacionAsignatura;
-            DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
+    -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
+DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
+DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
+DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
+DROP PROCEDURE IF EXISTS ActualizarHomologacionAsignatura;
+DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
 
-            -- OBTENER TODAS LAS HOMOLOGACIONES
-           CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
+-- OBTENER TODAS LAS HOMOLOGACIONES (VERSIÓN SIMPLE)
+CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
 BEGIN
     SELECT
         ha.id_homologacion,
         ha.solicitud_id,
         s.numero_radicado,
-
-        -- Asignatura origen
-        ao.id_asignatura   AS asignatura_origen_id,
-        ao.nombre          AS asignatura_origen,
-        po.nombre          AS programa_origen,
-        ao.semestre        AS semestre_origen,
-        i_origen.nombre    AS institucion_origen,
-
-        -- Asignatura destino (puede ser NULL)
-        ad.id_asignatura   AS asignatura_destino_id,
-        ad.nombre          AS asignatura_destino,
-        pd.nombre          AS programa_destino,
-        ad.semestre        AS semestre_destino,
-        i_destino.nombre   AS institucion_destino,
-
-        -- Nota y horas
-        sa.nota_origen,
-        sa.horas_sena,
-
-        -- Datos de homologación
-        ha.nota_destino,
-        ha.fecha,
-        ha.comentarios,
-        ha.created_at,
-        ha.updated_at,
-
-        -- Datos del estudiante
         CONCAT(
             u.primer_nombre, ' ',
             IFNULL(u.segundo_nombre, ''), ' ',
             u.primer_apellido, ' ',
             IFNULL(u.segundo_apellido, '')
-        ) AS estudiante
-
+        ) AS estudiante,
+        ha.homologaciones, -- Devolvemos el JSON tal cual
+        ha.fecha,
+        ha.created_at,
+        ha.updated_at
     FROM homologacion_asignaturas ha
-    JOIN asignaturas ao ON ha.asignatura_origen_id = ao.id_asignatura
-    LEFT JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
     JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
     JOIN users u ON s.usuario_id = u.id_usuario
-    LEFT JOIN solicitud_asignaturas sa
-        ON sa.solicitud_id = ha.solicitud_id
-        AND sa.asignatura_id = ha.asignatura_origen_id
-    LEFT JOIN programas po ON ao.programa_id = po.id_programa
-    LEFT JOIN instituciones i_origen ON po.institucion_id = i_origen.id_institucion
-    LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
-    LEFT JOIN instituciones i_destino ON pd.institucion_id = i_destino.id_institucion
-
     ORDER BY ha.id_homologacion ASC;
 END;
 
-            -- OBTENER UNA HOMOLOGACIÓN POR ID
-            CREATE PROCEDURE ObtenerHomologacionAsignaturaPorId(IN homologacionId INT)
+-- OBTENER UNA HOMOLOGACIÓN POR ID (VERSIÓN SIMPLE)
+CREATE PROCEDURE ObtenerHomologacionAsignaturaPorId(IN homologacionId INT)
 BEGIN
     SELECT
         ha.id_homologacion,
         ha.solicitud_id,
         s.numero_radicado,
-
-        -- Asignatura origen
-        ao.id_asignatura   AS asignatura_origen_id,
-        ao.nombre          AS asignatura_origen,
-        po.nombre          AS programa_origen,
-        ao.semestre        AS semestre_origen,
-        i_origen.nombre    AS institucion_origen,
-
-        -- Asignatura destino (puede ser NULL)
-        ad.id_asignatura   AS asignatura_destino_id,
-        ad.nombre          AS asignatura_destino,
-        pd.nombre          AS programa_destino,
-        ad.semestre        AS semestre_destino,
-        i_destino.nombre   AS institucion_destino,
-
-        -- Nota y horas
-        sa.nota_origen,
-        sa.horas_sena,
-
-        -- Datos de homologación
-        ha.nota_destino,
-        ha.fecha,
-        ha.comentarios,
-        ha.created_at,
-        ha.updated_at,
-
-        -- Datos del estudiante
         CONCAT(
             u.primer_nombre, ' ',
             IFNULL(u.segundo_nombre, ''), ' ',
             u.primer_apellido, ' ',
             IFNULL(u.segundo_apellido, '')
-        ) AS estudiante
-
+        ) AS estudiante,
+        ha.homologaciones, -- Devolvemos el JSON tal cual
+        ha.fecha,
+        ha.created_at,
+        ha.updated_at
     FROM homologacion_asignaturas ha
-    JOIN asignaturas ao ON ha.asignatura_origen_id = ao.id_asignatura
-    LEFT JOIN asignaturas ad ON ha.asignatura_destino_id = ad.id_asignatura
     JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
     JOIN users u ON s.usuario_id = u.id_usuario
-    LEFT JOIN solicitud_asignaturas sa
-        ON sa.solicitud_id = ha.solicitud_id
-        AND sa.asignatura_id = ha.asignatura_origen_id
-    LEFT JOIN programas po ON ao.programa_id = po.id_programa
-    LEFT JOIN instituciones i_origen ON po.institucion_id = i_origen.id_institucion
-    LEFT JOIN programas pd ON ad.programa_id = pd.id_programa
-    LEFT JOIN instituciones i_destino ON pd.institucion_id = i_destino.id_institucion
-
     WHERE ha.id_homologacion = homologacionId;
 END;
 
-            -- ACTUALIZAR HOMOLOGACIÓN
-            CREATE PROCEDURE ActualizarHomologacionAsignatura(
-                IN p_id_homologacion INT,
-                IN p_solicitud_id INT,
-                IN p_asignatura_origen_id INT,
-                IN p_asignatura_destino_id INT,
-                IN p_nota_destino DECIMAL(3,1),
-                IN p_comentarios TEXT
-            )
-            BEGIN
-                UPDATE homologacion_asignaturas
-                SET
-                    solicitud_id = p_solicitud_id,
-                    asignatura_origen_id = p_asignatura_origen_id,
-                    asignatura_destino_id = p_asignatura_destino_id,
-                    nota_destino = p_nota_destino,
-                    comentarios = p_comentarios,
-                    updated_at = NOW()
-                WHERE id_homologacion = p_id_homologacion;
-            END;
+-- INSERTAR HOMOLOGACIÓN ASIGNATURA (ahora recibe un JSON con las homologaciones)
+CREATE PROCEDURE InsertarHomologacionAsignatura(
+    IN p_solicitud_id INT,
+    IN p_homologaciones JSON,
+    IN p_fecha DATE
+)
+BEGIN
+    -- Verificamos si ya existe un registro para esta solicitud
+    DECLARE homologacion_exists INT;
 
-            -- ELIMINAR HOMOLOGACIÓN
-            CREATE PROCEDURE EliminarHomologacionAsignatura(IN homologacionId INT)
-            BEGIN
-                DELETE FROM homologacion_asignaturas WHERE id_homologacion = homologacionId;
-            END;
+    SELECT COUNT(*) INTO homologacion_exists
+    FROM homologacion_asignaturas
+    WHERE solicitud_id = p_solicitud_id;
 
+    IF homologacion_exists > 0 THEN
+        -- Si existe, actualizamos
+        UPDATE homologacion_asignaturas
+        SET homologaciones = p_homologaciones,
+            fecha = p_fecha,
+            updated_at = NOW()
+        WHERE solicitud_id = p_solicitud_id;
+    ELSE
+        -- Si no existe, insertamos nuevo
+        INSERT INTO homologacion_asignaturas (
+            solicitud_id, homologaciones, fecha, created_at, updated_at
+        )
+        VALUES (
+            p_solicitud_id, p_homologaciones, p_fecha, NOW(), NOW()
+        );
+    END IF;
+END;
 
+-- ACTUALIZAR HOMOLOGACIÓN
+CREATE PROCEDURE ActualizarHomologacionAsignatura(
+    IN p_id_homologacion INT,
+    IN p_solicitud_id INT,
+    IN p_homologaciones JSON
+)
+BEGIN
+    UPDATE homologacion_asignaturas
+    SET
+        solicitud_id = p_solicitud_id,
+        homologaciones = p_homologaciones,
+        updated_at = NOW()
+    WHERE id_homologacion = p_id_homologacion;
+END;
+
+-- ELIMINAR HOMOLOGACIÓN
+CREATE PROCEDURE EliminarHomologacionAsignatura(IN homologacionId INT)
+BEGIN
+    DELETE FROM homologacion_asignaturas WHERE id_homologacion = homologacionId;
+END;
 
 
 
