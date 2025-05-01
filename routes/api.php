@@ -19,13 +19,12 @@ use App\Http\Controllers\RolControllerApi;
 use App\Http\Controllers\ContenidoProgramaticoControllerApi;
 
 /*
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------
 | API Routes
-|--------------------------------------------------------------------------
-|
+|----------------------------------------------------------------------
 | Aquí puedes registrar las rutas de tu API. Están cargadas
-en el grupo 'api' dentro de RouteServiceProvider.
-|
+| en el grupo 'api' dentro de RouteServiceProvider.
+| Las rutas protegidas con JWT requieren el middleware 'jwt.verify'.
 */
 
 // Rutas públicas de autenticación
@@ -34,15 +33,15 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
 });
 
-// Rutas protegidas de autenticación
-Route::group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function () {
+// Rutas protegidas de autenticación (requieren JWT)
+Route::group(['middleware' => ['jwt.verify'], 'prefix' => 'auth'], function () {
     Route::post('logout',       [AuthController::class, 'logout']);
     Route::post('refresh',      [AuthController::class, 'refresh']);
     Route::get('user-profile', [AuthController::class, 'userProfile']);
 });
 
-// Rutas protegidas de negocio (requieren token válido)
-Route::group(['middleware' => ['auth:api']], function () {
+// Rutas protegidas de negocio (requieren JWT válido)
+Route::group(['middleware' => ['jwt.verify']], function () {
     // Países
     Route::get('paises',                [PaisControllerApi::class, 'traerPaises']);
     Route::get('paises/{id}',           [PaisControllerApi::class, 'llevarPais']);
