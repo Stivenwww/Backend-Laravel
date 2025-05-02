@@ -80,7 +80,10 @@ class AuthController extends Controller
         ]);
 
         // Aquí iría el código para enviar el correo con las credenciales
-        Mail::to($user->email)->send(new SoporteMailable($user, $password));
+        // AuthController.php, método register()
+        Mail::to($user->email)
+            ->send(new SoporteMailable($user->email, $password));
+
 
         return response()->json([
             'message' => 'Usuario registrado exitosamente. Se ha enviado un correo con las credenciales.',

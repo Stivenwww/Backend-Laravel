@@ -28,7 +28,7 @@ class SoporteMailable extends Mailable
     public function build()
     {
         return $this->subject('Email.soporte')
-            ->view('emails.send-password')
+            ->view('emails.soporte')
             ->with([
                 'email' => $this->email,
                 'password' => $this->password,

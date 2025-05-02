@@ -147,7 +147,7 @@ class AsignaturaControllerApi extends Controller
             $asignaturasConPrograma = $asignaturas->map(function ($asignatura) {
                 return [
                     'nombre_programa' => $asignatura->programa->nombre,  // Suponiendo que el campo del programa es 'nombre'
-                    'id_asignatura' => $asignatura->id,
+                    'id_asignatura' => $asignatura->id_asignatura,
                     'programa_id' => $asignatura->programa_id,
                     'nombre' => $asignatura->nombre,
                     'tipo' => $asignatura->tipo,
