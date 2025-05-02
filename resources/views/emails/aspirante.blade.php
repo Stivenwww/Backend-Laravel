@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -90,18 +89,15 @@
             color: #ffffff;
             background: #1858b8;
             border: #ffffff 2px solid;
-
         }
 
-
-        .student-info h3 :hover{
+        .student-info h3 :hover {
             margin-top: 0;
             color: #ffffff;
             border-bottom: 1px solid #c0d3e8;
             padding-bottom: 8px;
             font-size: 18px;
         }
-
 
         .footer {
             text-align: center;
@@ -123,7 +119,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -131,39 +126,29 @@
         </div>
 
         <div class="content">
-            <p>Estimado Coordinador:</p>
-            <p>Se ha registrado una nueva solicitud de homologación que requiere su revisión y validación en el sistema.
-            </p>
+            <p>Estimado/a aspirante:</p>
+            <p>Su solicitud de homologación ha sido registrada exitosamente. Le recomendamos estar atento/a a la plataforma, donde la Corporación Universitaria Autónoma del Cauca le notificará los pasos a seguir. Al ingresar a la plataforma encontrará información adicional relacionada con su solicitud.</p>
 
             <div class="radicado">
                 Número de radicado: {{ $numero_radicado }}
             </div>
 
             <div class="student-info">
-                <h3>Datos del Estudiante</h3>
-                <p><span class="label">Nombre completo:</span> {{ $primer_nombre }} {{ $segundo_nombre }}
-                    {{ $primer_apellido }} {{ $segundo_apellido }}</p>
-                <p><span class="label">Correo electrónico:</span> {{ $email }}</p>
+                <h3>Datos del Aspirante</h3>
+                <p><span class="label">Nombre completo:</span> {{ $primer_nombre }} {{ $segundo_nombre }} {{ $primer_apellido }} {{ $segundo_apellido }}</p>
                 <p><span class="label">Programa destino:</span> {{ $programa_destino }}</p>
-                <p><span class="label">Finalizó estudios:</span> {{ $finalizo_estudios }}</p>
-                <p><span class="label">Fecha de solicitud:</span> {{ $fecha_solicitud }}</p>
                 <p><span class="label">Estado actual:</span> {{ $estado }}</p>
             </div>
 
-            <p>Le agradecemos ingresar al sistema de homologaciones para gestionar esta solicitud de manera oportuna.
-            </p>
-
-            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}"
-                class="button">
+            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}" class="button">
                 Ver Solicitud en el Sistema
             </a>
         </div>
 
         <div class="footer">
-            <p>Este es un mensaje automático del Sistema de Homologaciones de la Universidad Autónoma del Cauca.</p>
-            <p>Por favor, no responda a este correo. Para soporte, comuníquese con el administrador del sistema.</p>
+            <p>Este es un correo automático del Sistema de Homologaciones de la Universidad Autónoma del Cauca.</p>
+            <p>No responda a este correo. Para soporte, contacte al administrador del sistema.</p>
         </div>
     </div>
 </body>
-
 </html>

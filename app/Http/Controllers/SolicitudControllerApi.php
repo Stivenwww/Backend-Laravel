@@ -2,12 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AspiranteMailable;
+use App\Mail\ControlSeguimientoMailable;
+use App\Mail\CoordinacionMailable;
+use App\Mail\SecretariaMailable;
+use App\Mail\VicerrectoriaMailable;
+use App\Mail\ViserrectoriaMailable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Solicitud;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SolicitudControllerApi extends Controller
 {
+    public $notificacionSecretariaController;
+    public function __construct(
+        NotificacionSecretariaController $notificacionSecretariaController
+    ) {
+        $this->notificacionSecretariaController = $notificacionSecretariaController;
+    }
+
     // Método para obtener todas las solicitudes
     public function traerSolicitudes()
     {
@@ -63,6 +78,20 @@ class SolicitudControllerApi extends Controller
             $solicitud->ruta_pdf_resolucion = $request->ruta_pdf_resolucion;
             $solicitud->save();
 
+            // Log de la solicitud insertada
+            Log::info('Solicitud insertada correctamente', [
+                'usuario_id' => $request->usuario_id,
+                'programa_destino_id' => $request->programa_destino_id,
+                'finalizo_estudios' => $request->finalizo_estudios,
+                'fecha_finalizacion_estudios' => $request->fecha_finalizacion_estudios,
+                'fecha_ultimo_semestre_cursado' => $request->fecha_ultimo_semestre_cursado,
+                'estado' => $request->estado ?? 'Radicado',
+                'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion
+            ]);
+
+            // Enviar correo a la secretaria con el ID de la solicitud recién creada
+            $this->enviarCorreo($solicitud->id_solicitud);
+
             return response()->json([
                 'mensaje' => 'Solicitud insertada correctamente',
                 'numero_radicado' => $solicitud->numero_radicado,
@@ -73,6 +102,55 @@ class SolicitudControllerApi extends Controller
                 'mensaje' => 'Error al insertar la solicitud',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function enviarCorreo($solicitudId)
+    {
+        try {
+            $solicitud = Solicitud::with('usuario', 'programaDestino')->findOrFail($solicitudId);
+            $usuario = $solicitud->usuario;
+
+            // Datos a enviar adaptados para la clase SecretariaMailable
+            $datos = [
+                'primer_nombre' => $usuario->primer_nombre,
+                'segundo_nombre' => $usuario->segundo_nombre,
+                'primer_apellido' => $usuario->primer_apellido,
+                'segundo_apellido' => $usuario->segundo_apellido,
+                'email' => $usuario->email,
+                'programa_destino' => $solicitud->programaDestino->nombre ?? 'No especificado',
+                'finalizo_estudios' => $solicitud->finalizo_estudios ? 'Sí' : 'No',
+                'fecha_solicitud' => $solicitud->fecha_solicitud,
+                'estado' => $solicitud->estado,
+                'numero_radicado' => $solicitud->numero_radicado
+            ];
+
+            // Enviar correo a una dirección real de correo
+            //primeras notificaciones de cuando se crea una solicitud
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new SecretariaMailable($datos));
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new CoordinacionMailable($datos));
+            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+
+            //Aspirante prueba para vere si se envía el correo y si llega
+            //Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
+
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new ControlSeguimientoMailable($datos));
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new VicerrectoriaMailable($datos));
+
+
+
+            // Registrar éxito en el log
+            Log::info('Correo enviado exitosamente a Secretaría', ['radicado' => $solicitud->numero_radicado]);
+
+            return true;
+        } catch (\Exception $e) {
+            // Registrar error en el log
+            Log::error('Error al enviar correo a Secretaría', [
+                'error email notificacion secretaria' => $e->getMessage(),
+                'trace email notificacion secretaria' => $e->getTraceAsString()
+            ]);
+
+            return false;
         }
     }
 

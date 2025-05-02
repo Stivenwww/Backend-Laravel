@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class VicerrectoriaMailable extends Mailable
+class AspiranteMailable extends Mailable
 {
     use Queueable, SerializesModels;
     public $primer_nombre;
@@ -14,13 +14,11 @@ class VicerrectoriaMailable extends Mailable
     public $primer_apellido;
     public $segundo_apellido;
     public $email;
-
-    public $solicitud_id;
-    public $asignatura_origen_id;
-    public $asignatura_destino_id;
-    public $nota_destino;
-    public $fecha;
-    public $comentarios;
+    public $programa_destino;
+    public $finalizo_estudios;
+    public $fecha_solicitud;
+    public $estado;
+    public $numero_radicado;
 
     /**
      * Create a new message instance.
@@ -34,12 +32,11 @@ class VicerrectoriaMailable extends Mailable
         $this->primer_apellido = $data['primer_apellido'];
         $this->segundo_apellido = $data['segundo_apellido'];
         $this->email = $data['email'];
-        $this->solicitud_id = $data['solicitud_id'];
-        $this->asignatura_origen_id = $data['asignatura_origen_id'];
-        $this->asignatura_destino_id = $data['asignatura_destino_id'];
-        $this->nota_destino = $data['nota_destino'];
-        $this->fecha = $data['fecha'];
-        $this->comentarios = $data['comentarios'];
+        $this->programa_destino = $data['programa_destino'];
+        $this->finalizo_estudios = $data['finalizo_estudios'];
+        $this->fecha_solicitud = $data['fecha_solicitud'];
+        $this->estado = $data['estado'];
+        $this->numero_radicado = $data['numero_radicado'];
     }
 
     /**
@@ -49,7 +46,7 @@ class VicerrectoriaMailable extends Mailable
      */
     public function build()
     {
-        return $this->subject('Nueva Homologación de Asignatura')
-                    ->view('emails.Viserrectoria');
+        return $this->subject('Nueva Solicitud de Homologación')
+                    ->view('emails.aspirante');
     }
 }

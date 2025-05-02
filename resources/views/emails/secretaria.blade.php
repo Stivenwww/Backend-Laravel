@@ -75,9 +75,10 @@
             width: 90%;
             margin: 30px auto 10px;
             text-align: center;
-            background: #004080;
+            background: #ffffff;
             color: #ffffff;
             padding: 14px;
+            border: #004080 2px solid;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
@@ -85,8 +86,21 @@
         }
 
         .button:hover {
-            background: #0059b3;
+            color: #ffffff;
+            background: #1858b8;
+            border: #ffffff 2px solid;
+
         }
+
+
+        .student-info h3 :hover{
+            margin-top: 0;
+            color: #ffffff;
+            border-bottom: 1px solid #c0d3e8;
+            padding-bottom: 8px;
+            font-size: 18px;
+        }
+
 
         .footer {
             text-align: center;
