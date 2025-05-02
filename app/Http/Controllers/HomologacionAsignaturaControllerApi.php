@@ -70,76 +70,139 @@ class HomologacionAsignaturaControllerApi extends Controller
     }
 
     // Método para insertar una nueva homologación de asignatura
-    public function insertarHomologacionAsignatura(Request $request)
-    {
-        try {
-            // Validamos los datos
-            $request->validate([
-                'solicitud_id' => 'required|integer',
-                'homologaciones' => 'required|array',
-                'homologaciones.*.asignatura_origen_id' => 'required|integer',
-                'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
-                'homologaciones.*.nota_destino' => 'nullable|numeric',
-                'homologaciones.*.comentarios' => 'nullable|string',
-            ]);
+    // Método para insertar una nueva homologación de asignatura
+public function insertarHomologacionAsignatura(Request $request)
+{
+    try {
+        // Validamos los datos
+        $request->validate([
+            'solicitud_id' => 'required|integer',
+            'asignaturas_origen' => 'required|array',
+            'asignaturas_origen.*' => 'required|integer',
+        ]);
 
-            // Convertimos el array de homologaciones a formato JSON para almacenar
-            $homologacionesJson = json_encode($request->homologaciones);
+        // Obtenemos las asignaturas de origen desde el request
+        $asignaturasOrigen = $request->asignaturas_origen;
 
-            // Insertar llamando al procedimiento almacenado
-            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?)', [
-                $request->solicitud_id,
-                $homologacionesJson,
-                Carbon::now()->toDateString()
-            ]);
-
-            return response()->json([
-                'mensaje' => 'Homologación de asignatura insertada correctamente'
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'mensaje' => 'Error al insertar la homologación de asignatura',
-                'error' => $e->getMessage(),
-                'linea' => $e->getLine(),
-                'archivo' => $e->getFile()
-            ], 500);
+        // Creamos la estructura de homologaciones con destinos vacíos
+        $homologaciones = [];
+        foreach ($asignaturasOrigen as $asignaturaOrigenId) {
+            $homologaciones[] = [
+                'asignatura_origen_id' => $asignaturaOrigenId,
+                'asignatura_destino_id' => null,
+                'nota_destino' => null,
+                'comentarios' => null
+            ];
         }
+
+        // Convertimos el array de homologaciones a formato JSON para almacenar
+        $homologacionesJson = json_encode($homologaciones);
+
+        // Insertar llamando al procedimiento almacenado
+        DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?)', [
+            $request->solicitud_id,
+            $homologacionesJson,
+            Carbon::now()->toDateString()
+        ]);
+
+        return response()->json([
+            'mensaje' => 'Homologación de asignatura insertada correctamente',
+            'datos' => [
+                'solicitud_id' => $request->solicitud_id,
+                'homologaciones' => $homologaciones
+            ]
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'mensaje' => 'Error al insertar la homologación de asignatura',
+            'error' => $e->getMessage(),
+            'linea' => $e->getLine(),
+            'archivo' => $e->getFile()
+        ], 500);
     }
+}
 
-    // Método para actualizar una homologación de asignatura
-    public function actualizarHomologacionAsignatura(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'solicitud_id' => 'required|integer',
-                'homologaciones' => 'required|array',
-                'homologaciones.*.asignatura_origen_id' => 'required|integer',
-                'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
-                'homologaciones.*.nota_destino' => 'nullable|numeric',
-                'homologaciones.*.comentarios' => 'nullable|string',
-            ]);
+    // Método para actualizar múltiples asignaturas destino en una homologación con una sola petición
+public function actualizarHomologacionAsignatura(Request $request, $id)
+{
+    try {
+        $request->validate([
+            'homologaciones' => 'required|array',
+            'homologaciones.*.asignatura_origen_id' => 'required|integer',
+            'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
+            'homologaciones.*.nota_destino' => 'nullable|numeric',
+            'homologaciones.*.comentarios' => 'nullable|string',
+        ]);
 
-            // Convertimos el array de homologaciones a formato JSON para almacenar
-            $homologacionesJson = json_encode($request->homologaciones);
+        // Obtenemos la homologación actual
+        $homologacion = HomologacionAsignatura::findOrFail($id);
 
-            DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?)', [
-                $id,
-                $request->solicitud_id,
-                $homologacionesJson
-            ]);
+        // Decodificamos las homologaciones existentes
+        $homologacionesActuales = $homologacion->homologaciones;
 
-            return response()->json([
-                'mensaje' => 'Homologación de asignatura actualizada correctamente'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'mensaje' => 'Error al actualizar la homologación de asignatura',
-                'error' => $e->getMessage(),
-                'linea' => $e->getLine(),
-                'archivo' => $e->getFile()
-            ], 500);
+        // Creamos un mapeo de origen_id => índice para buscar rápidamente
+        $mapeoIndices = [];
+        foreach ($homologacionesActuales as $key => $homologacionItem) {
+            $mapeoIndices[$homologacionItem['asignatura_origen_id']] = $key;
         }
+
+        // Asignaturas actualizadas y no encontradas
+        $actualizadas = [];
+        $noEncontradas = [];
+
+        // Procesamos cada homologación del request
+        foreach ($request->homologaciones as $homologacionRequest) {
+            $origenId = $homologacionRequest['asignatura_origen_id'];
+
+            // Verificamos si la asignatura origen existe en la homologación actual
+            if (isset($mapeoIndices[$origenId])) {
+                $index = $mapeoIndices[$origenId];
+
+                // Actualizamos solo los campos de destino
+                $homologacionesActuales[$index]['asignatura_destino_id'] = $homologacionRequest['asignatura_destino_id'];
+                $homologacionesActuales[$index]['nota_destino'] = $homologacionRequest['nota_destino'];
+                $homologacionesActuales[$index]['comentarios'] = $homologacionRequest['comentarios'] ?? null;
+
+                $actualizadas[] = $origenId;
+            } else {
+                $noEncontradas[] = $origenId;
+            }
+        }
+
+        // Si hay asignaturas no encontradas, devolvemos advertencia
+        if (!empty($noEncontradas)) {
+            return response()->json([
+                'mensaje' => 'Algunas asignaturas de origen no fueron encontradas en esta homologación',
+                'asignaturas_no_encontradas' => $noEncontradas,
+                'asignaturas_actualizadas' => $actualizadas
+            ], 400);
+        }
+
+        // Convertimos a JSON para almacenar
+        $homologacionesJson = json_encode($homologacionesActuales);
+
+        // Actualizamos usando el procedimiento almacenado
+        DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?)', [
+            $id,
+            $homologacion->solicitud_id,
+            $homologacionesJson,
+            now()->toDateString()
+        ]);
+
+        return response()->json([
+            'mensaje' => 'Homologación de asignaturas actualizada correctamente',
+            'asignaturas_actualizadas' => $actualizadas,
+            'total_actualizadas' => count($actualizadas)
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'mensaje' => 'Error al actualizar la homologación de asignatura',
+            'error' => $e->getMessage(),
+            'linea' => $e->getLine(),
+            'archivo' => $e->getFile()
+        ], 500);
     }
+}
 
     // Método para eliminar una homologación de asignatura
     public function eliminarHomologacionAsignatura($id)
