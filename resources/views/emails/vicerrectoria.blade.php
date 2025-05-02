@@ -13,6 +13,7 @@
     </style>
 </head>
 <body>
+{{-- somo nosotros como equipo y soporte de la plataforma  --}}
     <div class="container">
         <h1>Resultado de Homologación</h1>
         <p>Estimado/a Aspirante,</p>

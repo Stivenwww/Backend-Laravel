@@ -122,8 +122,8 @@ public function insertarHomologacionAsignatura(Request $request)
     }
 }
 
-    // Método para actualizar múltiples asignaturas destino en una homologación con una sola petición
-public function actualizarHomologacionAsignatura(Request $request, $id)
+    // Método para actualizar una homologación de asignatura
+    public function actualizarHomologacionAsignatura(Request $request, $id)
 {
     try {
         $request->validate([

@@ -13,6 +13,7 @@
     </style>
 </head>
 <body>
+    {{--  --}}
     <div class="container">
         <h1>Homologaciones Pendientes</h1>
         <p>Estimado/a Coordinador/a,</p>

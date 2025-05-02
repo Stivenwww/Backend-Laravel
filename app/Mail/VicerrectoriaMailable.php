@@ -2,28 +2,24 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
-class CredencialesUsuario extends Mailable
+class VicerrectoriaMailable extends Mailable
 {
     use Queueable, SerializesModels;
-
-    public $user;
-    public $password;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, string $password)
+    public function __construct()
     {
-        $this->user = $user;
-        $this->password = $password;
+        //
     }
 
     /**
@@ -32,7 +28,8 @@ class CredencialesUsuario extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tus Credenciales de Acceso',
+            from: new Address ('homologaciones@uniautonoma.edu.co','Universidad Autonoma del Cauca'),
+            subject: 'Homologacion Uniautonoma',
         );
     }
 
@@ -42,7 +39,7 @@ class CredencialesUsuario extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.credenciales',
+            view: 'emails.homologaciones',
         );
     }
 

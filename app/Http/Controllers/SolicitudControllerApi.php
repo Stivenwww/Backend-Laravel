@@ -65,7 +65,8 @@ class SolicitudControllerApi extends Controller
 
             return response()->json([
                 'mensaje' => 'Solicitud insertada correctamente',
-                'numero_radicado' => $solicitud->numero_radicado
+                'numero_radicado' => $solicitud->numero_radicado,
+                'id_solicitud' => $solicitud->id_solicitud
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
