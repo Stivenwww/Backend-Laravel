@@ -1277,212 +1277,212 @@ return new class extends Migration {
 
 
 
-           -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUD ASIGNATURAS)
-DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturas;
-DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturaPorId;
-DROP PROCEDURE IF EXISTS InsertarSolicitudAsignatura;
-DROP PROCEDURE IF EXISTS ActualizarSolicitudAsignatura;
-DROP PROCEDURE IF EXISTS EliminarSolicitudAsignatura;
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUD ASIGNATURAS)
+            DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturas;
+            DROP PROCEDURE IF EXISTS ObtenerSolicitudAsignaturaPorId;
+            DROP PROCEDURE IF EXISTS InsertarSolicitudAsignatura;
+            DROP PROCEDURE IF EXISTS ActualizarSolicitudAsignatura;
+            DROP PROCEDURE IF EXISTS EliminarSolicitudAsignatura;
 
--- OBTENER TODAS LAS SOLICITUDES DE ASIGNATURAS
-CREATE PROCEDURE ObtenerSolicitudAsignaturas()
-BEGIN
-    SELECT
-        sa.id_solicitud_asignatura,
-        sa.solicitud_id,
-        s.numero_radicado,
-        CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-        i.nombre AS institucion,
-        sa.asignaturas, -- Campo JSON con todas las asignaturas
-        sa.created_at,
-        sa.updated_at
-    FROM solicitud_asignaturas sa
-    LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
-    LEFT JOIN users u ON s.usuario_id = u.id_usuario
-    LEFT JOIN programas p ON s.programa_destino_id = p.id_programa
-    LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
-    ORDER BY sa.id_solicitud_asignatura ASC;
-END;
+            -- OBTENER TODAS LAS SOLICITUDES DE ASIGNATURAS
+            CREATE PROCEDURE ObtenerSolicitudAsignaturas()
+            BEGIN
+                SELECT
+                    sa.id_solicitud_asignatura,
+                    sa.solicitud_id,
+                    s.numero_radicado,
+                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
+                    i.nombre AS institucion,
+                    sa.asignaturas, -- Campo JSON con todas las asignaturas
+                    sa.created_at,
+                    sa.updated_at
+                FROM solicitud_asignaturas sa
+                LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
+                LEFT JOIN users u ON s.usuario_id = u.id_usuario
+                LEFT JOIN programas p ON s.programa_destino_id = p.id_programa
+                LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
+                ORDER BY sa.id_solicitud_asignatura ASC;
+            END;
 
--- OBTENER POR ID
-CREATE PROCEDURE ObtenerSolicitudAsignaturaPorId(IN solicitudAsignaturaId INT)
-BEGIN
-    SELECT
-        sa.id_solicitud_asignatura,
-        sa.solicitud_id,
-        s.numero_radicado,
-        CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-        i.nombre AS institucion,
-        sa.asignaturas, -- Campo JSON con todas las asignaturas
-        sa.created_at,
-        sa.updated_at
-    FROM solicitud_asignaturas sa
-    LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
-    LEFT JOIN users u ON s.usuario_id = u.id_usuario
-    LEFT JOIN programas p ON s.programa_destino_id = p.id_programa
-    LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
-    WHERE sa.id_solicitud_asignatura = solicitudAsignaturaId;
-END;
+            -- OBTENER POR ID
+            CREATE PROCEDURE ObtenerSolicitudAsignaturaPorId(IN solicitudAsignaturaId INT)
+            BEGIN
+                SELECT
+                    sa.id_solicitud_asignatura,
+                    sa.solicitud_id,
+                    s.numero_radicado,
+                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
+                    i.nombre AS institucion,
+                    sa.asignaturas, -- Campo JSON con todas las asignaturas
+                    sa.created_at,
+                    sa.updated_at
+                FROM solicitud_asignaturas sa
+                LEFT JOIN solicitudes s ON sa.solicitud_id = s.id_solicitud
+                LEFT JOIN users u ON s.usuario_id = u.id_usuario
+                LEFT JOIN programas p ON s.programa_destino_id = p.id_programa
+                LEFT JOIN instituciones i ON p.institucion_id = i.id_institucion
+                WHERE sa.id_solicitud_asignatura = solicitudAsignaturaId;
+            END;
 
--- INSERTAR SOLICITUD ASIGNATURA (ahora recibe un JSON con las asignaturas)
-CREATE PROCEDURE InsertarSolicitudAsignatura(
-    IN p_solicitud_id INT,
-    IN p_asignaturas JSON
-)
-BEGIN
-    -- Primero verificamos si ya existe un registro para esta solicitud
-    DECLARE solicitud_exists INT;
+            -- INSERTAR SOLICITUD ASIGNATURA (ahora recibe un JSON con las asignaturas)
+            CREATE PROCEDURE InsertarSolicitudAsignatura(
+                IN p_solicitud_id INT,
+                IN p_asignaturas JSON
+            )
+            BEGIN
+                -- Primero verificamos si ya existe un registro para esta solicitud
+                DECLARE solicitud_exists INT;
 
-    SELECT COUNT(*) INTO solicitud_exists
-    FROM solicitud_asignaturas
-    WHERE solicitud_id = p_solicitud_id;
+                SELECT COUNT(*) INTO solicitud_exists
+                FROM solicitud_asignaturas
+                WHERE solicitud_id = p_solicitud_id;
 
-    IF solicitud_exists > 0 THEN
-        -- Si existe, actualizamos
-        UPDATE solicitud_asignaturas
-        SET asignaturas = p_asignaturas,
-            updated_at = NOW()
-        WHERE solicitud_id = p_solicitud_id;
-    ELSE
-        -- Si no existe, insertamos nuevo
-        INSERT INTO solicitud_asignaturas (
-            solicitud_id, asignaturas, created_at, updated_at
-        )
-        VALUES (
-            p_solicitud_id, p_asignaturas, NOW(), NOW()
-        );
-    END IF;
-END;
+                IF solicitud_exists > 0 THEN
+                    -- Si existe, actualizamos
+                    UPDATE solicitud_asignaturas
+                    SET asignaturas = p_asignaturas,
+                        updated_at = NOW()
+                    WHERE solicitud_id = p_solicitud_id;
+                ELSE
+                    -- Si no existe, insertamos nuevo
+                    INSERT INTO solicitud_asignaturas (
+                        solicitud_id, asignaturas, created_at, updated_at
+                    )
+                    VALUES (
+                        p_solicitud_id, p_asignaturas, NOW(), NOW()
+                    );
+                END IF;
+            END;
 
--- ACTUALIZAR SOLICITUD ASIGNATURA
-CREATE PROCEDURE ActualizarSolicitudAsignatura(
-    IN solicitudAsignaturaId INT,
-    IN p_solicitud_id INT,
-    IN p_asignaturas JSON
-)
-BEGIN
-    UPDATE solicitud_asignaturas
-    SET solicitud_id = p_solicitud_id,
-        asignaturas = p_asignaturas,
-        updated_at = NOW()
-    WHERE id_solicitud_asignatura = solicitudAsignaturaId;
-END;
+            -- ACTUALIZAR SOLICITUD ASIGNATURA
+            CREATE PROCEDURE ActualizarSolicitudAsignatura(
+                IN solicitudAsignaturaId INT,
+                IN p_solicitud_id INT,
+                IN p_asignaturas JSON
+            )
+            BEGIN
+                UPDATE solicitud_asignaturas
+                SET solicitud_id = p_solicitud_id,
+                    asignaturas = p_asignaturas,
+                    updated_at = NOW()
+                WHERE id_solicitud_asignatura = solicitudAsignaturaId;
+            END;
 
--- ELIMINAR SOLICITUD ASIGNATURA
-CREATE PROCEDURE EliminarSolicitudAsignatura(IN solicitudAsignaturaId INT)
-BEGIN
-    DELETE FROM solicitud_asignaturas WHERE id_solicitud_asignatura = solicitudAsignaturaId;
-END;
-
-
+            -- ELIMINAR SOLICITUD ASIGNATURA
+            CREATE PROCEDURE EliminarSolicitudAsignatura(IN solicitudAsignaturaId INT)
+            BEGIN
+                DELETE FROM solicitud_asignaturas WHERE id_solicitud_asignatura = solicitudAsignaturaId;
+            END;
 
 
 
-    -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
-DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
-DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
-DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
-DROP PROCEDURE IF EXISTS ActualizarHomologacionAsignatura;
-DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
 
--- OBTENER TODAS LAS HOMOLOGACIONES (VERSIÓN SIMPLE)
-CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
-BEGIN
-    SELECT
-        ha.id_homologacion,
-        ha.solicitud_id,
-        s.numero_radicado,
-        CONCAT(
-            u.primer_nombre, ' ',
-            IFNULL(u.segundo_nombre, ''), ' ',
-            u.primer_apellido, ' ',
-            IFNULL(u.segundo_apellido, '')
-        ) AS estudiante,
-        ha.homologaciones, -- Devolvemos el JSON tal cual
-        ha.fecha,
-        ha.created_at,
-        ha.updated_at
-    FROM homologacion_asignaturas ha
-    JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
-    JOIN users u ON s.usuario_id = u.id_usuario
-    ORDER BY ha.id_homologacion ASC;
-END;
 
--- OBTENER UNA HOMOLOGACIÓN POR ID (VERSIÓN SIMPLE)
-CREATE PROCEDURE ObtenerHomologacionAsignaturaPorId(IN homologacionId INT)
-BEGIN
-    SELECT
-        ha.id_homologacion,
-        ha.solicitud_id,
-        s.numero_radicado,
-        CONCAT(
-            u.primer_nombre, ' ',
-            IFNULL(u.segundo_nombre, ''), ' ',
-            u.primer_apellido, ' ',
-            IFNULL(u.segundo_apellido, '')
-        ) AS estudiante,
-        ha.homologaciones, -- Devolvemos el JSON tal cual
-        ha.fecha,
-        ha.created_at,
-        ha.updated_at
-    FROM homologacion_asignaturas ha
-    JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
-    JOIN users u ON s.usuario_id = u.id_usuario
-    WHERE ha.id_homologacion = homologacionId;
-END;
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
+            DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
+            DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
+            DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
+            DROP PROCEDURE IF EXISTS ActualizarHomologacionAsignatura;
+            DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
 
--- INSERTAR HOMOLOGACIÓN ASIGNATURA (ahora recibe un JSON con las homologaciones)
-CREATE PROCEDURE InsertarHomologacionAsignatura(
-    IN p_solicitud_id INT,
-    IN p_homologaciones JSON,
-    IN p_fecha DATE
-)
-BEGIN
-    -- Verificamos si ya existe un registro para esta solicitud
-    DECLARE homologacion_exists INT;
+            -- OBTENER TODAS LAS HOMOLOGACIONES (VERSIÓN SIMPLE)
+            CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
+            BEGIN
+                SELECT
+                    ha.id_homologacion,
+                    ha.solicitud_id,
+                    s.numero_radicado,
+                    CONCAT(
+                        u.primer_nombre, ' ',
+                        IFNULL(u.segundo_nombre, ''), ' ',
+                        u.primer_apellido, ' ',
+                        IFNULL(u.segundo_apellido, '')
+                    ) AS estudiante,
+                    ha.homologaciones, -- Devolvemos el JSON tal cual
+                    ha.fecha,
+                    ha.created_at,
+                    ha.updated_at
+                FROM homologacion_asignaturas ha
+                JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
+                JOIN users u ON s.usuario_id = u.id_usuario
+                ORDER BY ha.id_homologacion ASC;
+            END;
 
-    SELECT COUNT(*) INTO homologacion_exists
-    FROM homologacion_asignaturas
-    WHERE solicitud_id = p_solicitud_id;
+            -- OBTENER UNA HOMOLOGACIÓN POR ID (VERSIÓN SIMPLE)
+            CREATE PROCEDURE ObtenerHomologacionAsignaturaPorId(IN homologacionId INT)
+            BEGIN
+                SELECT
+                    ha.id_homologacion,
+                    ha.solicitud_id,
+                    s.numero_radicado,
+                    CONCAT(
+                        u.primer_nombre, ' ',
+                        IFNULL(u.segundo_nombre, ''), ' ',
+                        u.primer_apellido, ' ',
+                        IFNULL(u.segundo_apellido, '')
+                    ) AS estudiante,
+                    ha.homologaciones, -- Devolvemos el JSON tal cual
+                    ha.fecha,
+                    ha.created_at,
+                    ha.updated_at
+                FROM homologacion_asignaturas ha
+                JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
+                JOIN users u ON s.usuario_id = u.id_usuario
+                WHERE ha.id_homologacion = homologacionId;
+            END;
 
-    IF homologacion_exists > 0 THEN
-        -- Si existe, actualizamos
-        UPDATE homologacion_asignaturas
-        SET homologaciones = p_homologaciones,
-            fecha = p_fecha,
-            updated_at = NOW()
-        WHERE solicitud_id = p_solicitud_id;
-    ELSE
-        -- Si no existe, insertamos nuevo
-        INSERT INTO homologacion_asignaturas (
-            solicitud_id, homologaciones, fecha, created_at, updated_at
-        )
-        VALUES (
-            p_solicitud_id, p_homologaciones, p_fecha, NOW(), NOW()
-        );
-    END IF;
-END;
+            -- INSERTAR HOMOLOGACIÓN ASIGNATURA (ahora recibe un JSON con las homologaciones)
+            CREATE PROCEDURE InsertarHomologacionAsignatura(
+                IN p_solicitud_id INT,
+                IN p_homologaciones JSON,
+                IN p_fecha DATE
+            )
+            BEGIN
+                -- Verificamos si ya existe un registro para esta solicitud
+                DECLARE homologacion_exists INT;
 
--- ACTUALIZAR HOMOLOGACIÓN
-CREATE PROCEDURE ActualizarHomologacionAsignatura(
-    IN p_id_homologacion INT,
-    IN p_solicitud_id INT,
-    IN p_homologaciones JSON
-)
-BEGIN
-    UPDATE homologacion_asignaturas
-    SET
-        solicitud_id = p_solicitud_id,
-        homologaciones = p_homologaciones,
-        updated_at = NOW()
-    WHERE id_homologacion = p_id_homologacion;
-END;
+                SELECT COUNT(*) INTO homologacion_exists
+                FROM homologacion_asignaturas
+                WHERE solicitud_id = p_solicitud_id;
 
--- ELIMINAR HOMOLOGACIÓN
-CREATE PROCEDURE EliminarHomologacionAsignatura(IN homologacionId INT)
-BEGIN
-    DELETE FROM homologacion_asignaturas WHERE id_homologacion = homologacionId;
-END;
+                IF homologacion_exists > 0 THEN
+                    -- Si existe, actualizamos
+                    UPDATE homologacion_asignaturas
+                    SET homologaciones = p_homologaciones,
+                        fecha = p_fecha,
+                        updated_at = NOW()
+                    WHERE solicitud_id = p_solicitud_id;
+                ELSE
+                    -- Si no existe, insertamos nuevo
+                    INSERT INTO homologacion_asignaturas (
+                        solicitud_id, homologaciones, fecha, created_at, updated_at
+                    )
+                    VALUES (
+                        p_solicitud_id, p_homologaciones, p_fecha, NOW(), NOW()
+                    );
+                END IF;
+            END;
+
+            -- ACTUALIZAR HOMOLOGACIÓN
+            CREATE PROCEDURE ActualizarHomologacionAsignatura(
+                IN p_id_homologacion INT,
+                IN p_solicitud_id INT,
+                IN p_homologaciones JSON
+            )
+            BEGIN
+                UPDATE homologacion_asignaturas
+                SET
+                    solicitud_id = p_solicitud_id,
+                    homologaciones = p_homologaciones,
+                    updated_at = NOW()
+                WHERE id_homologacion = p_id_homologacion;
+            END;
+
+            -- ELIMINAR HOMOLOGACIÓN
+            CREATE PROCEDURE EliminarHomologacionAsignatura(IN homologacionId INT)
+            BEGIN
+                DELETE FROM homologacion_asignaturas WHERE id_homologacion = homologacionId;
+            END;
 
 
 
@@ -1594,6 +1594,14 @@ END;
             DROP PROCEDURE IF EXISTS InsertarSolicitudAsignatura;
             DROP PROCEDURE IF EXISTS ActualizarSolicitudAsignatura;
             DROP PROCEDURE IF EXISTS EliminarSolicitudAsignatura;
+
+
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
+            DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
+            DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
+            DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
+            DROP PROCEDURE IF EXISTS ActualizarHomologacionAsignatura;
+            DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
         ");
     }
 };

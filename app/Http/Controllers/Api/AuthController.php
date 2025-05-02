@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CredencialesUsuario;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -10,6 +11,9 @@ use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+
+use Illuminate\Support\Facades\Mail;
+
 
 class AuthController extends Controller
 {
@@ -75,7 +79,7 @@ class AuthController extends Controller
         ]);
 
         // Aquí iría el código para enviar el correo con las credenciales
-        // Mail::to($user->email)->send(new CredencialesUsuario($user, $password));
+        Mail::to($user->email)->send(new CredencialesUsuario($user, $password));
 
         return response()->json([
             'message' => 'Usuario registrado exitosamente. Se ha enviado un correo con las credenciales.',
