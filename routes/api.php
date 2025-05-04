@@ -27,6 +27,10 @@ use App\Http\Controllers\ContenidoProgramaticoControllerApi;
 | Las rutas protegidas con JWT requieren el middleware 'jwt.verify'.
 */
 
+
+Route::get('/auth/check', [App\Http\Controllers\Api\AuthController::class, 'checkAuth'])
+    ->middleware('auth:api');
+
 // Rutas públicas de autenticación
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -40,9 +44,9 @@ Route::group(['middleware' => ['jwt.verify'], 'prefix' => 'auth'], function () {
     Route::get('user-profile', [AuthController::class, 'userProfile']);
 });
 
-/* // Rutas protegidas de negocio (requieren JWT válido)
+
 Route::group(['middleware' => ['jwt.verify']], function () {
-    // Países */
+    // Países
     Route::get('paises', [PaisControllerApi::class, 'traerPaises']);
     Route::get('paises/{id}', [PaisControllerApi::class, 'llevarPais']);
     Route::post('paises', [PaisControllerApi::class, 'insertarPais']);
@@ -149,4 +153,4 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::put('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerApi::class, 'actualizarContenidoProgramatico']);
     Route::delete('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerApi::class, 'eliminarContenidoProgramatico']);
 
-/* }); */
+});

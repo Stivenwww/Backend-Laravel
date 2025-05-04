@@ -7,9 +7,11 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     /**
-     * Global HTTP middleware stack.
+     * The application's global HTTP middleware stack.
      *
-     * @var array<int, class-string|string>
+     * These middleware are run during every request to your application.
+     *
+     * @var array
      */
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
@@ -21,9 +23,9 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * Route middleware groups.
+     * The application's route middleware groups.
      *
-     * @var array<string, array<int, class-string|string>>
+     * @var array
      */
     protected $middlewareGroups = [
         'web' => [
@@ -42,9 +44,11 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * Route middleware aliases.
+     * The application's route middleware.
      *
-     * @var array<string, class-string|string>
+     * These middleware may be assigned to groups or used individually.
+     *
+     * @var array
      */
     protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -58,6 +62,6 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class, // tu middleware personalizado
+        'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
     ];
 }

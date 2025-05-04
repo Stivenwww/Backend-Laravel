@@ -44,7 +44,10 @@ class AuthController extends Controller
             return response()->json(['error' => 'Credenciales no válidas'], 401);
         }
 
-        return $this->createNewToken($token);
+        // Guardar el token en cookie
+        $cookie = cookie('jwt_token', $token, auth()->factory()->getTTL(), '/', null, false, true);
+
+        return $this->createNewToken($token)->withCookie($cookie);
     }
 
     /**
@@ -96,7 +99,13 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Sesión cerrada exitosamente']);
+        // También cerrar sesión en guard 'web'
+        auth('web')->logout();
+
+        // Eliminar la cookie del token JWT
+        $cookie = cookie('jwt_token', '', -1);
+
+        return response()->json(['message' => 'Sesión cerrada exitosamente'])->withCookie($cookie);
     }
 
     /**
@@ -106,7 +115,13 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->createNewToken(auth()->refresh());
+        $token = auth()->refresh();
+
+        // Crear la respuesta con el token actualizado y actualizar la cookie
+        $response = $this->createNewToken($token);
+        $cookie = cookie('jwt_token', $token, auth()->factory()->getTTL(), '/', null, false, true);
+
+        return $response->withCookie($cookie);
     }
 
     /**
@@ -134,5 +149,21 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => auth()->user()
         ]);
+    }
+    
+    public function checkAuth()
+    {
+        try {
+            if (!$user = auth('api')->user()) {
+                return response()->json(['error' => 'No autenticado'], 401);
+            }
+
+            return response()->json([
+                'authenticated' => true,
+                'user' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'No autenticado'], 401);
+        }
     }
 }
