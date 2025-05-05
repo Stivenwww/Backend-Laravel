@@ -18,9 +18,9 @@ class SolicitudSeeder extends Seeder
             1 => ['No', null, '2023-12-01', 'Radicado'],
             2 => ['No', null, '2023-06-15', 'En revisión'],
             3 => ['No', null, '2022-12-01', 'Radicado'],
-            4 => ['Si', '2023-05-30', null, 'En revisión'],
-            5 => ['Si', '2022-11-15', null, 'Aprobado'],
-            6 => ['Si', '2022-10-10', null, 'Rechazado'],
+            4 => ['No', null, '2025-01-23', 'Rechazado'],
+            5 => ['No', null, '2024-06-30', 'Aprobado'],
+            6 => ['Si', '2022-10-10', null, 'Aprobado'],
         ];
 
         foreach ($usuarios as $usuarioId => $data) {

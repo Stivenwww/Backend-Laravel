@@ -30,105 +30,212 @@ class AsignaturaSeeder extends Seeder
         $pensum = [
             // Universidad del Cauca
             1 => [ // Ing. Electrónica y Telecomunicaciones
-                'Circuitos Eléctricos', 'Electrónica Analógica', 'Electrónica Digital',
-                'Comunicación Digital', 'Microcontroladores', 'Procesamiento de Señales',
-                'Control Automático', 'Redes de Computadoras', 'Proyecto Electrónico I'
+                'Circuitos Eléctricos',
+                'Electrónica Analógica',
+                'Electrónica Digital',
+                'Comunicación Digital',
+                'Microcontroladores',
+                'Procesamiento de Señales',
+                'Control Automático',
+                'Redes de Computadoras',
+                'Proyecto Electrónico I'
             ],
             2 => [ // Ing. Civil
-                'Matemáticas I', 'Topografía', 'Mecánica de Materiales',
-                'Hidráulica', 'Estructuras I', 'Materiales de Construcción',
-                'Geotecnia', 'Transporte y Vías', 'Gestión de Proyectos'
+                'Matemáticas I',
+                'Topografía',
+                'Mecánica de Materiales',
+                'Hidráulica',
+                'Estructuras I',
+                'Materiales de Construcción',
+                'Geotecnia',
+                'Transporte y Vías',
+                'Gestión de Proyectos'
             ],
             3 => [ // Ing. de Sistemas
-                'Fundamentos de Programación', 'Estructuras de Datos', 'Sistemas Operativos',
-                'Redes de Computadores', 'Bases de Datos', 'Ingeniería de Software',
-                'Análisis de Algoritmos', 'Desarrollo Web', 'Sistemas Distribuidos'
+                'Fundamentos de Programación',
+                'Estructuras de Datos',
+                'Sistemas Operativos',
+                'Redes de Computadores',
+                'Bases de Datos',
+                'Ingeniería de Software',
+                'Análisis de Algoritmos',
+                'Desarrollo Web',
+                'Sistemas Distribuidos'
             ],
             4 => [ // Ing. en Automática Industrial
-                'Control de Procesos', 'Instrumentación Industrial', 'Sistemas SCADA',
-                'Robótica Industrial', 'Electrónica de Potencia', 'PLC y Modulación',
-                'Redes Industriales', 'Mantenimiento Industrial', 'Metrología'
+                'Control de Procesos',
+                'Instrumentación Industrial',
+                'Sistemas SCADA',
+                'Robótica Industrial',
+                'Electrónica de Potencia',
+                'PLC y Modulación',
+                'Redes Industriales',
+                'Mantenimiento Industrial',
+                'Metrología'
             ],
             5 => [ // Ing. Física
-                'Matemáticas I', 'Física I', 'Física II',
-                'Termodinámica', 'Mecánica Cuántica', 'Ondas y Óptica',
-                'Física Computacional', 'Electrónica para Físicos', 'Láseres y Fotónica'
+                'Matemáticas I',
+                'Física I',
+                'Física II',
+                'Termodinámica',
+                'Mecánica Cuántica',
+                'Ondas y Óptica',
+                'Física Computacional',
+                'Electrónica para Físicos',
+                'Láseres y Fotónica'
             ],
 
             // FUP
             6 => [ // Ing. de Sistemas
-                'Programación I', 'Estructuras de Datos', 'Arquitectura de Computadores',
-                'Bases de Datos', 'Ingeniería de Software', 'Redes y Comunicaciones',
-                'Sistemas Operativos', 'Seguridad Informática', 'Gestión de Proyectos'
+                'Programación I',
+                'Estructuras de Datos',
+                'Arquitectura de Computadores',
+                'Bases de Datos',
+                'Ingeniería de Software',
+                'Redes y Comunicaciones',
+                'Sistemas Operativos',
+                'Seguridad Informática',
+                'Gestión de Proyectos'
             ],
             7 => [ // Ing. Industrial
-                'Investigación de Operaciones', 'Estadística Aplicada', 'Gestión de Calidad',
-                'Procesos de Manufactura', 'Ingeniería de Métodos', 'Logística',
-                'Gestión de la Producción', 'Seguridad Industrial', 'Ergonomía'
+                'Investigación de Operaciones',
+                'Estadística Aplicada',
+                'Gestión de Calidad',
+                'Procesos de Manufactura',
+                'Ingeniería de Métodos',
+                'Logística',
+                'Gestión de la Producción',
+                'Seguridad Industrial',
+                'Ergonomía'
             ],
             8 => [ // Arquitectura
-                'Diseño Arquitectónico', 'Historia de la Arquitectura', 'Construcción I',
-                'Dibujo Arquitectónico', 'Urbanismo', 'Tecnología de la Construcción',
-                'Paisajismo', 'BIM', 'Diseño Urbano'
+                'Diseño Arquitectónico',
+                'Historia de la Arquitectura',
+                'Construcción I',
+                'Dibujo Arquitectónico',
+                'Urbanismo',
+                'Tecnología de la Construcción',
+                'Paisajismo',
+                'BIM',
+                'Diseño Urbano'
             ],
 
             // Colegio Mayor del Cauca
-            9  => [ // Ing. Informática
-                'Fundamentos de Programación', 'Estructuras de Datos', 'Sistemas Operativos',
-                'Bases de Datos', 'Redes de Computadores', 'Desarrollo Web',
-                'Programación Móvil', 'Inteligencia Artificial', 'Seguridad Informática'
+            9 => [ // Ing. Informática
+                'Fundamentos de Programación',
+                'Estructuras de Datos',
+                'Sistemas Operativos',
+                'Bases de Datos',
+                'Redes de Computadores',
+                'Desarrollo Web',
+                'Programación Móvil',
+                'Inteligencia Artificial',
+                'Seguridad Informática'
             ],
             10 => [ // Ing. Electrónica
-                'Circuitos Eléctricos', 'Electrónica Analógica', 'Electrónica Digital',
-                'Microcontroladores', 'Señales y Sistemas', 'Electrónica de Potencia',
-                'Control Automático', 'Redes de Comunicaciones', 'Proyecto Electrónico I'
+                'Circuitos Eléctricos',
+                'Electrónica Analógica',
+                'Electrónica Digital',
+                'Microcontroladores',
+                'Señales y Sistemas',
+                'Electrónica de Potencia',
+                'Control Automático',
+                'Redes de Comunicaciones',
+                'Proyecto Electrónico I'
             ],
             11 => [ // Tecnología en Desarrollo de Software
-                'Análisis de Requisitos', 'Diseño de Software', 'Programación Orientada a Objetos',
-                'Bases de Datos', 'Desarrollo Web', 'Pruebas de Software',
-                'Metodologías Ágiles', 'DevOps Básico', 'Cloud Computing', 'Proyecto Integrador'
+                'Análisis de Requisitos',
+                'Diseño de Software',
+                'Programación Orientada a Objetos',
+                'Bases de Datos',
+                'Desarrollo Web',
+                'Pruebas de Software',
+                'Metodologías Ágiles',
+                'DevOps Básico',
+                'Cloud Computing',
+                'Proyecto Integrador'
             ],
 
             // SENA Regional Cauca (IDs 16–23)
             16 => [ // Tecnólogo en Análisis y Desarrollo de Software
-                'Analizar Requerimientos', 'Diseñar Soluciones Software', 'Desarrollar Aplicaciones',
-                'Realizar Pruebas de Software', 'Implementar Front‑end', 'Desplegar en Servidor',
-                'Mantener Software', 'Documentar Proyectos'
+                'Analizar Requerimientos',
+                'Diseñar Soluciones Software',
+                'Desarrollar Aplicaciones',
+                'Realizar Pruebas de Software',
+                'Implementar Front‑end',
+                'Desplegar en Servidor',
+                'Mantener Software',
+                'Documentar Proyectos'
             ],
             17 => [ // Técnico en Sistemas
-                'Instalar Software', 'Configurar Hardware', 'Administrar Sistemas Operativos',
-                'Montar Redes Locales', 'Mantenimiento Preventivo', 'Administrar Cuentas de Usuario',
-                'Instalación de Periféricos', 'Monitoreo de Sistemas'
+                'Instalar Software',
+                'Configurar Hardware',
+                'Administrar Sistemas Operativos',
+                'Montar Redes Locales',
+                'Mantenimiento Preventivo',
+                'Administrar Cuentas de Usuario',
+                'Instalación de Periféricos',
+                'Monitoreo de Sistemas'
             ],
             18 => [ // Tecnólogo en Gestión de Redes de Datos
-                'Diseñar Topologías de Red', 'Configurar Routers y Switches', 'Implementar VLAN',
-                'Asegurar Redes', 'Monitorizar Tráfico', 'Administrar VPN',
-                'Optimizar Rendimiento', 'Gestionar Proyectos de Redes'
+                'Diseñar Topologías de Red',
+                'Configurar Routers y Switches',
+                'Implementar VLAN',
+                'Asegurar Redes',
+                'Monitorizar Tráfico',
+                'Administrar VPN',
+                'Optimizar Rendimiento',
+                'Gestionar Proyectos de Redes'
             ],
             19 => [ // Tecnólogo en Producción Multimedia
-                'Diseñar Gráficos', 'Edición de Video', 'Creación de Animaciones',
-                'Producción de Audio', 'Maquetación Web', 'Modelado 3D',
-                'UX/UI Básico', 'Publicación Multimedia'
+                'Diseñar Gráficos',
+                'Edición de Video',
+                'Creación de Animaciones',
+                'Producción de Audio',
+                'Maquetación Web',
+                'Modelado 3D',
+                'UX/UI Básico',
+                'Publicación Multimedia'
             ],
             20 => [ // Técnico en Programación de Software
-                'Codificar Módulos', 'Depurar Código', 'Gestionar Repositorios',
-                'Documentar Código', 'Ejecutar Compilaciones', 'Pruebas Unitarias',
-                'Asistir en Análisis', 'Soporte a Usuario'
+                'Codificar Módulos',
+                'Depurar Código',
+                'Gestionar Repositorios',
+                'Documentar Código',
+                'Ejecutar Compilaciones',
+                'Pruebas Unitarias',
+                'Asistir en Análisis',
+                'Soporte a Usuario'
             ],
             21 => [ // Tecnólogo en Implementación de Infraestructura TIC
-                'Instalar Servidores', 'Configurar Redes', 'Desplegar Servicios',
-                'Virtualización', 'Administrar Almacenamiento', 'Asegurar Infraestructura',
-                'Automatizar Despliegues', 'Monitorizar Servicios'
+                'Instalar Servidores',
+                'Configurar Redes',
+                'Desplegar Servicios',
+                'Virtualización',
+                'Administrar Almacenamiento',
+                'Asegurar Infraestructura',
+                'Automatizar Despliegues',
+                'Monitorizar Servicios'
             ],
             22 => [ // Tecnólogo en Gestión de Seguridad y Salud en el Trabajo
-                'Identificar Riesgos', 'Implementar Medidas Preventivas', 'Elaborar Planes SST',
-                'Capacitar Personal', 'Realizar Auditorías', 'Gestionar Incidentes',
-                'Reportar Accidentes', 'Actualizar Normatividad'
+                'Identificar Riesgos',
+                'Implementar Medidas Preventivas',
+                'Elaborar Planes SST',
+                'Capacitar Personal',
+                'Realizar Auditorías',
+                'Gestionar Incidentes',
+                'Reportar Accidentes',
+                'Actualizar Normatividad'
             ],
             23 => [ // Tecnólogo en Gestión de Proyectos de Desarrollo de Software
-                'Definir Alcance', 'Elaborar Cronogramas', 'Administrar Recursos',
-                'Gestionar Riesgos', 'Liderar Equipos', 'Controlar Calidad',
-                'Comunicar Stakeholders', 'Entregar Entregables'
+                'Definir Alcance',
+                'Elaborar Cronogramas',
+                'Administrar Recursos',
+                'Gestionar Riesgos',
+                'Liderar Equipos',
+                'Controlar Calidad',
+                'Comunicar Stakeholders',
+                'Entregar Entregables'
             ],
         ];
 
@@ -156,19 +263,19 @@ class AsignaturaSeeder extends Seeder
                     Asignatura::updateOrCreate(
                         ['codigo_asignatura' => $codigo],
                         [
-                            'programa_id'             => $programaId,
-                            'nombre'                  => $nombre,
-                            'tipo'                    => 'Competencia',
-                            'creditos'                => null,
-                            'horas_sena'              => $this->calcularHorasSena($nombre),
-                            'semestre'                => null, // No se asigna semestre al SENA
-                            'tiempo_presencial'       => null,
-                            'tiempo_independiente'    => null,
+                            'programa_id' => $programaId,
+                            'nombre' => $nombre,
+                            'tipo' => 'Competencia',
+                            'creditos' => null,
+                            'horas_sena' => $this->calcularHorasSena($nombre),
+                            'semestre' => floor($index / ceil(count($asigs) / 4)) + 1,
+                            'tiempo_presencial' => null,
+                            'tiempo_independiente' => null,
                             'horas_totales_semanales' => null,
-                            'modalidad'               => 'Práctico',
-                            'metodologia'             => 'Presencial',
-                            'created_at'              => now(),
-                            'updated_at'              => now(),
+                            'modalidad' => 'Práctico',
+                            'metodologia' => 'Presencial',
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]
                     );
                 } else {
@@ -181,19 +288,19 @@ class AsignaturaSeeder extends Seeder
                     Asignatura::updateOrCreate(
                         ['codigo_asignatura' => $codigo],
                         [
-                            'programa_id'             => $programaId,
-                            'nombre'                  => $nombre,
-                            'tipo'                    => 'Materia',
-                            'creditos'                => $creditos,
-                            'horas_sena'              => null,
-                            'semestre'                => floor($index / 2) + 1,
-                            'tiempo_presencial'       => $tiempoPresencial,
-                            'tiempo_independiente'    => $tiempoIndependiente,
+                            'programa_id' => $programaId,
+                            'nombre' => $nombre,
+                            'tipo' => 'Materia',
+                            'creditos' => $creditos,
+                            'horas_sena' => null,
+                            'semestre' => floor($index / 2) + 1,
+                            'tiempo_presencial' => $tiempoPresencial,
+                            'tiempo_independiente' => $tiempoIndependiente,
                             'horas_totales_semanales' => $horasTotalesSemanales,
-                            'modalidad'               => $this->determinarModalidad($nombre),
-                            'metodologia'             => 'Presencial',
-                            'created_at'              => now(),
-                            'updated_at'              => now(),
+                            'modalidad' => $this->determinarModalidad($nombre),
+                            'metodologia' => 'Presencial',
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]
                     );
                 }
@@ -261,15 +368,29 @@ class AsignaturaSeeder extends Seeder
     {
         // Materias con mayor intensidad académica
         $materiasAvanzadas = [
-            'Proyecto', 'Trabajo de Grado', 'Práctica', 'Tesis', 'Laboratorio',
-            'Diseño', 'Arquitectura', 'Inteligencia Artificial', 'Bases de Datos',
-            'Desarrollo Web', 'Computación en la Nube', 'Desarrollo de Aplicaciones'
+            'Proyecto',
+            'Trabajo de Grado',
+            'Práctica',
+            'Tesis',
+            'Laboratorio',
+            'Diseño',
+            'Arquitectura',
+            'Inteligencia Artificial',
+            'Bases de Datos',
+            'Desarrollo Web',
+            'Computación en la Nube',
+            'Desarrollo de Aplicaciones'
         ];
 
         // Materias básicas o introductorias
         $materiasBasicas = [
-            'Fundamentos', 'Introducción', 'Comunicación', 'Oral', 'Escrita',
-            'Ética', 'Emprendimiento'
+            'Fundamentos',
+            'Introducción',
+            'Comunicación',
+            'Oral',
+            'Escrita',
+            'Ética',
+            'Emprendimiento'
         ];
 
         // Verificar si el nombre contiene palabras clave
@@ -295,8 +416,16 @@ class AsignaturaSeeder extends Seeder
     {
         // Palabras clave para materias con mayor componente práctico
         $componentePractico = [
-            'Laboratorio', 'Práctica', 'Proyecto', 'Taller', 'Desarrollo',
-            'Implementación', 'Diseño', 'Programación', 'DevOps', 'Front-end'
+            'Laboratorio',
+            'Práctica',
+            'Proyecto',
+            'Taller',
+            'Desarrollo',
+            'Implementación',
+            'Diseño',
+            'Programación',
+            'DevOps',
+            'Front-end'
         ];
 
         // Verificar si la materia tiene componente práctico
@@ -318,14 +447,29 @@ class AsignaturaSeeder extends Seeder
     {
         // Palabras clave para materias principalmente teóricas
         $materiasTeoricas = [
-            'Matemáticas', 'Física', 'Historia', 'Teoría', 'Lógica',
-            'Ética', 'Normatividad', 'Probabilidad', 'Estadística'
+            'Matemáticas',
+            'Física',
+            'Historia',
+            'Teoría',
+            'Lógica',
+            'Ética',
+            'Normatividad',
+            'Probabilidad',
+            'Estadística'
         ];
 
         // Palabras clave para materias principalmente prácticas
         $materiasPracticas = [
-            'Laboratorio', 'Taller', 'Práctica', 'Desarrollo', 'Implementación',
-            'Pruebas', 'Programación', 'Diseño', 'DevOps', 'Front-end'
+            'Laboratorio',
+            'Taller',
+            'Práctica',
+            'Desarrollo',
+            'Implementación',
+            'Pruebas',
+            'Programación',
+            'Diseño',
+            'DevOps',
+            'Front-end'
         ];
 
         // Verificar si la materia es principalmente teórica
@@ -353,14 +497,26 @@ class AsignaturaSeeder extends Seeder
     {
         // Competencias más complejas generalmente tienen más horas
         $competenciasComplejas = [
-            'Desarrollar', 'Implementar', 'Gestionar', 'Diseñar', 'Administrar',
-            'Liderar', 'Desplegar', 'Virtualización', 'Optimizar'
+            'Desarrollar',
+            'Implementar',
+            'Gestionar',
+            'Diseñar',
+            'Administrar',
+            'Liderar',
+            'Desplegar',
+            'Virtualización',
+            'Optimizar'
         ];
 
         // Competencias básicas o más simples
         $competenciasBasicas = [
-            'Instalar', 'Configurar', 'Documentar', 'Monitorear', 'Reportar',
-            'Mantener', 'Asistir'
+            'Instalar',
+            'Configurar',
+            'Documentar',
+            'Monitorear',
+            'Reportar',
+            'Mantener',
+            'Asistir'
         ];
 
         // Verificar complejidad de la competencia
