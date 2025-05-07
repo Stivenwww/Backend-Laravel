@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class AsignaturaControllerApi extends Controller
 {
-    // Método para obtener todas las asignaturas
+    /**
+     * Método para obtener todas las asignaturas.
+     * Utiliza un procedimiento almacenado en la base de datos.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function traerAsignaturas()
     {
         try {
@@ -16,6 +21,7 @@ class AsignaturaControllerApi extends Controller
             $asignaturas = DB::select('CALL ObtenerAsignaturas()');
             return response()->json($asignaturas);
         } catch (\Exception $e) {
+            // Manejo de errores con respuesta JSON y código 500 (Error del servidor)
             return response()->json([
                 'mensaje' => 'Error al obtener las asignaturas',
                 'error' => $e->getMessage()
@@ -23,24 +29,33 @@ class AsignaturaControllerApi extends Controller
         }
     }
 
-    // Método para obtener una asignatura por ID
+    /**
+     * Método para obtener una asignatura específica por su ID.
+     * Utiliza un procedimiento almacenado en la base de datos.
+     *
+     * @param int $id ID de la asignatura a buscar
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function llevarAsignatura($id)
     {
         try {
-            // Llamada al procedimiento almacenado para obtener una asignatura por ID
+            // Llamada al procedimiento almacenado con parámetro ID
             $asignatura = DB::select('CALL ObtenerAsignaturaPorId(?)', [$id]);
 
+            // Verifica si se encontró la asignatura
             if (!empty($asignatura)) {
                 return response()->json([
                     'mensaje' => 'Asignatura encontrada',
-                    'datos' => $asignatura[0] // Accedemos al primer resultado
+                    'datos' => $asignatura[0] // Accede al primer resultado del array
                 ], 200);
             } else {
+                // Respuesta si no se encuentra la asignatura, código 404 (No encontrado)
                 return response()->json([
                     'mensaje' => 'Asignatura no encontrada',
                 ], 404);
             }
         } catch (\Exception $e) {
+            // Manejo de errores con respuesta JSON
             return response()->json([
                 'mensaje' => 'Error al obtener la asignatura',
                 'error' => $e->getMessage()
@@ -48,11 +63,17 @@ class AsignaturaControllerApi extends Controller
         }
     }
 
-    // Método para insertar una nueva asignatura
+    /**
+     * Método para insertar una nueva asignatura.
+     * Utiliza un procedimiento almacenado en la base de datos.
+     *
+     * @param Request $request Datos de la asignatura a insertar
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function insertarAsignatura(Request $request)
     {
         try {
-            // Llamada al procedimiento almacenado para insertar una nueva asignatura
+            // Llamada al procedimiento almacenado con múltiples parámetros
             DB::statement('CALL InsertarAsignatura(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
                 $request->programa_id,
                 $request->nombre,
@@ -68,10 +89,12 @@ class AsignaturaControllerApi extends Controller
                 $request->metodologia
             ]);
 
+            // Respuesta exitosa, código 201 (Creado)
             return response()->json([
                 'mensaje' => 'Asignatura insertada correctamente'
             ], 201);
         } catch (\Exception $e) {
+            // Manejo de errores con respuesta JSON
             return response()->json([
                 'mensaje' => 'Error al insertar la asignatura',
                 'error' => $e->getMessage()
@@ -79,11 +102,18 @@ class AsignaturaControllerApi extends Controller
         }
     }
 
-    // Método para actualizar una asignatura
+    /**
+     * Método para actualizar una asignatura existente.
+     * Utiliza un procedimiento almacenado en la base de datos.
+     *
+     * @param Request $request Datos actualizados de la asignatura
+     * @param int $id ID de la asignatura a actualizar
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function actualizarAsignatura(Request $request, $id)
     {
         try {
-            // Llamada al procedimiento almacenado para actualizar una asignatura
+            // Llamada al procedimiento almacenado con ID y demás parámetros
             DB::statement('CALL ActualizarAsignatura(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
                 $id,
                 $request->programa_id,
@@ -100,10 +130,12 @@ class AsignaturaControllerApi extends Controller
                 $request->metodologia
             ]);
 
+            // Respuesta exitosa, código 200 (OK)
             return response()->json([
                 'mensaje' => 'Asignatura actualizada correctamente'
             ], 200);
         } catch (\Exception $e) {
+            // Manejo de errores con respuesta JSON
             return response()->json([
                 'mensaje' => 'Error al actualizar la asignatura',
                 'error' => $e->getMessage()
@@ -111,17 +143,25 @@ class AsignaturaControllerApi extends Controller
         }
     }
 
-    // Método para eliminar una asignatura
+    /**
+     * Método para eliminar una asignatura.
+     * Utiliza un procedimiento almacenado en la base de datos.
+     *
+     * @param int $id ID de la asignatura a eliminar
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function eliminarAsignatura($id)
     {
         try {
-            // Llamada al procedimiento almacenado para eliminar una asignatura
+            // Llamada al procedimiento almacenado para eliminar
             DB::statement('CALL EliminarAsignatura(?)', [$id]);
 
+            // Respuesta exitosa, código 200 (OK)
             return response()->json([
                 'mensaje' => 'Asignatura eliminada correctamente'
             ], 200);
         } catch (\Exception $e) {
+            // Manejo de errores con respuesta JSON
             return response()->json([
                 'mensaje' => 'Error al eliminar la asignatura',
                 'error' => $e->getMessage()
@@ -130,7 +170,8 @@ class AsignaturaControllerApi extends Controller
     }
 
     /**
-     * Obtiene todas las asignaturas pertenecientes a un programa específico
+     * Obtiene todas las asignaturas pertenecientes a un programa específico.
+     * Utiliza Eloquent ORM en lugar de procedimientos almacenados.
      *
      * @param int $id_programa ID del programa
      * @return \Illuminate\Http\JsonResponse
@@ -138,15 +179,15 @@ class AsignaturaControllerApi extends Controller
     public function traerAsignaturasPorPrograma($id_programa)
     {
         try {
-            // Obtener las asignaturas y cargar el nombre del programa
+            // Consulta Eloquent con relación "programa"
             $asignaturas = Asignatura::where('programa_id', $id_programa)
-                ->with('programa')  // Cargar la relación del programa
+                ->with('programa')  // Carga anticipada de la relación programa
                 ->get();
 
-            // Formatear la respuesta para incluir el nombre del programa y las asignaturas
+            // Transforma la colección para incluir datos del programa y la asignatura
             $asignaturasConPrograma = $asignaturas->map(function ($asignatura) {
                 return [
-                    'nombre_programa' => $asignatura->programa->nombre,  // Suponiendo que el campo del programa es 'nombre'
+                    'nombre_programa' => $asignatura->programa->nombre,  // Accede al nombre del programa relacionado
                     'id_asignatura' => $asignatura->id_asignatura,
                     'programa_id' => $asignatura->programa_id,
                     'nombre' => $asignatura->nombre,
@@ -165,12 +206,14 @@ class AsignaturaControllerApi extends Controller
                 ];
             });
 
+            // Respuesta exitosa con estructura estandarizada
             return response()->json([
                 'data' => $asignaturasConPrograma,
                 'message' => 'Asignaturas del programa recuperadas correctamente',
                 'success' => true
             ], 200);
         } catch (\Exception $e) {
+            // Manejo de errores con estructura estandarizada
             return response()->json([
                 'message' => 'Error al recuperar las asignaturas: ' . $e->getMessage(),
                 'success' => false
@@ -180,7 +223,8 @@ class AsignaturaControllerApi extends Controller
 
 
     /**
-     * Obtiene una asignatura específica de un programa específico
+     * Obtiene una asignatura específica de un programa específico.
+     * Utiliza Eloquent ORM en lugar de procedimientos almacenados.
      *
      * @param int $id_programa ID del programa
      * @param int $id_asignatura ID de la asignatura
@@ -189,12 +233,13 @@ class AsignaturaControllerApi extends Controller
     public function llevarAsignaturaPorPrograma($id_programa, $id_asignatura)
     {
         try {
-            // Obtener la asignatura y cargar el programa relacionado
+            // Consulta Eloquent con doble condición y relación "programa"
             $asignatura = Asignatura::where('programa_id', $id_programa)
                 ->where('id_asignatura', $id_asignatura)
-                ->with('programa')  // Cargar la relación del programa
+                ->with('programa')  // Carga anticipada de la relación programa
                 ->first();
 
+            // Verifica si se encontró la asignatura
             if (!$asignatura) {
                 return response()->json([
                     'message' => 'Asignatura no encontrada en este programa',
@@ -202,11 +247,11 @@ class AsignaturaControllerApi extends Controller
                 ], 404);
             }
 
-            // Estructurar la respuesta
+            // Respuesta exitosa con estructura estandarizada
             return response()->json([
                 'data' => [
-                    'nombre_programa' => $asignatura->programa->nombre,  // Suponiendo que 'nombre' es el campo del programa
-                    'id_asignatura' => $asignatura->id,
+                    'nombre_programa' => $asignatura->programa->nombre,
+                    'id_asignatura' => $asignatura->id,        // NOTA: Hay una inconsistencia aquí (ver observación abajo)
                     'programa_id' => $asignatura->programa_id,
                     'nombre' => $asignatura->nombre,
                     'tipo' => $asignatura->tipo,
@@ -226,6 +271,7 @@ class AsignaturaControllerApi extends Controller
                 'success' => true
             ], 200);
         } catch (\Exception $e) {
+            // Manejo de errores con estructura estandarizada
             return response()->json([
                 'message' => 'Error al recuperar la asignatura: ' . $e->getMessage(),
                 'success' => false

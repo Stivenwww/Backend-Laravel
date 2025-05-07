@@ -17,20 +17,27 @@ use App\Models\ContenidoProgramatico;
 
 class HomologacionAsignaturaControllerApi extends Controller
 {
-    // Método para obtener todas las homologaciones de asignaturas
+    /**
+     * Método para obtener todas las homologaciones de asignaturas.
+     * Utiliza un procedimiento almacenado y formatea los resultados.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function traerHomologacionAsignaturas()
     {
         try {
+            // Llamada al procedimiento almacenado
             $homologaciones = DB::select('CALL ObtenerHomologacionesAsignaturas()');
             $resultados = [];
 
+            // Formatear cada resultado para darle la estructura adecuada
             foreach ($homologaciones as $homologacion) {
-                // Convertir datos a nuevo formato
                 $resultados[] = $this->formatearDatosHomologacion($homologacion);
             }
 
             return response()->json($resultados);
         } catch (\Exception $e) {
+            // Manejo detallado de errores incluyendo línea y archivo
             return response()->json([
                 'mensaje' => 'Error al obtener las homologaciones de asignaturas',
                 'error' => $e->getMessage(),
@@ -40,14 +47,20 @@ class HomologacionAsignaturaControllerApi extends Controller
         }
     }
 
-    // Método para obtener una homologación de asignatura por ID
+    /**
+     * Método para obtener una homologación de asignatura específica por su ID.
+     *
+     * @param int $id ID de la homologación a buscar
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function llevarHomologacionAsignatura($id)
     {
         try {
+            // Llamada al procedimiento almacenado con el ID como parámetro
             $homologacion = DB::select('CALL ObtenerHomologacionAsignaturaPorId(?)', [$id]);
 
             if (!empty($homologacion)) {
-                // Convertir a nuevo formato
+                // Convertir el resultado a formato estandarizado
                 $datosFormateados = $this->formatearDatosHomologacion($homologacion[0]);
 
                 return response()->json([
@@ -55,11 +68,13 @@ class HomologacionAsignaturaControllerApi extends Controller
                     'datos' => $datosFormateados
                 ], 200);
             } else {
+                // Respuesta cuando no se encuentra la homologación
                 return response()->json([
                     'mensaje' => 'Homologación de asignatura no encontrada',
                 ], 404);
             }
         } catch (\Exception $e) {
+            // Manejo detallado de errores
             return response()->json([
                 'mensaje' => 'Error al obtener la homologación de asignatura',
                 'error' => $e->getMessage(),
@@ -69,151 +84,176 @@ class HomologacionAsignaturaControllerApi extends Controller
         }
     }
 
-    // Método para insertar una nueva homologación de asignatura
-    // Método para insertar una nueva homologación de asignatura
-public function insertarHomologacionAsignatura(Request $request)
-{
-    try {
-        // Validamos los datos
-        $request->validate([
-            'solicitud_id' => 'required|integer',
-            'asignaturas_origen' => 'required|array',
-            'asignaturas_origen.*' => 'required|integer',
-        ]);
+    /**
+     * Método para insertar una nueva homologación de asignatura.
+     * Recibe las asignaturas de origen y crea homologaciones pendientes.
+     *
+     * @param Request $request Datos de la solicitud
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function insertarHomologacionAsignatura(Request $request)
+    {
+        try {
+            // Validación de datos de entrada
+            $request->validate([
+                'solicitud_id' => 'required|integer',
+                'asignaturas_origen' => 'required|array',
+                'asignaturas_origen.*' => 'required|integer',
+            ]);
 
-        // Obtenemos las asignaturas de origen desde el request
-        $asignaturasOrigen = $request->asignaturas_origen;
+            // Obtenemos las asignaturas de origen del request
+            $asignaturasOrigen = $request->asignaturas_origen;
 
-        // Creamos la estructura de homologaciones con destinos vacíos
-        $homologaciones = [];
-        foreach ($asignaturasOrigen as $asignaturaOrigenId) {
-            $homologaciones[] = [
-                'asignatura_origen_id' => $asignaturaOrigenId,
-                'asignatura_destino_id' => null,
-                'nota_destino' => null,
-                'comentarios' => null
-            ];
-        }
-
-        // Convertimos el array de homologaciones a formato JSON para almacenar
-        $homologacionesJson = json_encode($homologaciones);
-
-        // Insertar llamando al procedimiento almacenado
-        DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?)', [
-            $request->solicitud_id,
-            $homologacionesJson,
-            Carbon::now()->toDateString()
-        ]);
-
-        return response()->json([
-            'mensaje' => 'Homologación de asignatura insertada correctamente',
-            'datos' => [
-                'solicitud_id' => $request->solicitud_id,
-                'homologaciones' => $homologaciones
-            ]
-        ], 201);
-    } catch (\Exception $e) {
-        return response()->json([
-            'mensaje' => 'Error al insertar la homologación de asignatura',
-            'error' => $e->getMessage(),
-            'linea' => $e->getLine(),
-            'archivo' => $e->getFile()
-        ], 500);
-    }
-}
-
-    // Método para actualizar una homologación de asignatura
-    public function actualizarHomologacionAsignatura(Request $request, $id)
-{
-    try {
-        $request->validate([
-            'homologaciones' => 'required|array',
-            'homologaciones.*.asignatura_origen_id' => 'required|integer',
-            'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
-            'homologaciones.*.nota_destino' => 'nullable|numeric',
-            'homologaciones.*.comentarios' => 'nullable|string',
-        ]);
-
-        // Obtenemos la homologación actual
-        $homologacion = HomologacionAsignatura::findOrFail($id);
-
-        // Decodificamos las homologaciones existentes
-        $homologacionesActuales = $homologacion->homologaciones;
-
-        // Creamos un mapeo de origen_id => índice para buscar rápidamente
-        $mapeoIndices = [];
-        foreach ($homologacionesActuales as $key => $homologacionItem) {
-            $mapeoIndices[$homologacionItem['asignatura_origen_id']] = $key;
-        }
-
-        // Asignaturas actualizadas y no encontradas
-        $actualizadas = [];
-        $noEncontradas = [];
-
-        // Procesamos cada homologación del request
-        foreach ($request->homologaciones as $homologacionRequest) {
-            $origenId = $homologacionRequest['asignatura_origen_id'];
-
-            // Verificamos si la asignatura origen existe en la homologación actual
-            if (isset($mapeoIndices[$origenId])) {
-                $index = $mapeoIndices[$origenId];
-
-                // Actualizamos solo los campos de destino
-                $homologacionesActuales[$index]['asignatura_destino_id'] = $homologacionRequest['asignatura_destino_id'];
-                $homologacionesActuales[$index]['nota_destino'] = $homologacionRequest['nota_destino'];
-                $homologacionesActuales[$index]['comentarios'] = $homologacionRequest['comentarios'] ?? null;
-
-                $actualizadas[] = $origenId;
-            } else {
-                $noEncontradas[] = $origenId;
+            // Creamos la estructura inicial de homologaciones sin asignaturas de destino asignadas
+            $homologaciones = [];
+            foreach ($asignaturasOrigen as $asignaturaOrigenId) {
+                $homologaciones[] = [
+                    'asignatura_origen_id' => $asignaturaOrigenId,
+                    'asignatura_destino_id' => null, // Pendiente de asignar
+                    'nota_destino' => null,          // Pendiente de calificar
+                    'comentarios' => null            // Sin comentarios iniciales
+                ];
             }
-        }
 
-        // Si hay asignaturas no encontradas, devolvemos advertencia
-        if (!empty($noEncontradas)) {
+            // Convertimos el array de homologaciones a formato JSON para almacenar
+            $homologacionesJson = json_encode($homologaciones);
+
+            // Insertar mediante procedimiento almacenado
+            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?)', [
+                $request->solicitud_id,
+                $homologacionesJson,
+                Carbon::now()->toDateString() // Fecha actual
+            ]);
+
+            // Respuesta exitosa con los datos creados
             return response()->json([
-                'mensaje' => 'Algunas asignaturas de origen no fueron encontradas en esta homologación',
-                'asignaturas_no_encontradas' => $noEncontradas,
-                'asignaturas_actualizadas' => $actualizadas
-            ], 400);
+                'mensaje' => 'Homologación de asignatura insertada correctamente',
+                'datos' => [
+                    'solicitud_id' => $request->solicitud_id,
+                    'homologaciones' => $homologaciones
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            // Manejo detallado de errores
+            return response()->json([
+                'mensaje' => 'Error al insertar la homologación de asignatura',
+                'error' => $e->getMessage(),
+                'linea' => $e->getLine(),
+                'archivo' => $e->getFile()
+            ], 500);
         }
-
-        // Convertimos a JSON para almacenar
-        $homologacionesJson = json_encode($homologacionesActuales);
-
-        // Actualizamos usando el procedimiento almacenado
-        DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?)', [
-            $id,
-            $homologacion->solicitud_id,
-            $homologacionesJson,
-            now()->toDateString()
-        ]);
-
-        return response()->json([
-            'mensaje' => 'Homologación de asignaturas actualizada correctamente',
-            'asignaturas_actualizadas' => $actualizadas,
-            'total_actualizadas' => count($actualizadas)
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'mensaje' => 'Error al actualizar la homologación de asignatura',
-            'error' => $e->getMessage(),
-            'linea' => $e->getLine(),
-            'archivo' => $e->getFile()
-        ], 500);
     }
-}
 
-    // Método para eliminar una homologación de asignatura
+    /**
+     * Método para actualizar una homologación de asignatura existente.
+     * Permite asignar asignaturas destino, notas y comentarios.
+     *
+     * @param Request $request Datos de la actualización
+     * @param int $id ID de la homologación a actualizar
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function actualizarHomologacionAsignatura(Request $request, $id)
+    {
+        try {
+            // Validación de datos de entrada
+            $request->validate([
+                'homologaciones' => 'required|array',
+                'homologaciones.*.asignatura_origen_id' => 'required|integer',
+                'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
+                'homologaciones.*.nota_destino' => 'nullable|numeric',
+                'homologaciones.*.comentarios' => 'nullable|string',
+            ]);
+
+            // Obtener la homologación actual de la base de datos
+            $homologacion = HomologacionAsignatura::findOrFail($id);
+
+            // Decodificar las homologaciones existentes (de JSON a array)
+            $homologacionesActuales = $homologacion->homologaciones;
+
+            // Crear un mapeo para buscar rápidamente por ID de asignatura origen
+            $mapeoIndices = [];
+            foreach ($homologacionesActuales as $key => $homologacionItem) {
+                $mapeoIndices[$homologacionItem['asignatura_origen_id']] = $key;
+            }
+
+            // Arrays para seguimiento de cambios
+            $actualizadas = [];
+            $noEncontradas = [];
+
+            // Procesar cada homologación del request
+            foreach ($request->homologaciones as $homologacionRequest) {
+                $origenId = $homologacionRequest['asignatura_origen_id'];
+
+                // Verificar si la asignatura origen existe en la homologación actual
+                if (isset($mapeoIndices[$origenId])) {
+                    $index = $mapeoIndices[$origenId];
+
+                    // Actualizar solo los campos relacionados con el destino
+                    $homologacionesActuales[$index]['asignatura_destino_id'] = $homologacionRequest['asignatura_destino_id'];
+                    $homologacionesActuales[$index]['nota_destino'] = $homologacionRequest['nota_destino'];
+                    $homologacionesActuales[$index]['comentarios'] = $homologacionRequest['comentarios'] ?? null;
+
+                    $actualizadas[] = $origenId;
+                } else {
+                    // Registrar las asignaturas que no se encontraron
+                    $noEncontradas[] = $origenId;
+                }
+            }
+
+            // Si hay asignaturas no encontradas, devolvemos advertencia
+            if (!empty($noEncontradas)) {
+                return response()->json([
+                    'mensaje' => 'Algunas asignaturas de origen no fueron encontradas en esta homologación',
+                    'asignaturas_no_encontradas' => $noEncontradas,
+                    'asignaturas_actualizadas' => $actualizadas
+                ], 400);
+            }
+
+            // Convertir el array actualizado a JSON para almacenar
+            $homologacionesJson = json_encode($homologacionesActuales);
+
+            // Actualizar mediante procedimiento almacenado
+            DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?)', [
+                $id,
+                $homologacion->solicitud_id,
+                $homologacionesJson,
+                now()->toDateString()
+            ]);
+
+            // Respuesta exitosa con información de cambios
+            return response()->json([
+                'mensaje' => 'Homologación de asignaturas actualizada correctamente',
+                'asignaturas_actualizadas' => $actualizadas,
+                'total_actualizadas' => count($actualizadas)
+            ], 200);
+        } catch (\Exception $e) {
+            // Manejo detallado de errores
+            return response()->json([
+                'mensaje' => 'Error al actualizar la homologación de asignatura',
+                'error' => $e->getMessage(),
+                'linea' => $e->getLine(),
+                'archivo' => $e->getFile()
+            ], 500);
+        }
+    }
+
+    /**
+     * Método para eliminar una homologación de asignatura.
+     *
+     * @param int $id ID de la homologación a eliminar
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function eliminarHomologacionAsignatura($id)
     {
         try {
+            // Eliminar mediante procedimiento almacenado
             DB::statement('CALL EliminarHomologacionAsignatura(?)', [$id]);
 
             return response()->json([
                 'mensaje' => 'Homologación de asignatura eliminada correctamente'
             ], 200);
         } catch (\Exception $e) {
+            // Manejo detallado de errores
             return response()->json([
                 'mensaje' => 'Error al eliminar la homologación de asignatura',
                 'error' => $e->getMessage(),
@@ -224,12 +264,16 @@ public function insertarHomologacionAsignatura(Request $request)
     }
 
     /**
-     * Método para dar formato a los datos de homologación en la estructura solicitada
+     * Método privado para dar formato a los datos de homologación.
+     * Estructura la información completa incluyendo datos relacionados.
+     *
+     * @param object $homologacion Datos de la homologación a formatear
+     * @return array Datos formateados en la estructura requerida
      */
     private function formatearDatosHomologacion($homologacion)
     {
         try {
-            // Obtener información de la solicitud
+            // Obtener información relacionada de la solicitud
             $solicitud = Solicitud::find($homologacion->solicitud_id);
 
             // Información del estudiante
@@ -238,7 +282,7 @@ public function insertarHomologacionAsignatura(Request $request)
             // Obtener programa de destino del estudiante
             $programaDestino = Programa::find($solicitud->programa_destino_id ?? 0);
 
-            // Datos base de la solicitud
+            // Estructura base de la respuesta
             $resultado = [
                 'id_homologacion' => $homologacion->id_homologacion,
                 'solicitud_id' => $homologacion->solicitud_id,
@@ -250,13 +294,13 @@ public function insertarHomologacionAsignatura(Request $request)
                 'fecha' => $homologacion->fecha,
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
-                'comentarios' => null  // Un solo comentario para toda la homologación, inicializado como null
+                'comentarios' => ''  // Comentario general inicializado como string vacío
             ];
 
-            // Verificar si homologaciones es una cadena JSON o ya es un array
+            // Manejo de diferentes formatos de datos para las homologaciones
             $homologacionesArray = null;
             if (is_string($homologacion->homologaciones)) {
-                // Es una cadena - intentar decodificar
+                // Es una cadena JSON - decodificar
                 $homologacionesArray = json_decode($homologacion->homologaciones, true);
             } elseif (is_array($homologacion->homologaciones)) {
                 // Ya es un array
@@ -269,18 +313,19 @@ public function insertarHomologacionAsignatura(Request $request)
                 $homologacionesArray = [];
             }
 
+            // Validar que sea un array
             if (!is_array($homologacionesArray)) {
                 return $resultado;
             }
 
-            // Obtener la información de la solicitud para saber si es SENA
+            // Determinar si es una homologación SENA
             try {
                 $solicitudAsignatura = SolicitudAsignatura::where('solicitud_id', $homologacion->solicitud_id)->first();
                 $esSena = false;
                 $asignaturasOrigen = [];
 
                 if ($solicitud && $solicitudAsignatura) {
-                    // Verificar si asignaturas es una cadena JSON o ya es un array
+                    // Manejar diferentes formatos de datos para las asignaturas
                     if (is_string($solicitudAsignatura->asignaturas)) {
                         $asignaturasOrigen = json_decode($solicitudAsignatura->asignaturas, true);
                     } elseif (is_array($solicitudAsignatura->asignaturas)) {
@@ -289,8 +334,8 @@ public function insertarHomologacionAsignatura(Request $request)
                         $asignaturasOrigen = json_decode(json_encode($solicitudAsignatura->asignaturas), true);
                     }
 
+                    // Determinar si es SENA basado en la presencia de horas_sena
                     if (is_array($asignaturasOrigen) && count($asignaturasOrigen) > 0) {
-                        // Si cualquiera de las asignaturas tiene horas_sena, asumimos que es SENA
                         foreach ($asignaturasOrigen as $asignatura) {
                             if (isset($asignatura['horas_sena']) && $asignatura['horas_sena'] !== null) {
                                 $esSena = true;
@@ -300,36 +345,42 @@ public function insertarHomologacionAsignatura(Request $request)
                     }
                 }
             } catch (\Exception $e) {
+                // En caso de error, valores por defecto
                 $esSena = false;
                 $asignaturasOrigen = [];
             }
 
-            // Procesar cada homologación
+            // Recolector de comentarios
+            $comentariosRecolectados = [];
+
+            // Procesar cada par de homologación (origen-destino)
             foreach ($homologacionesArray as $homologacionItem) {
-                // Obtener información de asignatura origen
+                // Obtener IDs de las asignaturas
                 $asignaturaOrigenId = $homologacionItem['asignatura_origen_id'] ?? 0;
                 $asignaturaDestinoId = $homologacionItem['asignatura_destino_id'] ?? null;
 
-                // Buscar la asignatura origen en la solicitud original para obtener nota_origen o horas_sena
+                // Obtener información detallada de la asignatura origen
                 $asignaturaOrigen = $this->obtenerInfoAsignatura($asignaturaOrigenId);
 
-                // Buscar contenido programático de la asignatura origen
+                // Añadir contenido programático de la asignatura origen
                 $asignaturaOrigen['contenido_programatico'] = $this->obtenerContenidoProgramatico($asignaturaOrigenId);
 
-                // Establecer universidad_origen en el resultado principal basado en la primera asignatura de origen
+                // Establecer universidad_origen en el resultado principal si aún no se ha establecido
                 if (empty($resultado['universidad_origen']) && !empty($asignaturaOrigen['institucion']) && $asignaturaOrigen['institucion'] != 'No disponible') {
                     $resultado['universidad_origen'] = $asignaturaOrigen['institucion'];
                 }
 
+                // Buscar información adicional en la solicitud original (notas o horas SENA)
                 if (isset($asignaturasOrigen) && is_array($asignaturasOrigen)) {
                     foreach ($asignaturasOrigen as $asignaturaSol) {
                         if (isset($asignaturaSol['asignatura_id']) && $asignaturaSol['asignatura_id'] == $asignaturaOrigenId) {
+                            // Si es SENA, obtener horas_sena; de lo contrario, obtener nota_origen
                             if ($esSena && isset($asignaturaSol['horas_sena'])) {
                                 $asignaturaOrigen['horas_sena'] = $asignaturaSol['horas_sena'];
                             } else if (isset($asignaturaSol['nota_origen'])) {
                                 $asignaturaOrigen['nota_origen'] = $asignaturaSol['nota_origen'];
                             }
-                            // Añadir créditos si existen
+                            // Añadir créditos si están disponibles
                             if (isset($asignaturaSol['creditos'])) {
                                 $asignaturaOrigen['creditos'] = $asignaturaSol['creditos'];
                             }
@@ -338,7 +389,7 @@ public function insertarHomologacionAsignatura(Request $request)
                     }
                 }
 
-                // Eliminar campos innecesarios basados en las condiciones
+                // Eliminar campos innecesarios según el tipo de homologación
                 if (!$esSena) {
                     unset($asignaturaOrigen['horas_sena']);
                 }
@@ -346,22 +397,24 @@ public function insertarHomologacionAsignatura(Request $request)
                 // Añadir asignatura origen al resultado
                 $resultado['asignaturas_origen'][] = $asignaturaOrigen;
 
-                // Obtener información de asignatura destino
+                // Procesar asignatura destino
                 $asignaturaDestino = null;
                 if ($asignaturaDestinoId) {
+                    // Si hay asignatura destino asignada, obtener su información
                     $asignaturaDestino = $this->obtenerInfoAsignatura($asignaturaDestinoId);
-                    // Añadir nota de destino
+                    // Añadir nota de destino desde la homologación
                     $asignaturaDestino['nota_destino'] = $homologacionItem['nota_destino'] ?? null;
-                    // Eliminar nota_origen ya que no es relevante en destino
+                    // Eliminar nota_origen que no aplica en destino
                     unset($asignaturaDestino['nota_origen']);
-                    // Buscar contenido programático de la asignatura destino
+                    // Obtener contenido programático
                     $asignaturaDestino['contenido_programatico'] = $this->obtenerContenidoProgramatico($asignaturaDestinoId);
 
-                    // Eliminar campos innecesarios basados en las condiciones
+                    // Eliminar campos innecesarios según el tipo
                     if (!$esSena) {
                         unset($asignaturaDestino['horas_sena']);
                     }
                 } else {
+                    // Si no hay asignatura destino, crear estructura vacía
                     $asignaturaDestino = [
                         'id' => null,
                         'nombre' => null,
@@ -384,22 +437,24 @@ public function insertarHomologacionAsignatura(Request $request)
                 // Añadir asignatura destino al resultado
                 $resultado['asignaturas_destino'][] = $asignaturaDestino;
 
-                // Agregar los comentarios individuales
+                // Recolectar comentarios individuales
                 if (isset($homologacionItem['comentarios']) && !empty($homologacionItem['comentarios'])) {
-                    if ($resultado['comentarios'] === null) {
-                        $resultado['comentarios'] = [];
-                    }
-                    $resultado['comentarios'][] = [
-                        'asignatura_origen_id' => $asignaturaOrigenId,
-                        'asignatura_destino_id' => $asignaturaDestinoId,
-                        'comentario' => $homologacionItem['comentarios']
-                    ];
+                    $nombreAsignaturaOrigen = $asignaturaOrigen['nombre'] ?? 'Asignatura origen';
+                    $nombreAsignaturaDestino = $asignaturaDestino['nombre'] ?? 'Asignatura destino';
+
+                    $comentarioFormateado = "{$nombreAsignaturaOrigen} → {$nombreAsignaturaDestino}: {$homologacionItem['comentarios']}";
+                    $comentariosRecolectados[] = $comentarioFormateado;
                 }
+            }
+
+            // Unir todos los comentarios en un solo string
+            if (!empty($comentariosRecolectados)) {
+                $resultado['comentarios'] = implode("\n", $comentariosRecolectados);
             }
 
             return $resultado;
         } catch (\Exception $e) {
-            // En caso de error, devolver al menos los datos básicos
+            // En caso de error, devolver estructura mínima con información del error
             return [
                 'id_homologacion' => $homologacion->id_homologacion ?? 0,
                 'solicitud_id' => $homologacion->solicitud_id ?? 0,
@@ -408,16 +463,22 @@ public function insertarHomologacionAsignatura(Request $request)
                 'fecha' => $homologacion->fecha ?? null,
                 'error' => 'Error al formatear datos: ' . $e->getMessage(),
                 'asignaturas_origen' => [],
-                'asignaturas_destino' => []
+                'asignaturas_destino' => [],
+                'comentarios' => ''
             ];
         }
     }
-
+    
     /**
-     * Método para obtener información detallada de una asignatura
+     * Método privado auxiliar para obtener información detallada de una asignatura.
+     * Incluye datos de programa, facultad e institución relacionados.
+     *
+     * @param int $asignaturaId ID de la asignatura
+     * @return array Información detallada de la asignatura
      */
     private function obtenerInfoAsignatura($asignaturaId)
     {
+        // Estructura base de la información
         $info = [
             'id' => $asignaturaId,
             'nombre' => 'No disponible',
@@ -431,30 +492,33 @@ public function insertarHomologacionAsignatura(Request $request)
             'horas_sena' => null
         ];
 
+        // Si no hay ID, devolver estructura vacía
         if (empty($asignaturaId)) {
             return $info;
         }
 
         try {
+            // Buscar la asignatura por ID
             $asignatura = Asignatura::find($asignaturaId);
 
             if (!$asignatura) {
                 return $info;
             }
 
+            // Llenar información básica de la asignatura
             $info['nombre'] = $asignatura->nombre ?? 'No disponible';
             $info['codigo'] = $asignatura->codigo_asignatura ?? 'N/A';
             $info['semestre'] = $asignatura->semestre ?? 0;
             $info['creditos'] = $asignatura->creditos ?? null;
 
-            // Obtener programa
+            // Obtener información relacionada del programa y sus dependencias
             try {
                 if ($asignatura->programa_id) {
                     $programa = Programa::find($asignatura->programa_id);
                     if ($programa) {
                         $info['programa'] = $programa->nombre ?? 'No disponible';
 
-                        // Obtener facultad
+                        // Obtener facultad relacionada
                         if ($programa->facultad_id) {
                             $facultad = Facultad::find($programa->facultad_id);
                             if ($facultad) {
@@ -462,7 +526,7 @@ public function insertarHomologacionAsignatura(Request $request)
                             }
                         }
 
-                        // Obtener institución
+                        // Obtener institución relacionada
                         if ($programa->institucion_id) {
                             $institucion = Institucion::find($programa->institucion_id);
                             if ($institucion) {
@@ -472,17 +536,20 @@ public function insertarHomologacionAsignatura(Request $request)
                     }
                 }
             } catch (\Exception $e) {
-                // Silenciar error
+                // Silenciar errores en relaciones
             }
         } catch (\Exception $e) {
-            // Silenciar error
+            // Silenciar errores generales
         }
 
         return $info;
     }
 
     /**
-     * Método para obtener el contenido programático de una asignatura
+     * Método privado para obtener el contenido programático de una asignatura.
+     *
+     * @param int $asignaturaId ID de la asignatura
+     * @return array|null Contenido programático o null si no existe
      */
     private function obtenerContenidoProgramatico($asignaturaId)
     {
@@ -491,14 +558,14 @@ public function insertarHomologacionAsignatura(Request $request)
         }
 
         try {
-            // Obtener contenido programático
+            // Buscar el contenido programático asociado a la asignatura
             $contenidoProgramatico = ContenidoProgramatico::where('asignatura_id', $asignaturaId)->first();
 
             if (!$contenidoProgramatico) {
                 return null;
             }
 
-            // Devolvemos los campos según la estructura real de la tabla
+            // Devolver estructura con campos relevantes
             return [
                 'id' => $contenidoProgramatico->id_contenido ?? null,
                 'tema' => $contenidoProgramatico->tema ?? null,
@@ -511,15 +578,18 @@ public function insertarHomologacionAsignatura(Request $request)
     }
 
     /**
-     * Método para obtener todas las asignaturas que pertenecen a la Universidad Autónoma
+     * Método para obtener todas las asignaturas de la Universidad Autónoma.
+     * Útil para seleccionar asignaturas destino en homologaciones.
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function obtenerAsignaturasAutonoma()
     {
         try {
-            // Primero identificamos la institución Autónoma
+            // Buscar la institución por nombre (con variantes en la escritura)
             $institucion = Institucion::where('nombre', 'like', '%autónoma%')
-                                      ->orWhere('nombre', 'like', '%autonoma%')
-                                      ->first();
+                ->orWhere('nombre', 'like', '%autonoma%')
+                ->first();
 
             if (!$institucion) {
                 return response()->json([
@@ -528,7 +598,7 @@ public function insertarHomologacionAsignatura(Request $request)
                 ], 404);
             }
 
-            // Obtenemos los programas de la institución
+            // Obtener los IDs de programas asociados a la institución
             $programasIds = Programa::where('institucion_id', $institucion->id)->pluck('id')->toArray();
 
             if (empty($programasIds)) {
@@ -538,12 +608,12 @@ public function insertarHomologacionAsignatura(Request $request)
                 ], 404);
             }
 
-            // Obtenemos las asignaturas de esos programas
+            // Obtener asignaturas de esos programas con relaciones
             $asignaturas = Asignatura::whereIn('programa_id', $programasIds)
-                                     ->with(['programa', 'programa.facultad', 'programa.institucion'])
-                                     ->get();
+                ->with(['programa', 'programa.facultad', 'programa.institucion'])
+                ->get();
 
-            // Formateamos las asignaturas
+            // Formatear las asignaturas para la respuesta
             $asignaturasFormateadas = [];
             foreach ($asignaturas as $asignatura) {
                 $asignaturaFormateada = [
@@ -566,6 +636,7 @@ public function insertarHomologacionAsignatura(Request $request)
                 'asignaturas' => $asignaturasFormateadas
             ], 200);
         } catch (\Exception $e) {
+            // Manejo detallado de errores
             return response()->json([
                 'mensaje' => 'Error al obtener las asignaturas de la Universidad Autónoma',
                 'error' => $e->getMessage(),
