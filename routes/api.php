@@ -47,10 +47,12 @@ Route::group(['middleware' => ['jwt.verify'], 'prefix' => 'auth'], function () {
     Route::get('user-profile', [AuthController::class, 'userProfile']);
 });
 
-// 🔓 Rutas públicas de recursos CRUD (actualmente sin autenticación)
-// Route::group(['middleware' => ['jwt.verify']], function () {
 
-// Países
+
+// 🔓 Rutas públicas de recursos CRUD (actualmente sin autenticación)
+/* Route::group(['middleware' => ['jwt.verify']], function () { */
+
+//Países
 Route::get('paises', [PaisControllerApi::class, 'traerPaises']);
 Route::get('paises/{id}', [PaisControllerApi::class, 'llevarPais']);
 Route::post('paises', [PaisControllerApi::class, 'insertarPais']);
@@ -159,4 +161,4 @@ Route::put('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerApi:
 Route::delete('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerApi::class, 'eliminarContenidoProgramatico']);
 Route::get('contenidos-programaticos/asignatura/{asignatura_id}', [ContenidoProgramaticoControllerApi::class, 'obtenerContenidosPorAsignatura']);
 
-// });
+/* }); */
