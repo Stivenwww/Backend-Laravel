@@ -197,6 +197,7 @@ class SolicitudAsignaturaControllerApi extends Controller
        }
    }
 
+   
    /**
     * Da formato a los datos crudos de solicitud para presentación en API
     * Incluye detalles de asignaturas asociadas y su jerarquía académica
