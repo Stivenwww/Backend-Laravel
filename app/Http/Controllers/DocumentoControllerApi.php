@@ -77,15 +77,48 @@ class DocumentoControllerApi extends Controller
                 'solicitud_id' => 'required|integer',
                 'usuario_id' => 'required|integer',
                 'tipo' => 'required|string',
-                'ruta' => 'required|string|max:255',
+                'ruta' => 'required|file|mimes:pdf|max:10240', // Máximo 10 MB
             ]);
+            $dirDestino = '';
+            switch ($request->tipo) {
+                case 'Certificado de Notas':
+                    $dirDestino = 'cert_notas';
+                    break;
+                case 'Carta de Solicitud':
+                    $dirDestino = 'cart_solicitud';
+                    break;
+                case 'Certificación de Finalización de Estudios':
+                    $dirDestino = 'cert_fin_est';
+                    break;
+                case 'Copia de la Visa':
+                    $dirDestino = 'copia_visa';
+                    break;
+                case 'Copia del Pasaporte':
+                    $dirDestino = 'copia_pasaporte';
+                    break;
+                case 'Documento de Identidad':
+                    $dirDestino = 'doc_identidad';
+                    break;
+                case 'Contenido Programático':
+                    $dirDestino = 'cont_programatico';
+                    break;
+                case 'Apostilla':
+                    $dirDestino = 'apostillas';
+                    break;
+                default:
+                    $dirDestino = 'documentos';
+                    break;
+            }
+
+            // Guardar doc en el storage
+            $path = $request->file('ruta')->store($dirDestino, 'public');
 
             // Llamada al procedimiento almacenado para insertar
             DB::statement('CALL InsertarDocumento(?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $request->usuario_id,
                 $request->tipo,
-                $request->ruta
+                $path
             ]);
 
             // Respuesta exitosa, código 201 (Creado)

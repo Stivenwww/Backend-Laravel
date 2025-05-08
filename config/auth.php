@@ -12,7 +12,7 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-            'driver' => 'jwt',    // Cambiado de 'sanctum' a 'jwt'
+            'driver' => 'jwt',    
             'provider' => 'users',
         ],
     ],
