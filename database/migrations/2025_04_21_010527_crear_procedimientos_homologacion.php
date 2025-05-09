@@ -468,7 +468,6 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ActualizarUsuario;
             DROP PROCEDURE IF EXISTS EliminarUsuario;
 
-            -- OBTENER TODOS LOS USUARIOS ACTIVOS
             CREATE PROCEDURE ObtenerUsuarios()
             BEGIN
                 SELECT
@@ -478,6 +477,7 @@ return new class extends Migration {
                     u.primer_apellido,
                     u.segundo_apellido,
                     u.email,
+                    u.password,
                     u.tipo_identificacion,
                     u.numero_identificacion,
                     i.nombre AS institucion_origen,
@@ -487,6 +487,8 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
+                    r.nombre AS rol,               -- Nuevo: Nombre del rol
+                    u.activo,                     -- Nuevo: Estado activo/inactivo
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -495,6 +497,7 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
                 WHERE u.activo = 1
                 ORDER BY u.primer_nombre ASC;
             END;
@@ -509,6 +512,7 @@ return new class extends Migration {
                     u.primer_apellido,
                     u.segundo_apellido,
                     u.email,
+                    u.password,
                     u.tipo_identificacion,
                     u.numero_identificacion,
                     i.nombre AS institucion_origen,
@@ -518,6 +522,8 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
+                    r.nombre AS rol,               -- Nuevo: Nombre del rol
+                    u.activo,                     -- Nuevo: Estado activo/inactivo
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -526,9 +532,11 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
                 WHERE u.id_usuario = usuarioId
                 AND u.activo = 1;
             END;
+
 
             CREATE PROCEDURE InsertarUsuario(
                 IN p_primer_nombre VARCHAR(50),
