@@ -7,6 +7,7 @@ use App\Mail\ControlSeguimientoMailable;
 use App\Mail\CoordinacionMailable;
 use App\Mail\SecretariaMailable;
 use App\Mail\VicerrectoriaMailable;
+use App\Mail\RespuestaSolicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Solicitud;
@@ -201,17 +202,9 @@ class SolicitudControllerApi extends Controller
     }
 
 
-    /**
-     * Actualiza los datos de una solicitud existente
-     *
-     * @param \Illuminate\Http\Request $request Nuevos datos de la solicitud
-     * @param int $id Identificador de la solicitud a actualizar
-     * @return \Illuminate\Http\JsonResponse Confirmación o error
-     */
     public function actualizarSolicitud(Request $request, $id)
     {
         try {
-            // Encontrar la solicitud con relaciones necesarias para el correo
             $solicitud = Solicitud::with('usuario', 'programaDestino')->find($id);
 
             if (!$solicitud) {
@@ -222,7 +215,6 @@ class SolicitudControllerApi extends Controller
 
             $estadoAnterior = $solicitud->estado;
 
-            // Actualiza solo si hay cambios
             $solicitud->fill([
                 'usuario_id' => $request->usuario_id,
                 'programa_destino_id' => $request->programa_destino_id,
@@ -235,18 +227,16 @@ class SolicitudControllerApi extends Controller
 
             $solicitud->save();
 
-            // Si el estado cambió a "En revisión", dispara notificación
+            // Envío a Vicerrectoría si pasó a "En Revisión"
             if (
                 $estadoAnterior !== 'En Revisión' &&
                 $solicitud->estado === 'En Revisión'
             ) {
                 Log::info("Solicitud {$solicitud->id_solicitud} pasó a 'En Revisión'. Enviando notificación a Vicerrectoría.");
 
-                // Obtener datos necesarios para el correo
                 $usuario = $solicitud->usuario;
                 $programaDestino = $solicitud->programaDestino;
 
-                // Preparar datos para el correo, asegurando que todos los campos estén presentes
                 $datos = [
                     'primer_nombre' => $usuario->primer_nombre,
                     'segundo_nombre' => $usuario->segundo_nombre ?? '',
@@ -262,14 +252,11 @@ class SolicitudControllerApi extends Controller
                 ];
 
                 try {
-                    // Primera opción: usar el controlador de notificaciones
                     if (isset($this->notificacionVicerrectoriaController)) {
                         $resultadoControlador = $this->notificacionVicerrectoriaController->notificarVicerrectoriaPorSolicitud($solicitud->id_solicitud);
 
-                        // Registrar el resultado del intento de envío
                         Log::info("Resultado del envío mediante notificacionVicerrectoriaController: " . ($resultadoControlador ? 'Éxito' : 'Fallo'));
 
-                        // Si falló, intentar el método directo
                         if (!$resultadoControlador) {
                             throw new \Exception("Fallo al enviar correo mediante controlador");
                         }
@@ -280,30 +267,32 @@ class SolicitudControllerApi extends Controller
                     Log::warning("Error usando controlador: " . $controllerError->getMessage() . ". Intentando método directo");
 
                     try {
-                        // Intentar enviar correo directo como respaldo
                         Mail::to("brayner.trochez.o@uniautonoma.edu.co")->send(new VicerrectoriaMailable($datos));
                         Log::info("Correo enviado usando método directo de respaldo");
+                        Mail::to("brayner.trochez.o@uniautonoma.edu.co")->send(new RespuestaSolicitud($datos));
+                        Log::info("Correo enviado usando método directo de respaldo a correo de prueba");
                     } catch (\Exception $mailError) {
                         Log::error("Error al enviar correo directo", [
                             'error' => $mailError->getMessage(),
                             'trace' => $mailError->getTraceAsString()
                         ]);
-
-
                     }
                 }
             }
 
+            // NUEVA FUNCIÓN: Notificar al estudiante si el estado cambia a Aprobado, Rechazado o Cerrado
+            $estadosParaNotificar = ['Aprobado', 'Rechazado', 'Cerrado'];
+            if (in_array($solicitud->estado, $estadosParaNotificar)) {
+                Log::info("Estado actualizado a '{$solicitud->estado}', enviando notificación al aspirante.");
+                $this->enviarCorreo($solicitud->id_solicitud);
+            }
+
             return response()->json([
-                'mensaje' => 'Solicitud actualizada correctamente'
+                'mensaje' => 'Solicitud actualizada correctamente',
+                'estado_anterior' => $estadoAnterior,
+                'estado_actual' => $solicitud->estado
             ], 200);
-
         } catch (\Exception $e) {
-            Log::error('Error en actualizarSolicitud', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             return response()->json([
                 'mensaje' => 'Error al actualizar la solicitud',
                 'error' => $e->getMessage()

@@ -36,10 +36,10 @@ class NotificacionAspiranteController extends Controller
             ];
 
             // Envía el correo electrónico al usuario utilizando la clase mailable personalizada
-            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
 
             // Línea comentada: también se podría enviar el correo a una dirección fija (ejemplo institucional)
-            // Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
+             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
 
             // Registra en el log un mensaje de éxito junto con el número de radicado
             Log::info('Correo enviado exitosamente a Secretaría', ['radicado' => $solicitud->numero_radicado]);
