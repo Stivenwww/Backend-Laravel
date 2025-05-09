@@ -468,7 +468,7 @@ class HomologacionAsignaturaControllerApi extends Controller
             ];
         }
     }
-    
+
     /**
      * Método privado auxiliar para obtener información detallada de una asignatura.
      * Incluye datos de programa, facultad e institución relacionados.
