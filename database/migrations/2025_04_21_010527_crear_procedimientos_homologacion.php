@@ -468,7 +468,6 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ActualizarUsuario;
             DROP PROCEDURE IF EXISTS EliminarUsuario;
 
-            -- OBTENER TODOS LOS USUARIOS ACTIVOS
             CREATE PROCEDURE ObtenerUsuarios()
             BEGIN
                 SELECT
@@ -478,6 +477,7 @@ return new class extends Migration {
                     u.primer_apellido,
                     u.segundo_apellido,
                     u.email,
+                    u.password,
                     u.tipo_identificacion,
                     u.numero_identificacion,
                     i.nombre AS institucion_origen,
@@ -487,6 +487,8 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
+                    r.nombre AS rol,               -- Nuevo: Nombre del rol
+                    u.activo,                     -- Nuevo: Estado activo/inactivo
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -495,6 +497,7 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
                 WHERE u.activo = 1
                 ORDER BY u.primer_nombre ASC;
             END;
@@ -509,6 +512,7 @@ return new class extends Migration {
                     u.primer_apellido,
                     u.segundo_apellido,
                     u.email,
+                    u.password,
                     u.tipo_identificacion,
                     u.numero_identificacion,
                     i.nombre AS institucion_origen,
@@ -518,6 +522,8 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
+                    r.nombre AS rol,               -- Nuevo: Nombre del rol
+                    u.activo,                     -- Nuevo: Estado activo/inactivo
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -526,9 +532,11 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
                 WHERE u.id_usuario = usuarioId
                 AND u.activo = 1;
             END;
+
 
             CREATE PROCEDURE InsertarUsuario(
                 IN p_primer_nombre VARCHAR(50),
@@ -967,46 +975,89 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ActualizarDocumento;
             DROP PROCEDURE IF EXISTS EliminarDocumento;
 
-            -- OBTENER TODOS LOS DOCUMENTOS
+            -- OBTENER TODOS LOS DOCUMENTOS (modificado)
             CREATE PROCEDURE ObtenerDocumentos()
             BEGIN
                 SELECT
                     d.id_documento,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-                    s.id_solicitud,
-                    s.numero_radicado,  -- Incluyendo el número de radicado
+                    d.solicitud_id,
+                    d.usuario_id,
                     d.tipo,
                     d.ruta,
                     d.fecha_subida,
                     d.created_at,
-                    d.updated_at
+                    d.updated_at,
+                    -- Datos de usuario
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.email,
+                    u.tipo_identificacion,
+                    u.numero_identificacion,
+                    u.telefono,
+                    u.direccion,
+                    u.institucion_origen_id,
+                    u.facultad_id,
+                    u.pais_id,
+                    u.departamento_id,
+                    u.municipio_id,
+                    -- Datos de solicitud
+                    s.programa_destino_id,
+                    s.finalizo_estudios,
+                    s.fecha_finalizacion_estudios,
+                    s.fecha_ultimo_semestre_cursado,
+                    s.estado,
+                    s.numero_radicado,
+                    s.fecha_solicitud,
+                    s.ruta_pdf_resolucion
                 FROM documentos d
-                LEFT JOIN users
-                 u ON d.usuario_id = u.id_usuario
+                LEFT JOIN users u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 ORDER BY d.fecha_subida DESC;
             END;
 
-            -- OBTENER DOCUMENTO POR ID
+            -- OBTENER DOCUMENTO POR ID (modificado)
             CREATE PROCEDURE ObtenerDocumentoPorId(IN documentoId SMALLINT)
             BEGIN
                 SELECT
                     d.id_documento,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-                    s.id_solicitud,
-                    s.numero_radicado,  -- Incluyendo el número de radicado
+                    d.solicitud_id,
+                    d.usuario_id,
                     d.tipo,
                     d.ruta,
                     d.fecha_subida,
                     d.created_at,
-                    d.updated_at
+                    d.updated_at,
+                    -- Datos de usuario
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.email,
+                    u.tipo_identificacion,
+                    u.numero_identificacion,
+                    u.telefono,
+                    u.direccion,
+                    u.institucion_origen_id,
+                    u.facultad_id,
+                    u.pais_id,
+                    u.departamento_id,
+                    u.municipio_id,
+                    -- Datos de solicitud
+                    s.programa_destino_id,
+                    s.finalizo_estudios,
+                    s.fecha_finalizacion_estudios,
+                    s.fecha_ultimo_semestre_cursado,
+                    s.estado,
+                    s.numero_radicado,
+                    s.fecha_solicitud,
+                    s.ruta_pdf_resolucion
                 FROM documentos d
-                LEFT JOIN users
-                 u ON d.usuario_id = u.id_usuario
+                LEFT JOIN users u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 WHERE d.id_documento = documentoId;
             END;
-
             -- INSERTAR DOCUMENTO
             CREATE PROCEDURE InsertarDocumento(
                 IN p_solicitud_id SMALLINT,

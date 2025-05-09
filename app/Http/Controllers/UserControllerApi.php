@@ -148,7 +148,7 @@ class UserControllerApi extends Controller
                'segundo_nombre' => 'sometimes|nullable|string|max:50',
                'primer_apellido' => 'sometimes|required|string|max:50',
                'segundo_apellido' => 'sometimes|nullable|string|max:50',
-               'email' => "sometimes|required|email|unique:users,email,{$id},id_usuario",
+                'email' => 'required|email|unique:users,email,' . $id . ',id_usuario',
                'password' => 'sometimes|nullable|string|min:8|confirmed',
                'tipo_identificacion' => 'sometimes|required|in:Tarjeta de Identidad,Cédula de Ciudadanía,Cédula de Extranjería',
                'numero_identificacion' => "sometimes|nullable|string|max:20|unique:users,numero_identificacion,{$id},id_usuario",
