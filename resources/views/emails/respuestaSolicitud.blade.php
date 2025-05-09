@@ -88,6 +88,7 @@
             color: #777;
             padding-top: 20px;
             border-top: 1px solid #ddd;
+            
         }
     </style>
 </head>
