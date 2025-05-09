@@ -229,10 +229,10 @@ class SolicitudControllerApi extends Controller
 
             // Envío a Vicerrectoría si pasó a "En Revisión"
             if (
-                $estadoAnterior !== 'En Revisión' &&
-                $solicitud->estado === 'En Revisión'
+                $estadoAnterior !== 'En revisión' &&
+                $solicitud->estado === 'En revisión'
             ) {
-                Log::info("Solicitud {$solicitud->id_solicitud} pasó a 'En Revisión'. Enviando notificación a Vicerrectoría.");
+                Log::info("Solicitud {$solicitud->id_solicitud} pasó a 'En revisión'. Enviando notificación a Vicerrectoría.");
 
                 $usuario = $solicitud->usuario;
                 $programaDestino = $solicitud->programaDestino;

@@ -125,7 +125,7 @@
 <body>
     <div class="container">
         <div class="header">
-            Nueva Solicitud de Homologación
+            Solicitud de Homologación
         </div>
 
         <div class="content">

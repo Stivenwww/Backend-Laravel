@@ -4,7 +4,10 @@
 namespace App\Http\Controllers;
 
 // Se importan las clases necesarias
+
 use App\Mail\AspiranteMailable;
+use App\Mail\NotificacionEstadoAspirante;
+use App\Mail\NotificacionEstadoAspiranteMailable;
 use App\Models\Solicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -35,8 +38,23 @@ class NotificacionAspiranteController extends Controller
                 'numero_radicado' => $solicitud->numero_radicado
             ];
 
-            // Envía el correo electrónico al usuario utilizando la clase mailable personalizada
-            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            // Determina el mensaje basado en el estado del usuario
+            switch ($usuario->estado) {
+                case 'pendiente':
+                    $mensaje = 'Tu solicitud está siendo revisada.';
+                    break;
+                case 'aprobado':
+                    $mensaje = '¡Felicidades! Has sido aprobado.';
+                    break;
+                case 'rechazado':
+                    $mensaje = 'Tu solicitud fue rechazada.';
+                    break;
+                default:
+                    $mensaje = 'El estado ha cambiado.';
+            }
+
+            // Envía el correo electrónico al usuario utilizando el nuevo Mailable
+            //Mail::to($usuario->email)->send(new NotificacionEstadoAspiranteMailable($usuario, $mensaje));
 
             // Línea comentada: también se podría enviar el correo a una dirección fija (ejemplo institucional)
              Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
