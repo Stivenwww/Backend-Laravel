@@ -22,8 +22,7 @@ class Solicitud extends Model
         'fecha_ultimo_semestre_cursado',
         'estado',
         'numero_radicado',
-        'fecha_solicitud',
-        'ruta_pdf_resolucion'
+        'fecha_solicitud'
     ];
 
     public function usuario()
@@ -64,24 +63,13 @@ class Solicitud extends Model
         });
 
         static::updated(function ($solicitud) {
-            if ($solicitud->isDirty('estado') || $solicitud->isDirty('ruta_pdf_resolucion')) {
-                $observaciones = [];
-
-                if ($solicitud->isDirty('estado')) {
-                    $observaciones[] = 'Cambio automático de estado';
-                }
-
-                if ($solicitud->isDirty('ruta_pdf_resolucion')) {
-                    $observaciones[] = 'Se cargó o actualizó la resolución';
-                }
-
+            if ($solicitud->isDirty('estado')) {
                 HistorialHomologacion::create([
                     'usuario_id' => $solicitud->usuario_id,
                     'solicitud_id' => $solicitud->id_solicitud,
                     'estado' => $solicitud->estado,
-                    'observaciones' => implode(' y ', $observaciones),
+                    'observaciones' => 'Cambio automático de estado',
                     'fecha' => now(),
-                    'ruta_pdf_resolucion' => $solicitud->ruta_pdf_resolucion,
                 ]);
             }
         });

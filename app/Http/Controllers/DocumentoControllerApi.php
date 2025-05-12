@@ -155,7 +155,7 @@ class DocumentoControllerApi extends Controller
                 'solicitud_id' => 'sometimes|required|integer',
                 'usuario_id' => 'sometimes|required|integer',
                 'tipo' => 'sometimes|required|string',
-                'ruta' => 'sometimes|required|string|max:255',
+                'ruta' => 'required|file|mimes:pdf|max:10240',
             ]);
 
             // Llamada al procedimiento almacenado para actualizar

@@ -117,7 +117,6 @@ class SolicitudControllerApi extends Controller
             $solicitud->fecha_finalizacion_estudios = $request->fecha_finalizacion_estudios;
             $solicitud->fecha_ultimo_semestre_cursado = $request->fecha_ultimo_semestre_cursado;
             $solicitud->estado = $request->estado ?? 'Radicado'; // Valor predeterminado
-            $solicitud->ruta_pdf_resolucion = $request->ruta_pdf_resolucion;
             $solicitud->save();
 
             // Registra información detallada en el log
@@ -127,8 +126,7 @@ class SolicitudControllerApi extends Controller
                 'finalizo_estudios' => $request->finalizo_estudios,
                 'fecha_finalizacion_estudios' => $request->fecha_finalizacion_estudios,
                 'fecha_ultimo_semestre_cursado' => $request->fecha_ultimo_semestre_cursado,
-                'estado' => $request->estado ?? 'Radicado',
-                'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion
+                'estado' => $request->estado ?? 'Radicado'
             ]);
 
             // Envía notificaciones por correo electrónico
@@ -221,8 +219,7 @@ class SolicitudControllerApi extends Controller
                 'finalizo_estudios' => $request->finalizo_estudios,
                 'fecha_finalizacion_estudios' => $request->fecha_finalizacion_estudios,
                 'fecha_ultimo_semestre_cursado' => $request->fecha_ultimo_semestre_cursado,
-                'estado' => $request->estado,
-                'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion,
+                'estado' => $request->estado
             ]);
 
             $solicitud->save();

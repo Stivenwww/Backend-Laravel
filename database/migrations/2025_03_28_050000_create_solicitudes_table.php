@@ -20,7 +20,6 @@ return new class extends Migration {
             $table->enum('estado', ['Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'])->default('Radicado');
             $table->string('numero_radicado', 50)->unique();
             $table->timestamp('fecha_solicitud')->useCurrent();
-            $table->string('ruta_pdf_resolucion', 255)->nullable();
 
             // llaves foráneas
             $table->foreign('usuario_id')->references('id_usuario')->on('users');

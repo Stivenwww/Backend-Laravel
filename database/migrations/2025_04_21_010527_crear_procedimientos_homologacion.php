@@ -796,8 +796,7 @@ return new class extends Migration {
                 IN p_finalizo_estudios ENUM('Si', 'No'),
                 IN p_fecha_finalizacion_estudios DATE,
                 IN p_fecha_ultimo_semestre_cursado DATE,
-                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'),
-                IN p_ruta_pdf_resolucion VARCHAR(255)
+                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado')
             )
             BEGIN
                 UPDATE solicitudes
@@ -808,7 +807,6 @@ return new class extends Migration {
                     fecha_finalizacion_estudios = p_fecha_finalizacion_estudios,
                     fecha_ultimo_semestre_cursado = p_fecha_ultimo_semestre_cursado,
                     estado = p_estado,
-                    ruta_pdf_resolucion = p_ruta_pdf_resolucion,
                     updated_at = NOW()
                 WHERE id_solicitud = p_id_solicitud;
             END;
@@ -828,8 +826,7 @@ return new class extends Migration {
                 IN p_finalizo_estudios ENUM('Si', 'No'),
                 IN p_fecha_finalizacion_estudios DATE,
                 IN p_fecha_ultimo_semestre_cursado DATE,
-                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'),
-                IN p_ruta_pdf_resolucion VARCHAR(255)
+                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado')
             )
             BEGIN
                 DECLARE v_year INT;
@@ -860,7 +857,6 @@ return new class extends Migration {
                     fecha_ultimo_semestre_cursado,
                     estado,
                     numero_radicado,
-                    ruta_pdf_resolucion,
                     created_at,
                     updated_at
                 ) VALUES (
@@ -871,7 +867,6 @@ return new class extends Migration {
                     p_fecha_ultimo_semestre_cursado,
                     p_estado,
                     v_nuevo_radicado,
-                    p_ruta_pdf_resolucion,
                     NOW(),
                     NOW()
                 );
@@ -890,7 +885,6 @@ return new class extends Migration {
                     s.fecha_solicitud,
                     s.estado,
                     s.numero_radicado,
-                    s.ruta_pdf_resolucion AS pdf_resolucion,
 
                     -- Datos del programa destino
                     prog.nombre AS programa_destino_nombre,
@@ -933,7 +927,6 @@ return new class extends Migration {
                     s.fecha_solicitud,
                     s.estado,
                     s.numero_radicado,
-                    s.ruta_pdf_resolucion AS pdf_resolucion,
 
                     -- Datos del programa destino
                     prog.nombre AS programa_destino_nombre,
@@ -1429,7 +1422,7 @@ return new class extends Migration {
 
 
 
-                -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
             DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
             DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
             DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
@@ -1451,6 +1444,7 @@ return new class extends Migration {
                     ) AS estudiante,
                     ha.homologaciones, -- Devolvemos el JSON tal cual
                     ha.fecha,
+                    ha.ruta_pdf_resolucion,
                     ha.created_at,
                     ha.updated_at
                 FROM homologacion_asignaturas ha
@@ -1474,6 +1468,7 @@ return new class extends Migration {
                     ) AS estudiante,
                     ha.homologaciones, -- Devolvemos el JSON tal cual
                     ha.fecha,
+                    ha.ruta_pdf_resolucion,
                     ha.created_at,
                     ha.updated_at
                 FROM homologacion_asignaturas ha
@@ -1486,7 +1481,8 @@ return new class extends Migration {
             CREATE PROCEDURE InsertarHomologacionAsignatura(
                 IN p_solicitud_id INT,
                 IN p_homologaciones JSON,
-                IN p_fecha DATE
+                IN p_fecha DATE,
+                IN p_ruta_pdf_resolucion VARCHAR(255)
             )
             BEGIN
                 -- Verificamos si ya existe un registro para esta solicitud
@@ -1503,10 +1499,10 @@ return new class extends Migration {
                 ELSE
                     -- Si no existe, insertamos nuevo
                     INSERT INTO homologacion_asignaturas (
-                        solicitud_id, homologaciones, fecha, created_at, updated_at
+                        solicitud_id, homologaciones, fecha, ruta_pdf_resolucion, created_at, updated_at
                     )
                     VALUES (
-                        p_solicitud_id, p_homologaciones, p_fecha, NOW(), NOW()
+                        p_solicitud_id, p_homologaciones, p_fecha, p_ruta_pdf_resolucion, NOW(), NOW()
                     );
                 END IF;
             END;
@@ -1516,13 +1512,15 @@ return new class extends Migration {
             IN p_id_homologacion INT,
             IN p_solicitud_id INT,
             IN p_homologaciones JSON,
-            IN p_fecha DATE
+            IN p_fecha DATE,
+            IN p_ruta_pdf_resolucion VARCHAR(255)
             )
             BEGIN
                 UPDATE homologacion_asignaturas
                 SET
                     homologaciones = p_homologaciones,
                     fecha = p_fecha,
+                    ruta_pdf_resolucion = p_ruta_pdf_resolucion,
                     updated_at = NOW()
                 WHERE id_homologacion = p_id_homologacion;
             END;

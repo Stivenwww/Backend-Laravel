@@ -99,6 +99,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'solicitud_id' => 'required|integer',
                 'asignaturas_origen' => 'required|array',
                 'asignaturas_origen.*' => 'required|integer',
+                'ruta_pdf_resolucion' => 'nullable|string|max:255', // Validación para el nuevo campo
             ]);
 
             // Obtenemos las asignaturas de origen del request
@@ -119,10 +120,11 @@ class HomologacionAsignaturaControllerApi extends Controller
             $homologacionesJson = json_encode($homologaciones);
 
             // Insertar mediante procedimiento almacenado
-            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?)', [
+            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $homologacionesJson,
-                Carbon::now()->toDateString() // Fecha actual
+                Carbon::now()->toDateString(), // Fecha actual
+                $request->ruta_pdf_resolucion ?? null // Agregamos el campo de ruta_pdf_resolucion
             ]);
 
             // Respuesta exitosa con los datos creados
@@ -130,7 +132,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'mensaje' => 'Homologación de asignatura insertada correctamente',
                 'datos' => [
                     'solicitud_id' => $request->solicitud_id,
-                    'homologaciones' => $homologaciones
+                    'homologaciones' => $homologaciones,
+                    'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion ?? null
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -146,7 +149,7 @@ class HomologacionAsignaturaControllerApi extends Controller
 
     /**
      * Método para actualizar una homologación de asignatura existente.
-     * Permite asignar asignaturas destino, notas y comentarios.
+     * Permite asignar asignaturas destino, notas, comentarios y PDF de resolución.
      *
      * @param Request $request Datos de la actualización
      * @param int $id ID de la homologación a actualizar
@@ -162,6 +165,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
                 'homologaciones.*.nota_destino' => 'nullable|numeric',
                 'homologaciones.*.comentarios' => 'nullable|string',
+                'ruta_pdf_resolucion' => 'nullable|string|max:255', // Validación para el nuevo campo
             ]);
 
             // Obtener la homologación actual de la base de datos
@@ -213,18 +217,20 @@ class HomologacionAsignaturaControllerApi extends Controller
             $homologacionesJson = json_encode($homologacionesActuales);
 
             // Actualizar mediante procedimiento almacenado
-            DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?)', [
+            DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
                 $id,
                 $homologacion->solicitud_id,
                 $homologacionesJson,
-                now()->toDateString()
+                now()->toDateString(),
+                $request->ruta_pdf_resolucion ?? $homologacion->ruta_pdf_resolucion // Actualizamos PDF si existe, si no, mantenemos el valor actual
             ]);
 
             // Respuesta exitosa con información de cambios
             return response()->json([
                 'mensaje' => 'Homologación de asignaturas actualizada correctamente',
                 'asignaturas_actualizadas' => $actualizadas,
-                'total_actualizadas' => count($actualizadas)
+                'total_actualizadas' => count($actualizadas),
+                'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion ?? $homologacion->ruta_pdf_resolucion
             ], 200);
         } catch (\Exception $e) {
             // Manejo detallado de errores
@@ -292,6 +298,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'programa_destino' => $programaDestino->nombre ?? 'No disponible',
                 'estado_solicitud' => $solicitud->estado ?? 'No disponible',
                 'fecha' => $homologacion->fecha,
+                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null, // Incluimos la ruta del PDF en la respuesta
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
                 'comentarios' => ''  // Comentario general inicializado como string vacío
@@ -461,6 +468,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'numero_radicado' => $homologacion->numero_radicado ?? 'No disponible',
                 'estudiante' => $homologacion->estudiante ?? 'No disponible',
                 'fecha' => $homologacion->fecha ?? null,
+                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null, // Incluimos el campo en la respuesta de error
                 'error' => 'Error al formatear datos: ' . $e->getMessage(),
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
