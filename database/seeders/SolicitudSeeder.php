@@ -46,7 +46,6 @@ class SolicitudSeeder extends Seeder
                 'fecha_finalizacion_estudios' => $data[1],
                 'fecha_ultimo_semestre_cursado' => $data[2],
                 'estado' => $data[3],
-                'ruta_pdf_resolucion' => null,
                 'numero_radicado' => $radicado,
             ]);
         }
