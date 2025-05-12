@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Models\HomologacionAsignatura;
 use App\Models\Asignatura;
@@ -99,7 +100,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'solicitud_id' => 'required|integer',
                 'asignaturas_origen' => 'required|array',
                 'asignaturas_origen.*' => 'required|integer',
-                'ruta_pdf_resolucion' => 'nullable|string|max:255', // Validación para el nuevo campo
+                'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240', // Máximo 10 MB
             ]);
 
             // Obtenemos las asignaturas de origen del request
@@ -119,12 +120,19 @@ class HomologacionAsignaturaControllerApi extends Controller
             // Convertimos el array de homologaciones a formato JSON para almacenar
             $homologacionesJson = json_encode($homologaciones);
 
+            // Manejar la carga del archivo PDF si está presente
+            $pdfPath = null;
+            if ($request->hasFile('ruta_pdf_resolucion')) {
+                // Guardar el archivo PDF en el directorio 'resoluciones_homologaciones'
+                $pdfPath = $request->file('ruta_pdf_resolucion')->store('resoluciones_homologaciones', 'public');
+            }
+
             // Insertar mediante procedimiento almacenado
             DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $homologacionesJson,
                 Carbon::now()->toDateString(), // Fecha actual
-                $request->ruta_pdf_resolucion ?? null // Agregamos el campo de ruta_pdf_resolucion
+                $pdfPath // Ruta del PDF guardado
             ]);
 
             // Respuesta exitosa con los datos creados
@@ -133,7 +141,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'datos' => [
                     'solicitud_id' => $request->solicitud_id,
                     'homologaciones' => $homologaciones,
-                    'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion ?? null
+                    'ruta_pdf_resolucion' => $pdfPath
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -165,7 +173,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
                 'homologaciones.*.nota_destino' => 'nullable|numeric',
                 'homologaciones.*.comentarios' => 'nullable|string',
-                'ruta_pdf_resolucion' => 'nullable|string|max:255', // Validación para el nuevo campo
+                'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240', // Máximo 10 MB
             ]);
 
             // Obtener la homologación actual de la base de datos
@@ -216,13 +224,25 @@ class HomologacionAsignaturaControllerApi extends Controller
             // Convertir el array actualizado a JSON para almacenar
             $homologacionesJson = json_encode($homologacionesActuales);
 
+            // Manejar la actualización del archivo PDF si está presente
+            $pdfPath = $homologacion->ruta_pdf_resolucion; // Mantener el valor actual por defecto
+            if ($request->hasFile('ruta_pdf_resolucion')) {
+                // Si ya existe un PDF anterior, eliminarlo del storage
+                if ($pdfPath && Storage::disk('public')->exists($pdfPath)) {
+                    Storage::disk('public')->delete($pdfPath);
+                }
+
+                // Guardar el nuevo archivo PDF
+                $pdfPath = $request->file('ruta_pdf_resolucion')->store('resoluciones_homologaciones', 'public');
+            }
+
             // Actualizar mediante procedimiento almacenado
             DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
                 $id,
                 $homologacion->solicitud_id,
                 $homologacionesJson,
                 now()->toDateString(),
-                $request->ruta_pdf_resolucion ?? $homologacion->ruta_pdf_resolucion // Actualizamos PDF si existe, si no, mantenemos el valor actual
+                $pdfPath
             ]);
 
             // Respuesta exitosa con información de cambios
@@ -230,7 +250,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'mensaje' => 'Homologación de asignaturas actualizada correctamente',
                 'asignaturas_actualizadas' => $actualizadas,
                 'total_actualizadas' => count($actualizadas),
-                'ruta_pdf_resolucion' => $request->ruta_pdf_resolucion ?? $homologacion->ruta_pdf_resolucion
+                'ruta_pdf_resolucion' => $pdfPath
             ], 200);
         } catch (\Exception $e) {
             // Manejo detallado de errores
@@ -252,6 +272,16 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function eliminarHomologacionAsignatura($id)
     {
         try {
+            // Obtener la homologación primero para poder eliminar el archivo asociado
+            $homologacion = HomologacionAsignatura::find($id);
+
+            if ($homologacion && $homologacion->ruta_pdf_resolucion) {
+                // Eliminar el archivo PDF del storage si existe
+                if (Storage::disk('public')->exists($homologacion->ruta_pdf_resolucion)) {
+                    Storage::disk('public')->delete($homologacion->ruta_pdf_resolucion);
+                }
+            }
+
             // Eliminar mediante procedimiento almacenado
             DB::statement('CALL EliminarHomologacionAsignatura(?)', [$id]);
 
@@ -298,11 +328,18 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'programa_destino' => $programaDestino->nombre ?? 'No disponible',
                 'estado_solicitud' => $solicitud->estado ?? 'No disponible',
                 'fecha' => $homologacion->fecha,
-                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null, // Incluimos la ruta del PDF en la respuesta
+                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion, // Incluimos la ruta del PDF
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
                 'comentarios' => ''  // Comentario general inicializado como string vacío
             ];
+
+            // Si hay una ruta de PDF, construir la URL completa para acceso
+            if ($resultado['ruta_pdf_resolucion']) {
+                $resultado['url_pdf_resolucion'] = asset('storage/' . $resultado['ruta_pdf_resolucion']);
+            } else {
+                $resultado['url_pdf_resolucion'] = null;
+            }
 
             // Manejo de diferentes formatos de datos para las homologaciones
             $homologacionesArray = null;
@@ -468,7 +505,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'numero_radicado' => $homologacion->numero_radicado ?? 'No disponible',
                 'estudiante' => $homologacion->estudiante ?? 'No disponible',
                 'fecha' => $homologacion->fecha ?? null,
-                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null, // Incluimos el campo en la respuesta de error
+                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null,
+                'url_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ? asset('storage/' . $homologacion->ruta_pdf_resolucion) : null,
                 'error' => 'Error al formatear datos: ' . $e->getMessage(),
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
@@ -584,7 +622,6 @@ class HomologacionAsignaturaControllerApi extends Controller
             return null;
         }
     }
-
     /**
      * Método para obtener todas las asignaturas de la Universidad Autónoma.
      * Útil para seleccionar asignaturas destino en homologaciones.
