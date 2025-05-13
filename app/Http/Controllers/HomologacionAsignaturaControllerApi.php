@@ -418,12 +418,16 @@ class HomologacionAsignaturaControllerApi extends Controller
                 if (isset($asignaturasOrigen) && is_array($asignaturasOrigen)) {
                     foreach ($asignaturasOrigen as $asignaturaSol) {
                         if (isset($asignaturaSol['asignatura_id']) && $asignaturaSol['asignatura_id'] == $asignaturaOrigenId) {
-                            // Si es SENA, obtener horas_sena; de lo contrario, obtener nota_origen
+                            // Modificar esta parte para incluir siempre la nota_origen en ambos casos
                             if ($esSena && isset($asignaturaSol['horas_sena'])) {
                                 $asignaturaOrigen['horas_sena'] = $asignaturaSol['horas_sena'];
-                            } else if (isset($asignaturaSol['nota_origen'])) {
+                            }
+
+                            // Siempre incluir la nota_origen si está disponible, independientemente de si es SENA o no
+                            if (isset($asignaturaSol['nota_origen'])) {
                                 $asignaturaOrigen['nota_origen'] = $asignaturaSol['nota_origen'];
                             }
+
                             // Añadir créditos si están disponibles
                             if (isset($asignaturaSol['creditos'])) {
                                 $asignaturaOrigen['creditos'] = $asignaturaSol['creditos'];
