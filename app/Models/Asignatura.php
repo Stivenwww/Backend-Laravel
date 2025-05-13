@@ -34,4 +34,12 @@ class Asignatura extends Model
     {
         return $this->belongsTo(Programa::class, 'programa_id', 'id_programa');
     }
+
+    /**
+     * Relación con la tabla de contenidos programáticos
+     */
+    public function contenidosProgramaticos()
+    {
+        return $this->hasMany(ContenidoProgramatico::class, 'asignatura_id', 'id_asignatura');
+    }
 }
