@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SolicitudCompletaControllerApi;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\PaisControllerApi;
@@ -162,4 +163,6 @@ Route::put('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerApi:
 Route::delete('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerApi::class, 'eliminarContenidoProgramatico']);
 Route::get('contenidos-programaticos/asignatura/{asignatura_id}', [ContenidoProgramaticoControllerApi::class, 'obtenerContenidosPorAsignatura']);
 
-/* }); */
+// });
+
+Route::post('/solicitud-completa', [SolicitudCompletaControllerApi::class, 'store']);
