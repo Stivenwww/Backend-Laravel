@@ -177,14 +177,14 @@ class SolicitudControllerApi extends Controller
             // Envío de notificaciones a diferentes roles/departamentos
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new SecretariaMailable($datos, 'Nueva solicitud de homologación'));
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new CoordinacionMailable($datos));
-            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
 
             // Enviar notificación al aspirante usando el controlador especializado
-           // $notificacionController = app()->make(NotificacionAspiranteController::class);
-            //$resultadoNotificacion = $notificacionController->notificarAspirantePorSolicitud($solicitudId);
+            $notificacionController = app()->make(NotificacionAspiranteController::class);
+            $resultadoNotificacion = $notificacionController->notificarAspirantePorSolicitud($solicitudId);
 
             // Aspirante prueba para ver si se envía el correo y si llega
-            //Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
 
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new ControlSeguimientoMailable($datos));
 
@@ -192,7 +192,7 @@ class SolicitudControllerApi extends Controller
             Log::info('Correos enviados exitosamente', [
                 'radicado' => $solicitud->numero_radicado,
                 'estado' => $solicitud->estado,
-                //'notificacion_aspirante' => $resultadoNotificacion ? 'Éxito' : 'Fallo'
+                'notificacion_aspirante' => $resultadoNotificacion ? 'Éxito' : 'Fallo'
             ]);
             // Registra éxito en el log
             //Log::info('Correos enviados exitosamente', ['radicado' => $solicitud->numero_radicado]);

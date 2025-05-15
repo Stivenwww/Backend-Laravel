@@ -48,11 +48,11 @@ class NotificacionAspiranteController extends Controller
             ];
 
             // Envía el correo electrónico al usuario
-            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
 
             // Para propósitos de prueba, enviar también a una dirección conocida
             // Comentar o eliminar esta línea en producción si no es necesaria
-            //Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
 
             // Registra en el log un mensaje de éxito
             Log::info('Correo enviado exitosamente al aspirante', [

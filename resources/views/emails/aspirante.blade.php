@@ -1,194 +1,214 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $titulo_correo }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background-color: #f2f8ff;
-            color: #333;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 64, 128, 0.15);
-        }
-
-        .header {
-            background: #0074d9;
-            color: #ffffff;
-            text-align: center;
-            padding: 20px;
-            border-radius: 12px 12px 0 0;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .content {
-            padding: 20px;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
-        .radicado {
-            font-size: 18px;
-            font-weight: 600;
-            color: #0074d9;
-            text-align: center;
-            margin: 20px 0;
-            padding: 12px;
-            border: 1px dashed #0074d9;
-            background-color: #e6f2ff;
-            border-radius: 8px;
-        }
-
-        .estado {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 600;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .estado-Radicado {
-            color: #0074d9;
-            background-color: #e6f2ff;
-        }
-
-        .estado-En-revisión {
-            color: #f39c12;
-            background-color: #fff7e6;
-        }
-
-        .estado-Aprobado {
-            color: #2ecc71;
-            background-color: #e6fff0;
-        }
-
-        .estado-Rechazado {
-            color: #e74c3c;
-            background-color: #ffe6e6;
-        }
-
-        .estado-Cerrado {
-            color: #7f8c8d;
-            background-color: #f0f0f0;
-        }
-
-        .student-info {
-            background-color: #f0f7ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .student-info h3 {
-            margin-top: 0;
-            color: #004080;
-            border-bottom: 1px solid #c0d3e8;
-            padding-bottom: 8px;
-            font-size: 18px;
-        }
-
-        .label {
-            font-weight: 600;
-            color: #004080;
-        }
-
-        .mensaje-personalizado {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-left: 4px solid #0074d9;
-            margin: 20px 0;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
-        .button {
-            display: block;
-            width: 90%;
-            margin: 30px auto 10px;
-            text-align: center;
-            background: #0074d9;
-            color: #ffffff;
-            padding: 14px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.3s ease;
-        }
-
-        .button:hover {
-            background: #0056a4;
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 13px;
-            color: #777;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
-
-        @media (max-width: 640px) {
-            .container {
-                margin: 15px;
-                padding: 15px;
-            }
-
-            .button {
-                width: 100%;
-            }
-        }
-    </style>
+    <!--[if !mso]><!-->
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--<![endif]-->
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            {{ $titulo_correo }}
-        </div>
 
-        <div class="content">
-            <p>Estimado/a {{ $primer_nombre }} {{ $primer_apellido }}:</p>
+<body style="margin: 0; padding: 0; font-family: 'Inter', 'Atkinson Hyperlegible', Arial, sans-serif; background-color: #ffffff; color: #2c3e50; line-height: 1.6;">
+    <!-- CONTAINER -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <!-- MAIN EMAIL CONTAINER -->
+                <table class="email-container" width="650" cellpadding="0" cellspacing="0" border="0" style="max-width: 650px; margin: 0 auto; background: #ffffff; border-radius: 20px; box-shadow: 0 12px 35px rgba(12, 43, 90, 0.15); overflow: hidden;">
+                    <!-- HEADER -->
+                    <tr>
+                        <td class="email-header" style="background: linear-gradient(135deg, #0c2b5a, #0a4c8b); text-align: center; padding: 35px 20px; position: relative;">
+                            <!-- LOGO -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 15px;">
+                                        <img src="https://biblioteca.uniautonoma.edu.co/images/logo_home.png" alt="Quimerito" width="100" height="100" style="display: block; margin: 0 auto;">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h1 style="font-family: 'Atkinson Hyperlegible', Arial, sans-serif; font-size: 28px; font-weight: 700; margin: 0; padding: 12px 20px; color: #ffffff; text-align: center; background-color: rgba(0, 0, 0, 0.15); border-radius: 12px; display: inline-block; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);">{{ $titulo_correo }}</h1>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-            <div class="mensaje-personalizado">
-                {{ $mensaje_personalizado }}
-            </div>
+                    <!-- CONTENT -->
+                    <tr>
+                        <td class="email-content" style="padding: 35px 30px; font-size: 16px; background: #ffffff;">
+                            <!-- GREETING -->
+                            <p style="font-size: 20px; margin-bottom: 25px; color: #0c2b5a; font-weight: 500; border-bottom: 2px solid rgba(12, 43, 90, 0.1); padding-bottom: 12px;">Estimado/a <strong>{{ $primer_nombre }} {{ $primer_apellido }}</strong>,</p>
 
-            <div class="radicado">
-                Número de radicado: {{ $numero_radicado }}
-            </div>
+                            <!-- MENSAJE PERSONALIZADO -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td style="background-color: rgba(22, 120, 194, 0.05); padding: 25px; border-radius: 16px; font-size: 16px; line-height: 1.7; border-left: 5px solid #1678c2; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);">
+                                        {{ $mensaje_personalizado }}
+                                    </td>
+                                </tr>
+                            </table>
 
-            <div class="estado estado-{{ str_replace(' ', '-', $estado) }}">
-                Estado actual: {{ $estado }}
-            </div>
+                            <!-- RADICADO -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td align="center" style="font-size: 20px; font-weight: 600; color: #0a4c8b; text-align: center; padding: 20px; border: 2px dashed #1678c2; background-color: rgba(16, 76, 139, 0.05); border-radius: 16px;">
+                                        Número de radicado: <strong>{{ $numero_radicado }}</strong>
+                                    </td>
+                                </tr>
+                            </table>
 
-            <div class="student-info">
-                <h3>Datos del Aspirante</h3>
-                <p><span class="label">Nombre completo:</span> {{ $primer_nombre }} {{ $segundo_nombre }} {{ $primer_apellido }} {{ $segundo_apellido }}</p>
-                <p><span class="label">Programa destino:</span> {{ $programa_destino }}</p>
-                <p><span class="label">Finalizó estudios:</span> {{ $finalizo_estudios }}</p>
-                <p><span class="label">Fecha de solicitud:</span> {{ $fecha_solicitud }}</p>
-            </div>
+                            <!-- ESTADO -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td align="center" class="estado estado-{{ str_replace(' ', '-', $estado) }}" style="text-align: center; font-size: 18px; font-weight: 600; padding: 20px 15px; border-radius: 16px; color: #ffffff; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); background:
+                                    @if($estado == 'Radicado')
+                                        linear-gradient(135deg, #0c2b5a, #1678c2)
+                                    @elseif($estado == 'En revisión')
+                                        linear-gradient(135deg, #b15911, #e67e22)
+                                    @elseif($estado == 'Aprobado')
+                                        linear-gradient(135deg, #1d7d4d, #27ae60)
+                                    @elseif($estado == 'Rechazado')
+                                        linear-gradient(135deg, #a51f1f, #e53e3e)
+                                    @elseif($estado == 'Cerrado')
+                                        linear-gradient(135deg, #2c3e50, #576574)
+                                    @else
+                                        linear-gradient(135deg, #0c2b5a, #1678c2)
+                                    @endif
+                                    ;">
+                                        Estado actual: {{ $estado }}
+                                    </td>
+                                </tr>
+                            </table>
 
-            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}" class="button">
-                Ver Detalles en el Sistema
-            </a>
-        </div>
+                            <!-- STUDENT INFO -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 35px; background-color: #f9fafc; padding: 30px; border-radius: 16px; box-shadow: 0 8px 25px rgba(12, 43, 90, 0.08); border: 1px solid #e0e7ff;">
+                                <tr>
+                                    <td>
+                                        <h3 style="margin-top: 0; color: #0c2b5a; border-bottom: 2px solid #1678c2; padding-bottom: 12px; font-size: 20px; font-family: 'Atkinson Hyperlegible', Arial, sans-serif;">Datos del Aspirante</h3>
+                                    </td>
+                                </tr>
 
-        <div class="footer">
-            <p>Este es un correo automático del Sistema de Homologaciones de la Corporación Universitaria Autónoma del Cauca.</p>
-            <p>No responda a este correo. Para soporte, contacte al administrador del sistema.</p>
-        </div>
-    </div>
+                                <!-- INFO GRID FOR DESKTOP -->
+                                <tr>
+                                    <td>
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td width="50%" valign="top" style="padding-right: 10px; padding-bottom: 15px;">
+                                                    <span style="font-weight: 600; color: #0c2b5a; display: block; margin-bottom: 6px; font-size: 14px;">Nombre completo:</span>
+                                                    <span style="font-size: 16px; background-color: rgba(255, 255, 255, 0.7); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #1678c2; display: block;">{{ $primer_nombre }} {{ $segundo_nombre }} {{ $primer_apellido }} {{ $segundo_apellido }}</span>
+                                                </td>
+                                                <td width="50%" valign="top" style="padding-left: 10px; padding-bottom: 15px;">
+                                                    <span style="font-weight: 600; color: #0c2b5a; display: block; margin-bottom: 6px; font-size: 14px;">Programa destino:</span>
+                                                    <span style="font-size: 16px; background-color: rgba(255, 255, 255, 0.7); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #1678c2; display: block;">{{ $programa_destino }}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%" valign="top" style="padding-right: 10px; padding-bottom: 15px;">
+                                                    <span style="font-weight: 600; color: #0c2b5a; display: block; margin-bottom: 6px; font-size: 14px;">Finalizó estudios:</span>
+                                                    <span style="font-size: 16px; background-color: rgba(255, 255, 255, 0.7); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #1678c2; display: block;">{{ $finalizo_estudios }}</span>
+                                                </td>
+                                                <td width="50%" valign="top" style="padding-left: 10px; padding-bottom: 15px;">
+                                                    <span style="font-weight: 600; color: #0c2b5a; display: block; margin-bottom: 6px; font-size: 14px;">Fecha de solicitud:</span>
+                                                    <span style="font-size: 16px; background-color: rgba(255, 255, 255, 0.7); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #1678c2; display: block;">{{ $fecha_solicitud }}</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- BUTTON -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 40px;">
+                                <tr>
+                                    <td align="center" style="padding: 10px;">
+                                        <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}" style="display: inline-block; min-width: 240px; text-align: center; background: linear-gradient(135deg, #0a4c8b, #1678c2); color: #ffffff; padding: 16px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; box-shadow: 0 6px 15px rgba(10, 76, 139, 0.3); font-family: 'Atkinson Hyperlegible', Arial, sans-serif; font-size: 17px; letter-spacing: 0.5px; border: none;">
+                                            Ver Detalles en el Sistema
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td class="email-footer" style="background-color: #051835; color: #ffffff; padding: 30px 20px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; position: relative;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <img src="https://www.uniautonoma.edu.co/wp-content/uploads/2022/11/logo.png" alt="Uniautónoma del Cauca" width="150" style="display: block; margin: 0 auto;">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 15px; text-align: center; color: #00a2ff; text-transform: uppercase; letter-spacing: 1px;">Homologaciones Uniautónoma 2025</h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="#" style="color: #a0c6ff; text-decoration: none; font-size: 14px;">Portal Estudiantil</a>
+                                                </td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="#" style="color: #a0c6ff; text-decoration: none; font-size: 14px;">Programas Académicos</a>
+                                                </td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="#" style="color: #a0c6ff; text-decoration: none; font-size: 14px;">Contacto</a>
+                                                </td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="#" style="color: #a0c6ff; text-decoration: none; font-size: 14px;">Ayuda</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 15px;">
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding: 0 8px;">
+                                                    <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
+                                                        <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png" width="24" height="24" alt="Facebook" style="vertical-align: middle;">
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 0 8px;">
+                                                    <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
+                                                        <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/instagram_circle-512.png" width="24" height="24" alt="Instagram" style="vertical-align: middle;">
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 0 8px;">
+                                                    <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
+                                                        <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png" width="24" height="24" alt="Twitter" style="vertical-align: middle;">
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 0 8px;">
+                                                    <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
+                                                        <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/linkedin_circle-512.png" width="24" height="24" alt="LinkedIn" style="vertical-align: middle;">
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                                        &copy; 2025 Uniautónoma del Cauca. Todos los derechos reservados.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
+
 </html>
