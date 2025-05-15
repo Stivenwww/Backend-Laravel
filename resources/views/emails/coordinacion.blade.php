@@ -51,6 +51,36 @@
             border-radius: 8px;
         }
 
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+            margin: 5px 0;
+        }
+
+        .status-radicado {
+            background-color: #0074d9;
+        }
+
+        .status-revision {
+            background-color: #f39c12;
+        }
+
+        .status-aprobado {
+            background-color: #27ae60;
+        }
+
+        .status-rechazado {
+            background-color: #e74c3c;
+        }
+
+        .status-cerrado {
+            background-color: #7f8c8d;
+        }
+
         .student-info {
             background-color: #f0f7ff;
             padding: 15px;
@@ -76,10 +106,10 @@
             width: 90%;
             margin: 30px auto 10px;
             text-align: center;
-            background: #ffffff;
+            background: #0074d9;
             color: #ffffff;
             padding: 14px;
-            border: #004080 2px solid;
+            border: none;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
@@ -87,21 +117,8 @@
         }
 
         .button:hover {
-            color: #ffffff;
-            background: #1858b8;
-            border: #ffffff 2px solid;
-
+            background: #0056a3;
         }
-
-
-        .student-info h3 :hover{
-            margin-top: 0;
-            color: #ffffff;
-            border-bottom: 1px solid #c0d3e8;
-            padding-bottom: 8px;
-            font-size: 18px;
-        }
-
 
         .footer {
             text-align: center;
@@ -109,6 +126,14 @@
             color: #777;
             padding-top: 20px;
             border-top: 1px solid #ddd;
+        }
+
+        .message-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            border-left: 4px solid #0074d9;
         }
 
         @media (max-width: 640px) {
@@ -132,30 +157,56 @@
 
         <div class="content">
             <p>Estimado Coordinador:</p>
-            <p>Se ha registrado una nueva solicitud de homologación que requiere su revisión y validación en el sistema.
-            </p>
+
+            @php
+                $message =
+                    'Se ha radicado una nueva solicitud de homologación que requiere de su amable revisión para proceder con el análisis correspondiente.';
+                $action =
+                    'Le agradecemos ingresar al sistema institucional para validar la solicitud y continuar con el proceso establecido.';
+
+                if ($datos['estado'] == 'En revisión') {
+                    $message = 'La solicitud de homologación ha pasado a estado "En revisión" y requiere su atención.';
+                    $action = 'Por favor continúe con el proceso de evaluación.';
+                } elseif ($datos['estado'] == 'Aprobado') {
+                    $message = 'Una solicitud de homologación ha sido APROBADA.';
+                    $action = 'La solicitud ha sido procesada exitosamente.';
+                } elseif ($datos['estado'] == 'Rechazado') {
+                    $message = 'Una solicitud de homologación ha sido RECHAZADA.';
+                    $action = 'La solicitud no ha cumplido con los requisitos necesarios.';
+                } elseif ($datos['estado'] == 'Cerrado') {
+                    $message = 'Una solicitud de homologación ha sido CERRADA.';
+                    $action = 'El proceso de homologación ha finalizado.';
+                }
+            @endphp
+
+            <p>{{ $message }}</p>
 
             <div class="radicado">
-                Número de radicado: {{ $numero_radicado }}
+                Número de radicado: {{ $datos['numero_radicado'] }}
+                <br>
+                <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $datos['estado'])) }}">
+                    {{ $datos['estado'] }}
+                </span>
             </div>
 
             <div class="student-info">
                 <h3>Datos del Estudiante</h3>
-                <p><span class="label">Nombre completo:</span> {{ $primer_nombre }} {{ $segundo_nombre }}
-                    {{ $primer_apellido }} {{ $segundo_apellido }}</p>
-                <p><span class="label">Correo electrónico:</span> {{ $email }}</p>
-                <p><span class="label">Programa destino:</span> {{ $programa_destino }}</p>
-                <p><span class="label">Finalizó estudios:</span> {{ $finalizo_estudios }}</p>
-                <p><span class="label">Fecha de solicitud:</span> {{ $fecha_solicitud }}</p>
-                <p><span class="label">Estado actual:</span> {{ $estado }}</p>
+                <p><span class="label">Nombre completo:</span> {{ $datos['primer_nombre'] }}
+                    {{ $datos['segundo_nombre'] }}
+                    {{ $datos['primer_apellido'] }} {{ $datos['segundo_apellido'] }}</p>
+                <p><span class="label">Correo electrónico:</span> {{ $datos['email'] }}</p>
+                <p><span class="label">Programa destino:</span> {{ $datos['programa_destino'] }}</p>
+                <p><span class="label">Finalizó estudios:</span> {{ $datos['finalizo_estudios'] }}</p>
+                <p><span class="label">Fecha de solicitud:</span> {{ $datos['fecha_solicitud'] }}</p>
             </div>
 
-            <p>Le agradecemos ingresar al sistema de homologaciones para gestionar esta solicitud de manera oportuna.
-            </p>
 
-            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}"
+            <div class="message-box">
+                <p><strong>{{ $action }}</strong></p>
+            </div>
+            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $datos['numero_radicado'] }}"
                 class="button">
-                Ver Solicitud en el Sistema
+                Gestionar Solicitud
             </a>
         </div>
 

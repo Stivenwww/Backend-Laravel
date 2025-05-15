@@ -1,65 +1,68 @@
 <?php
 
-// Se define el espacio de nombres para este controlador
 namespace App\Http\Controllers;
 
-// Se importan las clases necesarias
-use App\Mail\CoordinacionMailable; // Mailable personalizado para el coordinador
-use App\Models\Solicitud; // Modelo de la solicitud
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log; // Para registrar información o errores
-use Illuminate\Support\Facades\Mail; // Para enviar correos
+use App\Mail\CoordinacionMailable;
+use App\Models\Solicitud;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
-// Se define el controlador NotificacionCoordinadorController, que extiende de Controller
 class NotificacionCoordinadorController extends Controller
 {
-    // Método público para enviar un correo con los datos de la solicitud al coordinador
-    public function enviarCorreoSolicitud($solicitud_id)
+    /**
+     * Envía una notificación por correo al coordinador según el estado de la solicitud
+     *
+     * @param int $solicitud_id ID de la solicitud
+     * @return bool Resultado de la operación de envío
+     */
+    public function notificarCoordinadorPorSolicitud($solicitud_id)
     {
         try {
-            // Se busca la solicitud con su relación 'usuario' por el ID dado
-            // Si no se encuentra, lanza una excepción
-            $solicitud = Solicitud::with('usuario')->findOrFail($solicitud_id);
-
-            // Se obtiene el usuario relacionado con la solicitud
+            // Buscar la solicitud con sus relaciones
+            $solicitud = Solicitud::with(['usuario', 'programaDestino'])->findOrFail($solicitud_id);
             $usuario = $solicitud->usuario;
 
-            // Se preparan los datos que se enviarán en el correo
+            // Preparar datos para la plantilla
             $datos = [
                 'primer_nombre' => $usuario->primer_nombre,
-                'segundo_nombre' => $usuario->segundo_nombre,
+                'segundo_nombre' => $usuario->segundo_nombre ?? '',
                 'primer_apellido' => $usuario->primer_apellido,
-                'segundo_apellido' => $usuario->segundo_apellido,
+                'segundo_apellido' => $usuario->segundo_apellido ?? '',
                 'email' => $usuario->email,
-
-                // Se obtiene el nombre del programa destino; si no existe, se asigna "No especificado"
                 'programa_destino' => $solicitud->programaDestino->nombre ?? 'No especificado',
-
-                // Se convierte el valor booleano a texto legible
                 'finalizo_estudios' => $solicitud->finalizo_estudios ? 'Sí' : 'No',
-
-                // Fecha en la que se realizó la solicitud
                 'fecha_solicitud' => $solicitud->fecha_solicitud,
-
-                // Estado actual de la solicitud
                 'estado' => $solicitud->estado,
-
-                // Número de radicado único
-                'numero_radicado' => $solicitud->numero_radicado
+                'numero_radicado' => $solicitud->numero_radicado,
+                'solicitud_id' => $solicitud->id_solicitud
             ];
 
-            // Enviar el correo electrónico al coordinador
-            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new CoordinacionMailable($datos));
+            // Personalizar el asunto según el estado
+            $asunto = $this->obtenerAsuntoSegunEstado($solicitud->estado, $solicitud->numero_radicado);
 
-            // Registrar en el log que el correo fue enviado exitosamente
-            Log::info('Correo enviado exitosamente a Secretaría', ['radicado' => $solicitud->numero_radicado]);
+            // Obtener correo de coordinador - por ahora usamos un correo de prueba
+            $correoCoordinador = 'brayner.trochez.o@uniautonoma.edu.co';
 
-        } catch (\Exception $e) {
-            // En caso de error, registrar el mensaje y el trace de la excepción en el log
-            Log::error('Error al enviar correo a Secretaría', [
-                'error email notificacion secretaria' => $e->getMessage(),
-                'trace email notificacion secretaria' => $e->getTraceAsString()
+            // Enviar correo
+            Mail::to($correoCoordinador)->send(new CoordinacionMailable($datos, $asunto));
+
+            // Registrar éxito en log
+            Log::info('Correo enviado exitosamente al Coordinador', [
+                'radicado' => $solicitud->numero_radicado,
+                'estado' => $solicitud->estado
             ]);
+
+            return true;
+        } catch (\Exception $e) {
+            // Registrar error en log
+            Log::error('Error al enviar correo al Coordinador', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'solicitud_id' => $solicitud_id
+            ]);
+
+            return false;
         }
     }
+
 }

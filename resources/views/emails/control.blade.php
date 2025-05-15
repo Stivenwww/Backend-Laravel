@@ -50,6 +50,44 @@
             border-radius: 8px;
         }
 
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            margin-left: 10px;
+        }
+
+        .status-Radicado {
+            background-color: #3498db;
+        }
+
+        .status-En-revisión {
+            background-color: #f39c12;
+        }
+
+        .status-Aprobado {
+            background-color: #2ecc71;
+        }
+
+        .status-Rechazado {
+            background-color: #e74c3c;
+        }
+
+        .status-Cerrado {
+            background-color: #7f8c8d;
+        }
+
+        .message-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0074d9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
         .student-info {
             background-color: #f0f7ff;
             padding: 15px;
@@ -75,10 +113,9 @@
             width: 90%;
             margin: 30px auto 10px;
             text-align: center;
-            background: #ffffff;
+            background: #0074d9;
             color: #ffffff;
             padding: 14px;
-            border: #004080 2px solid;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
@@ -86,13 +123,7 @@
         }
 
         .button:hover {
-            color: #ffffff;
-            background: #1858b8;
-            border: #ffffff 2px solid;
-        }
-
-        .student-info h3 :hover {
-            color: #ffffff;
+            background: #0056a2;
         }
 
         .footer {
@@ -119,11 +150,15 @@
     <div class="container">
         <div class="header">
             Solicitud de Homologación
+            <span class="status-badge status-{{ str_replace(' ', '-', $estado) }}">{{ $estado }}</span>
         </div>
 
         <div class="content">
             <p>Estimado equipo de Control y Seguimiento:</p>
-            <p>Se ha recibido una nueva solicitud de homologación en el sistema. Esta notificación se envía con el fin de que se lleve el debido registro y seguimiento del proceso por parte de su área.</p>
+
+            <div class="message-box">
+                <p>{{ $mensaje_personalizado }}</p>
+            </div>
 
             <div class="radicado">
                 Número de radicado: {{ $numero_radicado }}
@@ -133,8 +168,9 @@
                 <h3>Datos del Estudiante</h3>
                 <p><span class="label">Nombre completo:</span> {{ $primer_nombre }} {{ $segundo_nombre }} {{ $primer_apellido }} {{ $segundo_apellido }}</p>
                 <p><span class="label">Correo electrónico:</span> {{ $email }}</p>
+                <p><span class="label">Programa destino:</span> {{ $programa_destino }}</p>
+                <p><span class="label">Finalizó estudios:</span> {{ $finalizo_estudios }}</p>
                 <p><span class="label">Fecha de solicitud:</span> {{ $fecha_solicitud }}</p>
-                <p><span class="label">Estado actual:</span> {{ $estado }}</p>
             </div>
 
             <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}" class="button">

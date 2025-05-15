@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,7 @@
         }
 
         .header {
-            background: #0074d9;
+            background: #003366;
             color: #ffffff;
             text-align: center;
             padding: 20px;
@@ -41,13 +42,43 @@
         .radicado {
             font-size: 18px;
             font-weight: 600;
-            color: #0074d9;
+            color: #003366;
             text-align: center;
             margin: 20px 0;
             padding: 12px;
-            border: 1px dashed #0074d9;
+            border: 1px dashed #003366;
             background-color: #e6f2ff;
             border-radius: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+            margin: 5px 0;
+        }
+
+        .status-Radicado {
+            background-color: #0074d9;
+        }
+
+        .status-En-revisión {
+            background-color: #f39c12;
+        }
+
+        .status-Aprobado {
+            background-color: #27ae60;
+        }
+
+        .status-Rechazado {
+            background-color: #e74c3c;
+        }
+
+        .status-Cerrado {
+            background-color: #7f8c8d;
         }
 
         .student-info {
@@ -59,7 +90,7 @@
 
         .student-info h3 {
             margin-top: 0;
-            color: #004080;
+            color: #003366;
             border-bottom: 1px solid #c0d3e8;
             padding-bottom: 8px;
             font-size: 18px;
@@ -70,15 +101,23 @@
             color: #004080;
         }
 
+        .message-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            border-left: 4px solid #003366;
+        }
+
         .button {
             display: block;
             width: 90%;
             margin: 30px auto 10px;
             text-align: center;
-            background: #ffffff;
+            background: #003366;
             color: #ffffff;
             padding: 14px;
-            border: #004080 2px solid;
+            border: none;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
@@ -86,21 +125,8 @@
         }
 
         .button:hover {
-            color: #ffffff;
-            background: #1858b8;
-            border: #ffffff 2px solid;
-
+            background: #002244;
         }
-
-
-        .student-info h3 :hover{
-            margin-top: 0;
-            color: #ffffff;
-            border-bottom: 1px solid #c0d3e8;
-            padding-bottom: 8px;
-            font-size: 18px;
-        }
-
 
         .footer {
             text-align: center;
@@ -122,41 +148,77 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
-            Solicitud de Homologación
+            Notificación de Solicitud de Homologación
         </div>
 
         <div class="content">
-            <p>Estimada Secretaría Académica:</p>
-            <p>Se ha recibido una nueva solicitud de homologación en el sistema que requiere su atención.</p>
+            <p>Estimada Secretaria</p>
+
+            @php
+                function obtenerMensajePorEstado($estado) {
+                    switch ($estado) {
+                        case 'Radicado':
+                            return 'Se ha recibido una nueva solicitud de homologación que requiere su atención. ' .
+                                   'Por favor, proceda con la revisión inicial de documentos y requisitos.';
+                        case 'En revisión':
+                            return 'La solicitud ha pasado a estado de revisión. ' .
+                                   'Se requiere su seguimiento para coordinar el análisis académico correspondiente.';
+                        case 'Aprobado':
+                            return 'La solicitud de homologación ha sido APROBADA. ' .
+                                   'Se requiere su gestión para la emisión de resolución y notificación oficial.';
+                        case 'Rechazado':
+                            return 'La solicitud de homologación ha sido RECHAZADA. ' .
+                                   'Favor proceder con los procedimientos administrativos para cierre del expediente.';
+                        case 'Cerrado':
+                            return 'El proceso de homologación ha sido cerrado. ' .
+                                   'Favor archivar el expediente en el repositorio digital correspondiente.';
+                        default:
+                            return 'La solicitud de homologación ha cambiado de estado. ' .
+                                   'Se requiere su intervención para continuar con el proceso administrativo.';
+                    }
+                }
+
+                $mensajeEstado = obtenerMensajePorEstado($datos['estado']);
+            @endphp
+
+            <p>{{ $mensajeEstado }}</p>
 
             <div class="radicado">
-                Número de radicado: {{ $numero_radicado }}
+                Número de radicado: {{ $datos['numero_radicado'] }}
+                <br>
+                <span class="status-badge status-{{ str_replace(' ', '-', $datos['estado']) }}">
+                    {{ $datos['estado'] }}
+                </span>
             </div>
 
             <div class="student-info">
                 <h3>Datos del Estudiante</h3>
-                <p><span class="label">Nombre completo:</span> {{ $primer_nombre }} {{ $segundo_nombre }} {{ $primer_apellido }} {{ $segundo_apellido }}</p>
-                <p><span class="label">Correo electrónico:</span> {{ $email }}</p>
-                <p><span class="label">Programa destino:</span> {{ $programa_destino }}</p>
-                <p><span class="label">Finalizó estudios:</span> {{ $finalizo_estudios }}</p>
-                <p><span class="label">Fecha de solicitud:</span> {{ $fecha_solicitud }}</p>
-                <p><span class="label">Estado actual:</span> {{ $estado }}</p>
+                <p><span class="label">Nombre completo:</span> {{ $datos['primer_nombre'] }} {{ $datos['segundo_nombre'] }}
+                    {{ $datos['primer_apellido'] }} {{ $datos['segundo_apellido'] }}</p>
+                <p><span class="label">Correo electrónico:</span> {{ $datos['email'] }}</p>
+                <p><span class="label">Programa destino:</span> {{ $datos['programa_destino'] }}</p>
+                <p><span class="label">Finalizó estudios:</span> {{ $datos['finalizo_estudios'] }}</p>
+                <p><span class="label">Fecha de solicitud:</span> {{ $datos['fecha_solicitud'] }}</p>
             </div>
 
-            <p>Por favor, revise y gestione esta solicitud en el sistema de homologaciones.</p>
 
-            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $numero_radicado }}" class="button">
-                Ver Solicitud en el Sistema
+            </div>
+
+            <a href="{{ config('homologaciones.url_sistema') }}/homologaciones/admin/solicitudes/{{ $datos['numero_radicado'] }}"
+                class="button">
+                Gestionar Solicitud
             </a>
         </div>
 
         <div class="footer">
-            <p>Este es un correo automático del Sistema de Homologaciones de la Universidad Autónoma del Cauca.</p>
-            <p>No responda a este correo. Para soporte, contacte al administrador del sistema.</p>
+            <p>Este es un mensaje automático del Sistema de Homologaciones de la Universidad Autónoma del Cauca.</p>
+            <p>Por favor, no responda a este correo. Para soporte, comuníquese con el administrador del sistema.</p>
         </div>
     </div>
 </body>
+
 </html>

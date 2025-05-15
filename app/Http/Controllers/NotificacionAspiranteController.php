@@ -4,10 +4,7 @@
 namespace App\Http\Controllers;
 
 // Se importan las clases necesarias
-
 use App\Mail\AspiranteMailable;
-use App\Mail\NotificacionEstadoAspirante;
-use App\Mail\NotificacionEstadoAspiranteMailable;
 use App\Models\Solicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,58 +13,64 @@ use Illuminate\Support\Facades\Mail;
 // Se declara el controlador NotificacionAspiranteController que extiende de Controller
 class NotificacionAspiranteController extends Controller
 {
-    // Método público para enviar un correo de notificación relacionado con una solicitud específica
-    public function enviarCorreoSolicitud($solicitud_id)
+    /**
+     * Envía un correo de notificación al aspirante basado en el estado de su solicitud
+     *
+     * @param int $solicitud_id El ID de la solicitud
+     * @return bool Resultado de la operación de envío
+     */
+    public function notificarAspirantePorSolicitud($solicitud_id)
     {
         try {
-            // Busca la solicitud con su relación 'usuario' por el ID proporcionado
-            // Si no se encuentra, lanza una excepción
-            $solicitud = Solicitud::with('usuario')->findOrFail($solicitud_id);
+            // Busca la solicitud con sus relaciones
+            $solicitud = Solicitud::with(['usuario', 'programaDestino'])->findOrFail($solicitud_id);
 
             // Obtiene el usuario relacionado con la solicitud
             $usuario = $solicitud->usuario;
 
+            if (!$usuario) {
+                Log::error('No se encontró usuario asociado a la solicitud', ['solicitud_id' => $solicitud_id]);
+                return false;
+            }
+
             // Prepara los datos que se enviarán al correo
             $datos = [
                 'primer_nombre' => $usuario->primer_nombre,
-                'segundo_nombre' => $usuario->segundo_nombre,
+                'segundo_nombre' => $usuario->segundo_nombre ?? '',
                 'primer_apellido' => $usuario->primer_apellido,
-                'segundo_apellido' => $usuario->segundo_apellido,
+                'segundo_apellido' => $usuario->segundo_apellido ?? '',
                 'email' => $usuario->email,
+                'programa_destino' => $solicitud->programaDestino->nombre ?? 'No especificado',
+                'finalizo_estudios' => $solicitud->finalizo_estudios ? 'Sí' : 'No',
+                'fecha_solicitud' => $solicitud->fecha_solicitud,
                 'estado' => $solicitud->estado,
                 'numero_radicado' => $solicitud->numero_radicado
             ];
 
-            // Determina el mensaje basado en el estado del usuario
-            switch ($usuario->estado) {
-                case 'pendiente':
-                    $mensaje = 'Tu solicitud está siendo revisada.';
-                    break;
-                case 'aprobado':
-                    $mensaje = '¡Felicidades! Has sido aprobado.';
-                    break;
-                case 'rechazado':
-                    $mensaje = 'Tu solicitud fue rechazada.';
-                    break;
-                default:
-                    $mensaje = 'El estado ha cambiado.';
-            }
+            // Envía el correo electrónico al usuario
+            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
 
-            // Envía el correo electrónico al usuario utilizando el nuevo Mailable
-            //Mail::to($usuario->email)->send(new NotificacionEstadoAspiranteMailable($usuario, $mensaje));
+            // Para propósitos de prueba, enviar también a una dirección conocida
+            // Comentar o eliminar esta línea en producción si no es necesaria
+            //Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
 
-            // Línea comentada: también se podría enviar el correo a una dirección fija (ejemplo institucional)
-             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
+            // Registra en el log un mensaje de éxito
+            Log::info('Correo enviado exitosamente al aspirante', [
+                'radicado' => $solicitud->numero_radicado,
+                'estado' => $solicitud->estado
+            ]);
 
-            // Registra en el log un mensaje de éxito junto con el número de radicado
-            Log::info('Correo enviado exitosamente a Secretaría', ['radicado' => $solicitud->numero_radicado]);
+            return true;
 
         } catch (\Exception $e) {
             // En caso de error, registra el mensaje y el trace de la excepción en el log
-            Log::error('Error al enviar correo a Secretaría', [
-                'error email notificacion secretaria' => $e->getMessage(),
-                'trace email notificacion secretaria' => $e->getTraceAsString()
+            Log::error('Error al enviar correo al aspirante', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'solicitud_id' => $solicitud_id
             ]);
+
+            return false;
         }
     }
 }

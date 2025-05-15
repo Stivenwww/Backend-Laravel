@@ -37,7 +37,7 @@ class VicerrectoriaMailable extends Mailable
         $this->primer_nombre = $data['primer_nombre'] ?? '';
         $this->segundo_nombre = $data['segundo_nombre'] ?? '';
 
-        
+
         $this->primer_apellido = $data['primer_apellido'] ?? '';
         $this->segundo_apellido = $data['segundo_apellido'] ?? '';
         $this->email = $data['email'] ?? '';

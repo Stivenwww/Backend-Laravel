@@ -126,7 +126,7 @@ class SolicitudControllerApi extends Controller
                 'finalizo_estudios' => $request->finalizo_estudios,
                 'fecha_finalizacion_estudios' => $request->fecha_finalizacion_estudios,
                 'fecha_ultimo_semestre_cursado' => $request->fecha_ultimo_semestre_cursado,
-                'estado' => $request->estado ?? 'Radicado'
+                'estado' => $request->estado ?? 'Radicado',
             ]);
 
             // Envía notificaciones por correo electrónico
@@ -175,17 +175,27 @@ class SolicitudControllerApi extends Controller
             ];
 
             // Envío de notificaciones a diferentes roles/departamentos
-            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new SecretariaMailable($datos));
+            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new SecretariaMailable($datos, 'Nueva solicitud de homologación'));
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new CoordinacionMailable($datos));
-            //  Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+
+            // Enviar notificación al aspirante usando el controlador especializado
+           // $notificacionController = app()->make(NotificacionAspiranteController::class);
+            //$resultadoNotificacion = $notificacionController->notificarAspirantePorSolicitud($solicitudId);
 
             // Aspirante prueba para ver si se envía el correo y si llega
-            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
+            //Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new AspiranteMailable($datos));
 
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new ControlSeguimientoMailable($datos));
 
             // Registra éxito en el log
-            Log::info('Correos enviados exitosamente', ['radicado' => $solicitud->numero_radicado]);
+            Log::info('Correos enviados exitosamente', [
+                'radicado' => $solicitud->numero_radicado,
+                'estado' => $solicitud->estado,
+                //'notificacion_aspirante' => $resultadoNotificacion ? 'Éxito' : 'Fallo'
+            ]);
+            // Registra éxito en el log
+            //Log::info('Correos enviados exitosamente', ['radicado' => $solicitud->numero_radicado]);
 
             return true;
         } catch (\Exception $e) {
@@ -219,12 +229,12 @@ class SolicitudControllerApi extends Controller
                 'finalizo_estudios' => $request->finalizo_estudios,
                 'fecha_finalizacion_estudios' => $request->fecha_finalizacion_estudios,
                 'fecha_ultimo_semestre_cursado' => $request->fecha_ultimo_semestre_cursado,
-                'estado' => $request->estado
+                'estado' => $request->estado,
             ]);
 
             $solicitud->save();
 
-            // Envío a Vicerrectoría si pasó a "En Revisión"
+            // Envío a Vicerrectoría si pasó a "En revisión"
             if (
                 $estadoAnterior !== 'En revisión' &&
                 $solicitud->estado === 'En revisión'
@@ -266,8 +276,6 @@ class SolicitudControllerApi extends Controller
                     try {
                         Mail::to("brayner.trochez.o@uniautonoma.edu.co")->send(new VicerrectoriaMailable($datos));
                         Log::info("Correo enviado usando método directo de respaldo");
-                        Mail::to("brayner.trochez.o@uniautonoma.edu.co")->send(new RespuestaSolicitud($datos));
-                        Log::info("Correo enviado usando método directo de respaldo a correo de prueba");
                     } catch (\Exception $mailError) {
                         Log::error("Error al enviar correo directo", [
                             'error' => $mailError->getMessage(),
@@ -347,76 +355,76 @@ class SolicitudControllerApi extends Controller
     }
 
     /**
- * Obtiene todas las solicitudes de un usuario específico con datos completos
- *
- * @param int $id_usuario Identificador del usuario
- * @return \Illuminate\Http\JsonResponse Lista de solicitudes del usuario en formato JSON
- */
-public function obtenerSolicitudesPorUsuario($id_usuario)
-{
-    try {
-        // Usa Eloquent con todas las relaciones necesarias
-        $solicitudes = Solicitud::with([
+     * Obtiene todas las solicitudes de un usuario específico con datos completos
+     *
+     * @param int $id_usuario Identificador del usuario
+     * @return \Illuminate\Http\JsonResponse Lista de solicitudes del usuario en formato JSON
+     */
+    public function obtenerSolicitudesPorUsuario($id_usuario)
+    {
+        try {
+            // Usa Eloquent con todas las relaciones necesarias
+            $solicitudes = Solicitud::with([
                 'programaDestino',
                 'usuario.pais',
                 'usuario.departamento',
                 'usuario.municipio',
                 'usuario.institucionOrigen'
             ])
-            ->where('usuario_id', $id_usuario)
-            ->get()
-            ->map(function ($solicitud) {
-                // Formatear los datos como en el procedimiento almacenado
-                return [
-                    'id_solicitud' => $solicitud->id_solicitud,
-                    'finalizo_estudios' => $solicitud->finalizo_estudios,
-                    'fecha_finalizacion_estudios' => $solicitud->fecha_finalizacion_estudios,
-                    'fecha_ultimo_semestre_cursado' => $solicitud->fecha_ultimo_semestre_cursado,
-                    'fecha_solicitud' => $solicitud->fecha_solicitud,
-                    'estado' => $solicitud->estado,
-                    'numero_radicado' => $solicitud->numero_radicado,
+                ->where('usuario_id', $id_usuario)
+                ->get()
+                ->map(function ($solicitud) {
+                    // Formatear los datos como en el procedimiento almacenado
+                    return [
+                        'id_solicitud' => $solicitud->id_solicitud,
+                        'finalizo_estudios' => $solicitud->finalizo_estudios,
+                        'fecha_finalizacion_estudios' => $solicitud->fecha_finalizacion_estudios,
+                        'fecha_ultimo_semestre_cursado' => $solicitud->fecha_ultimo_semestre_cursado,
+                        'fecha_solicitud' => $solicitud->fecha_solicitud,
+                        'estado' => $solicitud->estado,
+                        'numero_radicado' => $solicitud->numero_radicado,
 
-                    // Datos del programa destino
-                    'programa_destino_nombre' => $solicitud->programaDestino->nombre ?? null,
+                        // Datos del programa destino
+                        'programa_destino_nombre' => $solicitud->programaDestino->nombre ?? null,
 
-                    // Datos del usuario
-                    'primer_nombre' => $solicitud->usuario->primer_nombre ?? null,
-                    'segundo_nombre' => $solicitud->usuario->segundo_nombre ?? null,
-                    'primer_apellido' => $solicitud->usuario->primer_apellido ?? null,
-                    'segundo_apellido' => $solicitud->usuario->segundo_apellido ?? null,
-                    'email' => $solicitud->usuario->email ?? null,
-                    'tipo_identificacion' => $solicitud->usuario->tipo_identificacion ?? null,
-                    'numero_identificacion' => $solicitud->usuario->numero_identificacion ?? null,
-                    'telefono' => $solicitud->usuario->telefono ?? null,
-                    'direccion' => $solicitud->usuario->direccion ?? null,
+                        // Datos del usuario
+                        'primer_nombre' => $solicitud->usuario->primer_nombre ?? null,
+                        'segundo_nombre' => $solicitud->usuario->segundo_nombre ?? null,
+                        'primer_apellido' => $solicitud->usuario->primer_apellido ?? null,
+                        'segundo_apellido' => $solicitud->usuario->segundo_apellido ?? null,
+                        'email' => $solicitud->usuario->email ?? null,
+                        'tipo_identificacion' => $solicitud->usuario->tipo_identificacion ?? null,
+                        'numero_identificacion' => $solicitud->usuario->numero_identificacion ?? null,
+                        'telefono' => $solicitud->usuario->telefono ?? null,
+                        'direccion' => $solicitud->usuario->direccion ?? null,
 
-                    // Nombres en vez de IDs
-                    'pais_nombre' => $solicitud->usuario->pais->nombre ?? null,
-                    'departamento_nombre' => $solicitud->usuario->departamento->nombre ?? null,
-                    'municipio_nombre' => $solicitud->usuario->municipio->nombre ?? null,
-                    'institucion_origen_nombre' => $solicitud->usuario->institucionOrigen->nombre ?? null
-                ];
-            });
+                        // Nombres en vez de IDs
+                        'pais_nombre' => $solicitud->usuario->pais->nombre ?? null,
+                        'departamento_nombre' => $solicitud->usuario->departamento->nombre ?? null,
+                        'municipio_nombre' => $solicitud->usuario->municipio->nombre ?? null,
+                        'institucion_origen_nombre' => $solicitud->usuario->institucionOrigen->nombre ?? null
+                    ];
+                });
 
-        return response()->json([
-            'mensaje' => count($solicitudes) > 0 ? 'Solicitudes encontradas' : 'No se encontraron solicitudes para este usuario',
-            'datos' => $solicitudes
-        ], 200);
-    } catch (\Exception $e) {
-        // Registra el error para diagnóstico
-        Log::error('Error al obtener solicitudes por usuario', [
-            'usuario_id' => $id_usuario,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
+            return response()->json([
+                'mensaje' => count($solicitudes) > 0 ? 'Solicitudes encontradas' : 'No se encontraron solicitudes para este usuario',
+                'datos' => $solicitudes
+            ], 200);
+        } catch (\Exception $e) {
+            // Registra el error para diagnóstico
+            Log::error('Error al obtener solicitudes por usuario', [
+                'usuario_id' => $id_usuario,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        // Manejo de errores con respuesta 500
-        return response()->json([
-            'mensaje' => 'Error al obtener las solicitudes del usuario',
-            'error' => $e->getMessage()
-        ], 500);
+            // Manejo de errores con respuesta 500
+            return response()->json([
+                'mensaje' => 'Error al obtener las solicitudes del usuario',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
 }
