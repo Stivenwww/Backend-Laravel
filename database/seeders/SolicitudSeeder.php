@@ -18,8 +18,8 @@ class SolicitudSeeder extends Seeder
             1 => ['No', null, '2023-12-01', 'Radicado'],
             2 => ['No', null, '2023-06-15', 'En revisión'],
             3 => ['No', null, '2022-12-01', 'Radicado'],
-            4 => ['No', null, '2025-01-23', 'Rechazado'],
-            5 => ['No', null, '2024-06-30', 'Aprobado'],
+            4 => ['No', null, '2025-01-23', 'Radicado'],
+            5 => ['No', null, '2024-06-30', 'En revisión'],
             6 => ['Si', '2022-10-10', null, 'Aprobado'],
         ];
 

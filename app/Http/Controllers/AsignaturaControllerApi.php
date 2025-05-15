@@ -175,8 +175,9 @@ class AsignaturaControllerApi extends Controller
         try {
             // Consulta Eloquent con relaciones "programa" y "contenidosProgramaticos"
             $asignaturas = Asignatura::where('programa_id', $id_programa)
-                ->with(['programa', 'contenidosProgramaticos'])  // Nombre correcto de la relación
+                ->with(['programa.facultad', 'contenidosProgramaticos']) // relación anidada
                 ->get();
+
 
             // Transforma la colección
             $asignaturasConPrograma = $asignaturas->map(function ($asignatura) {
@@ -185,6 +186,7 @@ class AsignaturaControllerApi extends Controller
                     'nombre_programa' => $asignatura->programa->nombre,
                     'id_asignatura' => $asignatura->id_asignatura,
                     'programa_id' => $asignatura->programa_id,
+                    'facultad' => $asignatura->programa->facultad->nombre ?? null,
                     'nombre' => $asignatura->nombre,
                     'tipo' => $asignatura->tipo,
                     'codigo_asignatura' => $asignatura->codigo_asignatura,
@@ -239,8 +241,9 @@ class AsignaturaControllerApi extends Controller
             // Consulta Eloquent
             $asignatura = Asignatura::where('programa_id', $id_programa)
                 ->where('id_asignatura', $id_asignatura)
-                ->with(['programa', 'contenidosProgramaticos'])  // Nombre correcto de la relación
+                ->with(['programa.facultad', 'contenidosProgramaticos'])
                 ->first();
+
 
             // Verifica si se encontró la asignatura
             if (!$asignatura) {
@@ -255,6 +258,7 @@ class AsignaturaControllerApi extends Controller
                 'nombre_programa' => $asignatura->programa->nombre,
                 'id_asignatura' => $asignatura->id_asignatura,
                 'programa_id' => $asignatura->programa_id,
+                'facultad' => $asignatura->programa->facultad->nombre ?? null,
                 'nombre' => $asignatura->nombre,
                 'tipo' => $asignatura->tipo,
                 'codigo_asignatura' => $asignatura->codigo_asignatura,
