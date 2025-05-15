@@ -247,8 +247,8 @@ class DocumentoControllerApi extends Controller
                     's.fecha_ultimo_semestre_cursado',
                     's.estado',
                     's.numero_radicado',
-                    's.fecha_solicitud',
-                    's.ruta_pdf_resolucion'
+                    's.fecha_solicitud'
+
                 )
                 ->leftJoin('users as u', 'd.usuario_id', '=', 'u.id_usuario')
                 ->leftJoin('solicitudes as s', 'd.solicitud_id', '=', 's.id_solicitud')

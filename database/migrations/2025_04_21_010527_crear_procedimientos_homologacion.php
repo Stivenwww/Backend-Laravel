@@ -1002,8 +1002,7 @@ return new class extends Migration {
                     s.fecha_ultimo_semestre_cursado,
                     s.estado,
                     s.numero_radicado,
-                    s.fecha_solicitud,
-                    s.ruta_pdf_resolucion
+                    s.fecha_solicitud
                 FROM documentos d
                 LEFT JOIN users u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
@@ -1044,13 +1043,14 @@ return new class extends Migration {
                     s.fecha_ultimo_semestre_cursado,
                     s.estado,
                     s.numero_radicado,
-                    s.fecha_solicitud,
-                    s.ruta_pdf_resolucion
+                    s.fecha_solicitud
                 FROM documentos d
                 LEFT JOIN users u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 WHERE d.id_documento = documentoId;
             END;
+
+            
             -- INSERTAR DOCUMENTO
             CREATE PROCEDURE InsertarDocumento(
                 IN p_solicitud_id SMALLINT,
