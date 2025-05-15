@@ -160,3 +160,9 @@ Route::delete('contenidos-programaticos/{id}', [ContenidoProgramaticoControllerA
 Route::get('contenidos-programaticos/asignatura/{asignatura_id}', [ContenidoProgramaticoControllerApi::class, 'obtenerContenidosPorAsignatura']);
 
 // });
+
+
+//Solcicitud Completa
+use App\Http\Controllers\SolicitudCompletaControllerApi;   
+
+Route::post('/solicitud-completa', [SolicitudCompletaControllerApi::class, 'store']);
