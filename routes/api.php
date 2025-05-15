@@ -109,6 +109,7 @@ Route::get('solicitud-asignaturas/{id}', [SolicitudAsignaturaControllerApi::clas
 Route::post('solicitud-asignaturas', [SolicitudAsignaturaControllerApi::class, 'insertarSolicitudAsignatura']);
 Route::put('solicitud-asignaturas/{id}', [SolicitudAsignaturaControllerApi::class, 'actualizarSolicitudAsignatura']);
 Route::delete('solicitud-asignaturas/{id}', [SolicitudAsignaturaControllerApi::class, 'eliminarSolicitudAsignatura']);
+Route::get('solicitudes/usuario/{id_usuario}', [SolicitudControllerApi::class, 'obtenerSolicitudesPorUsuario']);
 
 // Homologación - Asignaturas
 Route::get('homologacion-asignaturas', [HomologacionAsignaturaControllerApi::class, 'traerHomologacionAsignaturas']);
