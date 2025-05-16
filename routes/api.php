@@ -118,6 +118,7 @@ Route::get('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi
 Route::post('homologacion-asignaturas', [HomologacionAsignaturaControllerApi::class, 'insertarHomologacionAsignatura']);
 Route::put('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'actualizarHomologacionAsignatura']);
 Route::delete('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'eliminarHomologacionAsignatura']);
+Route::put('homologacion-asignatura/{id}/limpiar-destinos', [HomologacionAsignaturaControllerApi::class, 'limpiarAsignaturasDestino']);
 
 // Historial de homologaciones
 Route::get('historial-homologaciones', [HistorialHomologacionControllerApi::class, 'traerHistorialHomologaciones']);
@@ -165,4 +166,6 @@ Route::get('contenidos-programaticos/asignatura/{asignatura_id}', [ContenidoProg
 
 // });
 
+// En routes/api.php
+Route::match(['post', 'put'], '/solicitud-actualizar', [SolicitudCompletaControllerApi::class, 'update']);
 Route::post('/solicitud-completa', [SolicitudCompletaControllerApi::class, 'store']);

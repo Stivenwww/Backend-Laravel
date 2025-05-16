@@ -694,4 +694,90 @@ class HomologacionAsignaturaControllerApi extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Método para limpiar las asignaturas destino de una homologación.
+     * Preserva las asignaturas origen pero elimina todas las asignaciones destino.
+     *
+     * @param int $id ID de la homologación a limpiar
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function limpiarAsignaturasDestino($id)
+    {
+        try {
+            // Obtener la homologación actual de la base de datos
+            $homologacion = HomologacionAsignatura::findOrFail($id);
+
+            // Decodificar las homologaciones existentes (de JSON a array)
+            $homologacionesActuales = [];
+            if (is_string($homologacion->homologaciones)) {
+                $homologacionesActuales = json_decode($homologacion->homologaciones, true);
+            } elseif (is_array($homologacion->homologaciones)) {
+                $homologacionesActuales = $homologacion->homologaciones;
+            } elseif (is_object($homologacion->homologaciones)) {
+                $homologacionesActuales = json_decode(json_encode($homologacion->homologaciones), true);
+            }
+
+            // Verificar que sea un array válido
+            if (!is_array($homologacionesActuales)) {
+                return response()->json([
+                    'mensaje' => 'No se pudieron procesar las homologaciones existentes',
+                ], 400);
+            }
+
+            // Contador para seguimiento de cambios
+            $asignaturasLimpiadas = 0;
+
+            // Limpiar las asignaturas destino para cada homologación
+            foreach ($homologacionesActuales as &$homologacionItem) {
+                if (
+                    isset($homologacionItem['asignatura_destino_id']) &&
+                    !is_null($homologacionItem['asignatura_destino_id'])
+                ) {
+                    // Limpiar el ID de destino
+                    $homologacionItem['asignatura_destino_id'] = null;
+                    // Limpiar la nota de destino
+                    $homologacionItem['nota_destino'] = null;
+                    // Limpiar comentarios
+                    $homologacionItem['comentarios'] = null;
+
+                    $asignaturasLimpiadas++;
+                }
+            }
+
+            // Si no hay cambios, informar
+            if ($asignaturasLimpiadas === 0) {
+                return response()->json([
+                    'mensaje' => 'No hay asignaturas destino para limpiar en esta homologación',
+                    'total_limpiadas' => 0
+                ], 200);
+            }
+
+            // Convertir el array actualizado a JSON para almacenar
+            $homologacionesJson = json_encode($homologacionesActuales);
+
+            // Actualizar mediante procedimiento almacenado
+            DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
+                $id,
+                $homologacion->solicitud_id,
+                $homologacionesJson,
+                now()->toDateString(),
+                $homologacion->ruta_pdf_resolucion
+            ]);
+
+            // Respuesta exitosa con información de cambios
+            return response()->json([
+                'mensaje' => 'Asignaturas destino limpiadas correctamente',
+                'total_limpiadas' => $asignaturasLimpiadas
+            ], 200);
+        } catch (\Exception $e) {
+            // Manejo detallado de errores
+            return response()->json([
+                'mensaje' => 'Error al limpiar las asignaturas destino',
+                'error' => $e->getMessage(),
+                'linea' => $e->getLine(),
+                'archivo' => $e->getFile()
+            ], 500);
+        }
+    }
 }

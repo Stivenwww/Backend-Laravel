@@ -14,70 +14,77 @@ use Illuminate\Support\Facades\Storage;
 
 class SolicitudCompletaControllerApi extends Controller
 {
-    public function store(Request $request)
-    {
-        // Validación básica
-        $validator = Validator::make($request->all(), [
-            'tipo_identificacion' => 'required|string|max:30',
-            'numero_identificacion' => 'required|string|max:20',
-            'primer_nombre' => 'required|string|max:50',
-            'primer_apellido' => 'required|string|max:50',
-            'email' => 'required|email|max:100',
-            'telefono' => 'required|string|max:20',
-            'direccion' => 'required|string',
-            'pais' => 'required|string|max:50',
-            'departamento' => 'required',
-            'municipio' => 'required',
-            'programa' => 'required',
-            'finalizo_estudios' => 'required|string|in:si,no',
-            'numero_rad' => 'required|string',
-            'password' => 'required|string|min:6',
-            'materias' => 'required'
-        ]);
+    public function update(Request $request)
+{
+    // Log request for debugging
+    Log::info('Request data:', $request->all());
 
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Error de validación',
-                'message' => $validator->errors()->first()
-            ], 422);
+    // Validación básica
+    $validator = Validator::make($request->all(), [
+        'tipo_identificacion' => 'required|string|max:30',
+        'numero_identificacion' => 'required|string|max:20',
+        'primer_nombre' => 'required|string|max:50',
+        'primer_apellido' => 'required|string|max:50',
+        'email' => 'required|email|max:100',
+        'telefono' => 'required|string|max:20',
+        'direccion' => 'required|string',
+        'pais' => 'present',
+        'departamento' => 'present',
+        'municipio' => 'present',
+        'programa_origen' => 'present',
+        'programa_destino' => 'required',
+        'finalizo_estudios' => 'required|string',
+        'numero_rad' => 'required|string',
+        'password' => 'required|string|min:6',
+        'materias' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+        Log::warning('Validation errors:', $validator->errors()->toArray());
+        return response()->json([
+            'error' => 'Error de validación',
+            'message' => $validator->errors()->first(),
+            'all_errors' => $validator->errors()->toArray()
+        ], 422);
+    }
+
+    DB::beginTransaction();
+
+    try {
+        // Procesar JSON de materias
+        $materiasJson = $request->input('materias');
+        $materias = json_decode($materiasJson, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Error al decodificar JSON de materias: ' . json_last_error_msg());
         }
 
-        DB::beginTransaction();
+        if (!is_array($materias) || empty($materias)) {
+            throw new \Exception('No se proporcionaron materias para homologar');
+        }
 
-        try {
-            // Verificar y procesar el campo materias
-            $materiasJson = $request->input('materias');
+        // 1. Buscar o crear usuario
+        $usuario = User::where('email', $request->input('email'))->first();
 
-            // Si materias es un string, intentamos decodificarlo
-            if (is_string($materiasJson)) {
-                // Limpieza básica para problemas comunes
-                $materiasJson = $this->sanitizeJsonString($materiasJson);
-
-                // Decodificar JSON
-                $materiasPorSemestre = json_decode($materiasJson, true);
-
-                // Verificar si la decodificación fue exitosa
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return response()->json([
-                        'error' => 'Error de validación',
-                        'message' => 'El formato JSON de materias no es válido: ' . json_last_error_msg(),
-                        'received_data' => substr($materiasJson, 0, 500) // Primeros 500 caracteres
-                    ], 422);
-                }
-            } else {
-                // Si ya es un array (por ejemplo, si Laravel ya lo decodificó automáticamente)
-                $materiasPorSemestre = $materiasJson;
-            }
-
-            // Verificar que materiasPorSemestre sea un array y no esté vacío
-            if (!is_array($materiasPorSemestre) || empty($materiasPorSemestre)) {
-                return response()->json([
-                    'error' => 'Error de validación',
-                    'message' => 'No se proporcionaron materias para homologar'
-                ], 422);
-            }
-
-            // 1. Crear usuario
+        if ($usuario) {
+            // Actualizar usuario existente
+            $usuario->update([
+                'tipo_identificacion' => $request->input('tipo_identificacion'),
+                'numero_identificacion' => $request->input('numero_identificacion'),
+                'primer_nombre' => $request->input('primer_nombre'),
+                'segundo_nombre' => $request->input('segundo_nombre') ?: null,
+                'primer_apellido' => $request->input('primer_apellido'),
+                'segundo_apellido' => $request->input('segundo_apellido') ?: null,
+                'telefono' => $request->input('telefono'),
+                'direccion' => $request->input('direccion'),
+                'pais' => $request->input('pais'),
+                'departamento_id' => $request->input('departamento'),
+                'municipio_id' => $request->input('municipio'),
+                'institucion_origen' => $request->input('institucion_origen'),
+                'facultad' => $request->input('tipo_formacion'),
+            ]);
+        } else {
+            // Crear nuevo usuario
             $usuario = User::create([
                 'tipo_identificacion' => $request->input('tipo_identificacion'),
                 'numero_identificacion' => $request->input('numero_identificacion'),
@@ -92,98 +99,81 @@ class SolicitudCompletaControllerApi extends Controller
                 'pais' => $request->input('pais'),
                 'departamento_id' => $request->input('departamento'),
                 'municipio_id' => $request->input('municipio'),
+                'institucion_origen' => $request->input('institucion_origen'),
+                'facultad' => $request->input('tipo_formacion'),
             ]);
-
-            // 2. Crear solicitud
-            $solicitud = Solicitud::create([
-                'usuario_id' => $usuario->id_usuario,
-                'programa_destino_id' => $request->input('programa'),
-                'finalizo_estudios' => $request->input('finalizo_estudios'),
-                'fecha_finalizacion_estudios' => $request->filled('fecha_finalizacion') ? $request->input('fecha_finalizacion') : null,
-                'fecha_ultimo_semestre_cursado' => $request->filled('fecha_ultimo_semestre') ? $request->input('fecha_ultimo_semestre') : null,
-                'estado' => 'Radicado',
-                'numero_radicado' => $request->input('numero_rad'),
-                'fecha_solicitud' => now(),
-                'ruta_pdf_resolucion' => null,
-            ]);
-
-            // 3. NUEVO ENFOQUE: Guardar todas las materias en un solo registro
-            // Preparar el array para almacenar todas las materias
-            $todasLasMaterias = [];
-
-            foreach ($materiasPorSemestre as $semestre => $materias) {
-                if (is_array($materias)) {
-                    foreach ($materias as $materia) {
-                        if (!isset($materia['nombre']) || !isset($materia['nota'])) {
-                            continue; // Saltamos materias que no tengan nombre o nota
-                        }
-
-                        // Normalizar la nota (reemplazar coma por punto)
-                        $nota = isset($materia['nota']) ? str_replace(',', '.', $materia['nota']) : null;
-
-                        // Agregar esta materia al array general con su información de semestre
-                        $todasLasMaterias[] = [
-                            'nombre' => $materia['nombre'],
-                            'nota' => $nota,
-                            'semestre' => $semestre,
-                            'asignaturas' => isset($materia['asignaturas']) ? $materia['asignaturas'] : []
-                        ];
-                    }
-                }
-            }
-
-            // Crear un único registro en la tabla solicitud_asignaturas
-            SolicitudAsignatura::create([
-
-                'solicitud_id' => $solicitud->id_solicitud,
-                'asignaturas' => json_encode($todasLasMaterias),
-                'nombre' => 'Todas las materias', // Un nombre genérico
-                'nota' => null, // No aplicable para el conjunto
-                'semestre' => null // No aplicable para el conjunto
-            ]);
-
-            // 4. Procesar documentos (si los hubiera)
-            if ($request->hasFile('documentos') && $request->has('tipos')) {
-                $documentos = $request->file('documentos');
-                $tipos = $request->input('tipos');
-
-                foreach ($documentos as $index => $archivo) {
-                    if ($archivo->isValid()) {
-                        $ruta = $archivo->store('solicitudes', 'public');
-
-                        Documento::create([
-                            'usuario_id' => $usuario->id_usuario,
-                            'solicitud_id' => $solicitud->id_solicitud,
-                            'ruta' => $ruta,
-                            'tipo' => $tipos[$index] ?? 'Documento de Identidad', // Valor por defecto si falta
-                        ]);
-                    }
-                }
-            }
-
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Solicitud registrada correctamente',
-                'solicitud_id' => $solicitud->id_solicitud,
-                'numero_radicado' => $solicitud->numero_radicado
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Registrar error en los logs
-            Log::error('Error en SolicitudCompletaControllerApi@store: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->except(['password'])
-            ]);
-
-            return response()->json([
-                'error' => 'Error al procesar la solicitud',
-                'message' => $e->getMessage()
-            ], 500);
         }
+
+        // 2. Crear solicitud con programa de destino correcto
+        $solicitud = Solicitud::create([
+            'usuario_id' => $usuario->id_usuario,
+            'programa_destino_id' => $request->input('programa_destino'),
+            'programa_origen_id' => $request->input('programa_origen'),
+            'finalizo_estudios' => $request->input('finalizo_estudios'),
+            'fecha_finalizacion_estudios' => $request->filled('fecha_finalizacion') ? $request->input('fecha_finalizacion') : null,
+            'fecha_ultimo_semestre_cursado' => $request->filled('fecha_ultimo_semestre') ? $request->input('fecha_ultimo_semestre') : null,
+            'estado' => 'Radicado',
+            'numero_radicado' => $request->input('numero_rad'),
+            'fecha_solicitud' => now(),
+            'ruta_pdf_resolucion' => null,
+        ]);
+
+        // 3. Guardar materias con detalles completos
+        SolicitudAsignatura::create([
+            'solicitud_id' => $solicitud->id_solicitud,
+            'asignaturas' => $materiasJson,
+            'nombre' => 'Todas las materias',
+            'nota' => null,
+            'semestre' => null
+        ]);
+
+        // 4. Procesar documentos con estructura de directorios
+        if ($request->hasFile('documentos') && $request->has('tipos') && $request->has('directorios')) {
+            $documentos = $request->file('documentos');
+            $tipos = $request->input('tipos');
+            $directorios = $request->input('directorios');
+
+            foreach ($documentos as $index => $archivo) {
+                if ($archivo->isValid()) {
+                    // Determinar directorio de destino
+                    $dirDestino = $directorios[$index] ?? 'documentos';
+
+                    // Guardar archivo en el directorio correcto
+                    $ruta = $archivo->store($dirDestino, 'public');
+
+                    // Crear registro de documento
+                    Documento::create([
+                        'usuario_id' => $usuario->id_usuario,
+                        'solicitud_id' => $solicitud->id_solicitud,
+                        'ruta' => $ruta,
+                        'tipo' => $tipos[$index] ?? 'Documento',
+                    ]);
+                }
+            }
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'Solicitud registrada correctamente',
+            'solicitud_id' => $solicitud->id_solicitud,
+            'numero_radicado' => $solicitud->numero_radicado
+        ], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        // Registrar error en logs
+        Log::error('Error en SolicitudCompletaControllerApi@update: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+            'request_data' => $request->except(['password'])
+        ]);
+
+        return response()->json([
+            'error' => 'Error al procesar la solicitud',
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Sanitiza una cadena JSON para eliminar caracteres problemáticos
