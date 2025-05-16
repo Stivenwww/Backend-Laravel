@@ -26,7 +26,8 @@
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td align="center" style="padding-bottom: 15px;">
-                                        <img src="https://biblioteca.uniautonoma.edu.co/images/logo_home.png" alt="Quimerito" width="100" height="100" style="display: block; margin: 0 auto;">
+                                        <!-- URL corregida para la imagen -->
+                                        <img src="https://drive.google.com/uc?export=view&id=1PDYXH441oPwMX2HFaR2qK0oapII_GtJG" alt="Quimerito" width="100" height="100" style="display: block; margin: 0 auto;">
                                     </td>
                                 </tr>
                                 <tr>
@@ -158,7 +159,8 @@
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td align="center" style="padding-bottom: 20px;">
-                                        <img src="https://www.uniautonoma.edu.co/wp-content/uploads/2022/11/logo.png" alt="Uniautónoma del Cauca" width="150" style="display: block; margin: 0 auto;">
+                                        <!-- URL corregida para la imagen del footer -->
+                                        <img src="https://drive.google.com/uc?export=view&id=1PDYXH441oPwMX2HFaR2qK0oapII_GtJG" alt="Uniautónoma del Cauca" width="150" style="display: block; margin: 0 auto;">
                                     </td>
                                 </tr>
                                 <tr>
