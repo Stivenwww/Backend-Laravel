@@ -780,4 +780,104 @@ class HomologacionAsignaturaControllerApi extends Controller
             ], 500);
         }
     }
+    /**
+ * Método para eliminar completamente las asignaturas destino seleccionadas de una homologación.
+ * A diferencia de limpiarAsignaturasDestino, esta función elimina los registros completamente.
+ *
+ * @param int $id ID de la homologación
+ * @param Request $request Contiene los IDs de las asignaturas origen a eliminar
+ * @return \Illuminate\Http\JsonResponse
+ */
+/**
+ * Método para eliminar completamente las asignaturas origen seleccionadas de una homologación.
+ * Elimina por completo los registros de homologación para las asignaturas especificadas.
+ *
+ * @param int $id ID de la homologación
+ * @param Request $request Contiene los IDs de las asignaturas origen a eliminar
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function eliminarAsignaturasDestino(Request $request, $id)
+{
+    try {
+        // Validación de datos de entrada
+        $request->validate([
+            'asignaturas_origen_ids' => 'required|array',
+            'asignaturas_origen_ids.*' => 'required|integer',
+        ]);
+
+        // Obtener la homologación actual de la base de datos
+        $homologacion = HomologacionAsignatura::findOrFail($id);
+
+        // Decodificar las homologaciones existentes (de JSON a array)
+        $homologacionesActuales = [];
+        if (is_string($homologacion->homologaciones)) {
+            $homologacionesActuales = json_decode($homologacion->homologaciones, true);
+        } elseif (is_array($homologacion->homologaciones)) {
+            $homologacionesActuales = $homologacion->homologaciones;
+        } elseif (is_object($homologacion->homologaciones)) {
+            $homologacionesActuales = json_decode(json_encode($homologacion->homologaciones), true);
+        }
+
+        // Verificar que sea un array válido
+        if (!is_array($homologacionesActuales)) {
+            return response()->json([
+                'mensaje' => 'No se pudieron procesar las homologaciones existentes',
+            ], 400);
+        }
+
+        // IDs de asignaturas origen a eliminar
+        $idsAEliminar = $request->asignaturas_origen_ids;
+
+        // Filtrar las homologaciones, manteniendo solo las que no están en la lista a eliminar
+        $homologacionesFiltradas = array_filter($homologacionesActuales, function($item) use ($idsAEliminar) {
+            return !in_array($item['asignatura_origen_id'], $idsAEliminar);
+        });
+
+        // Si no hay cambios (no se encontraron los IDs a eliminar)
+        if (count($homologacionesActuales) === count($homologacionesFiltradas)) {
+            return response()->json([
+                'mensaje' => 'No se encontraron las asignaturas especificadas para eliminar',
+                'total_eliminadas' => 0
+            ], 200);
+        }
+
+        // Calcular cuántas asignaturas se eliminaron
+        $totalEliminadas = count($homologacionesActuales) - count($homologacionesFiltradas);
+
+        // Indexar de nuevo el array (para evitar problemas con índices no secuenciales)
+        $homologacionesFiltradas = array_values($homologacionesFiltradas);
+
+        // Convertir el array actualizado a JSON para almacenar
+        $homologacionesJson = json_encode($homologacionesFiltradas);
+
+        // Actualizar mediante procedimiento almacenado
+        DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
+            $id,
+            $homologacion->solicitud_id,
+            $homologacionesJson,
+            now()->toDateString(),
+            $homologacion->ruta_pdf_resolucion
+        ]);
+
+        // Obtener la homologación actualizada para devolver en la respuesta
+        $homologacionActualizada = HomologacionAsignatura::find($id);
+        $datosFormateados = $this->formatearDatosHomologacion($homologacionActualizada);
+
+        // Respuesta exitosa con información de cambios y datos actualizados
+        return response()->json([
+            'mensaje' => 'Asignaturas eliminadas correctamente de la homologación',
+            'total_eliminadas' => $totalEliminadas,
+            'asignaturas_restantes' => count($homologacionesFiltradas),
+            'datos' => $datosFormateados
+        ], 200);
+    } catch (\Exception $e) {
+        // Manejo detallado de errores
+        return response()->json([
+            'mensaje' => 'Error al eliminar las asignaturas destino',
+            'error' => $e->getMessage(),
+            'linea' => $e->getLine(),
+            'archivo' => $e->getFile()
+        ], 500);
+    }
+}
 }

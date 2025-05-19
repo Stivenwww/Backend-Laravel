@@ -102,6 +102,7 @@ Route::get('solicitudes', [SolicitudControllerApi::class, 'traerSolicitudes']);
 Route::get('solicitudes/{id}', [SolicitudControllerApi::class, 'llevarSolicitud']);
 Route::post('solicitudes', [SolicitudControllerApi::class, 'insertarSolicitud']);
 Route::put('solicitudes/{id}', [SolicitudControllerApi::class, 'actualizarSolicitud']);
+Route::patch('solicitudes/{id}/estado', [SolicitudControllerApi::class, 'actualizarEstadoSolicitud']);
 Route::delete('solicitudes/{id}', [SolicitudControllerApi::class, 'eliminarSolicitud']);
 
 // Solicitud - Asignaturas
@@ -118,14 +119,13 @@ Route::get('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi
 Route::post('homologacion-asignaturas', [HomologacionAsignaturaControllerApi::class, 'insertarHomologacionAsignatura']);
 Route::put('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'actualizarHomologacionAsignatura']);
 Route::delete('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'eliminarHomologacionAsignatura']);
-Route::put('homologacion-asignatura/{id}/limpiar-destinos', [HomologacionAsignaturaControllerApi::class, 'limpiarAsignaturasDestino']);
-
+Route::delete('homologacion-asignaturas/{id}/destinos', [HomologacionAsignaturaControllerApi::class, 'eliminarAsignaturasDestino']);
 // Historial de homologaciones
 Route::get('historial-homologaciones', [HistorialHomologacionControllerApi::class, 'traerHistorialHomologaciones']);
 Route::get('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'llevarHistorialHomologacion']);
 Route::post('historial-homologaciones', [HistorialHomologacionControllerApi::class, 'insertarHistorialHomologacion']);
 Route::put('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'actualizarHistorialHomologacion']);
-Route::delete('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'eliminarHistorialHomologacion']);
+Route::delete('historial-homologaciones/{id}', action: [HistorialHomologacionControllerApi::class, 'eliminarHistorialHomologacion']);
 
 // Usuarios
 Route::get('usuarios', [UserControllerApi::class, 'traerUsuarios']);

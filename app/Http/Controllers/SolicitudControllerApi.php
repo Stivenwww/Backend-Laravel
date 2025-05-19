@@ -425,6 +425,123 @@ class SolicitudControllerApi extends Controller
             ], 500);
         }
     }
+/**
+ * Actualiza únicamente el estado de una solicitud de homologación
+ * y envía notificaciones correspondientes según el nuevo estado.
+ *
+ * @param Request $request Datos con el nuevo estado
+ * @param int $id Identificador de la solicitud a actualizar
+ * @return \Illuminate\Http\JsonResponse Confirmación o error
+ */
+public function actualizarEstadoSolicitud(Request $request, $id)
+{
+    try {
+        // Validación básica del campo estado
+        $request->validate([
+            'estado' => 'required|string|in:Radicado,En revisión,Aprobado,Rechazado,Cerrado'
+        ]);
 
+        // Obtener la solicitud con sus relaciones
+        $solicitud = Solicitud::with('usuario', 'programaDestino')->find($id);
+
+        if (!$solicitud) {
+            return response()->json([
+                'mensaje' => 'Solicitud no encontrada'
+            ], 404);
+        }
+
+        // Guardar el estado anterior para comparación
+        $estadoAnterior = $solicitud->estado;
+        $nuevoEstado = $request->estado;
+
+        // Si el estado no cambia, no hacer nada
+        if ($estadoAnterior === $nuevoEstado) {
+            return response()->json([
+                'mensaje' => 'El estado de la solicitud ya es: ' . $nuevoEstado,
+                'estado' => $nuevoEstado
+            ], 200);
+        }
+
+        // Actualizar solo el campo estado
+        $solicitud->estado = $nuevoEstado;
+        $solicitud->save();
+
+        // Registrar el cambio en el log
+        Log::info("Solicitud {$solicitud->id_solicitud} cambió de estado", [
+            'estado_anterior' => $estadoAnterior,
+            'estado_nuevo' => $nuevoEstado,
+            'usuario_id' => $solicitud->usuario_id,
+            'numero_radicado' => $solicitud->numero_radicado
+        ]);
+
+        // Envío a Vicerrectoría si pasó a "En revisión"
+        if ($estadoAnterior !== 'En revisión' && $nuevoEstado === 'En revisión') {
+            Log::info("Solicitud {$solicitud->id_solicitud} pasó a 'En revisión'. Enviando notificación a Vicerrectoría.");
+
+            $usuario = $solicitud->usuario;
+            $programaDestino = $solicitud->programaDestino;
+
+            $datos = [
+                'primer_nombre' => $usuario->primer_nombre,
+                'segundo_nombre' => $usuario->segundo_nombre ?? '',
+                'primer_apellido' => $usuario->primer_apellido,
+                'segundo_apellido' => $usuario->segundo_apellido ?? '',
+                'email' => $usuario->email,
+                'solicitud_id' => $solicitud->id_solicitud,
+                'estado' => $solicitud->estado,
+                'numero_radicado' => $solicitud->numero_radicado ?? 'No disponible',
+                'programa_destino' => $programaDestino->nombre ?? 'No especificado',
+                'finalizo_estudios' => $solicitud->finalizo_estudios ? 'Sí' : 'No',
+                'fecha_solicitud' => $solicitud->fecha_solicitud
+            ];
+
+            try {
+                if (isset($this->notificacionVicerrectoriaController)) {
+                    $resultadoControlador = $this->notificacionVicerrectoriaController->notificarVicerrectoriaPorSolicitud($solicitud->id_solicitud);
+
+                    Log::info("Resultado del envío mediante notificacionVicerrectoriaController: " . ($resultadoControlador ? 'Éxito' : 'Fallo'));
+
+                    if (!$resultadoControlador) {
+                        throw new \Exception("Fallo al enviar correo mediante controlador");
+                    }
+                } else {
+                    throw new \Exception("El controlador notificacionVicerrectoriaController no está disponible");
+                }
+            } catch (\Exception $controllerError) {
+                Log::warning("Error usando controlador: " . $controllerError->getMessage() . ". Intentando método directo");
+
+                try {
+                    Mail::to("brayner.trochez.o@uniautonoma.edu.co")->send(new VicerrectoriaMailable($datos));
+                    Log::info("Correo enviado usando método directo de respaldo");
+                } catch (\Exception $mailError) {
+                    Log::error("Error al enviar correo directo", [
+                        'error' => $mailError->getMessage(),
+                        'trace' => $mailError->getTraceAsString()
+                    ]);
+                }
+            }
+        }
+
+        // Notificar al estudiante si el estado cambia a Aprobado, Rechazado o Cerrado
+        $estadosParaNotificar = ['Aprobado', 'Rechazado', 'Cerrado'];
+        if (in_array($nuevoEstado, $estadosParaNotificar)) {
+            Log::info("Estado actualizado a '{$nuevoEstado}', enviando notificación al aspirante.");
+            $this->enviarCorreo($solicitud->id_solicitud);
+        }
+
+        // Respuesta de éxito
+        return response()->json([
+            'mensaje' => 'Estado de solicitud actualizado correctamente',
+            'estado_anterior' => $estadoAnterior,
+            'estado_actual' => $nuevoEstado
+        ], 200);
+    } catch (\Exception $e) {
+        // Manejo de errores con respuesta 500
+        return response()->json([
+            'mensaje' => 'Error al actualizar el estado de la solicitud',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
 }
