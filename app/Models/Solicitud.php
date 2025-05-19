@@ -35,6 +35,12 @@ class Solicitud extends Model
         return $this->belongsTo(Programa::class, 'programa_destino_id', 'id_programa');
     }
 
+    // Añade esta relación que falta
+    public function programaOrigen()
+    {
+        return $this->belongsTo(Programa::class, 'programa_origen_id', 'id_programa');
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -1050,7 +1050,7 @@ return new class extends Migration {
                 WHERE d.id_documento = documentoId;
             END;
 
-            
+
             -- INSERTAR DOCUMENTO
             CREATE PROCEDURE InsertarDocumento(
                 IN p_solicitud_id SMALLINT,
