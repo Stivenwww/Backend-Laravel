@@ -1055,6 +1055,169 @@ DB::unprepared("
         );
     END;
 ");
+
+
+
+
+
+
+DB::unprepared("
+    -- 3. Trigger para bloquear solicitudes duplicadas del mismo estudiante para la misma asignatura
+    DROP TRIGGER IF EXISTS tr_prevent_duplicate_solicitud;
+    CREATE TRIGGER tr_prevent_duplicate_solicitud
+    BEFORE INSERT ON solicitudes
+    FOR EACH ROW
+    BEGIN
+        DECLARE duplicate_count INT;
+        
+        -- Verificar si ya existe una solicitud del mismo estudiante para el mismo programa
+        SELECT COUNT(*) INTO duplicate_count
+        FROM solicitudes
+        WHERE usuario_id = NEW.usuario_id
+        AND programa_destino_id = NEW.programa_destino_id
+        AND estado IN ('pendiente', 'en_revision', 'aprobada');
+        
+        IF duplicate_count > 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No se permite solicitudes duplicadas para el mismo programa';
+        END IF;
+    END;
+
+    -- 4. Trigger para no permitir cambios en la solicitud si ya ha sido aprobada
+    DROP TRIGGER IF EXISTS tr_prevent_update_approved_solicitud;
+    CREATE TRIGGER tr_prevent_update_approved_solicitud
+    BEFORE UPDATE ON solicitudes
+    FOR EACH ROW
+    BEGIN
+        IF OLD.estado = 'aprobada' THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No se permiten modificaciones en solicitudes ya aprobadas';
+        END IF;
+    END;
+
+    -- 5. Trigger para evitar espacios en blanco al principio o al final del nombre del estudiante
+    DROP TRIGGER IF EXISTS tr_trim_user_names;
+    CREATE TRIGGER tr_trim_user_names
+    BEFORE INSERT ON users
+    FOR EACH ROW
+    BEGIN
+        SET NEW.primer_nombre = TRIM(NEW.primer_nombre);
+        SET NEW.segundo_nombre = TRIM(NEW.segundo_nombre);
+        SET NEW.primer_apellido = TRIM(NEW.primer_apellido);
+        SET NEW.segundo_apellido = TRIM(NEW.segundo_apellido);
+    END;
+
+    DROP TRIGGER IF EXISTS tr_trim_user_names_update;
+    CREATE TRIGGER tr_trim_user_names_update
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    BEGIN
+        SET NEW.primer_nombre = TRIM(NEW.primer_nombre);
+        SET NEW.segundo_nombre = TRIM(NEW.segundo_nombre);
+        SET NEW.primer_apellido = TRIM(NEW.primer_apellido);
+        SET NEW.segundo_apellido = TRIM(NEW.segundo_apellido);
+    END;
+
+    -- 6. Trigger para no permitir solicitudes si ya hay una solicitud en proceso
+    DROP TRIGGER IF EXISTS tr_prevent_multiple_solicitudes;
+    CREATE TRIGGER tr_prevent_multiple_solicitudes
+    BEFORE INSERT ON solicitudes
+    FOR EACH ROW
+    BEGIN
+        DECLARE pending_count INT;
+        
+        -- Verificar si ya existe una solicitud en proceso del mismo estudiante
+        SELECT COUNT(*) INTO pending_count
+        FROM solicitudes
+        WHERE usuario_id = NEW.usuario_id
+        AND estado IN ('pendiente', 'en_revision');
+        
+        IF pending_count > 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'El estudiante ya tiene una solicitud en proceso';
+        END IF;
+    END;
+
+    -- 7. MODIFICADO: Trigger simplificado para registrar solicitudes pendientes
+    -- (La notificación deberá manejarse desde la aplicación o con un job programado)
+    DROP TRIGGER IF EXISTS tr_register_pending_solicitud;
+    CREATE TRIGGER tr_register_pending_solicitud
+    AFTER INSERT ON solicitudes
+    FOR EACH ROW
+    BEGIN
+        -- Solo registrar en una tabla de seguimiento si es necesario
+        IF NEW.estado = 'pendiente' THEN
+            INSERT INTO solicitudes_pendientes_seguimiento (solicitud_id, fecha_creacion)
+            VALUES (NEW.id_solicitud, NOW());
+        END IF;
+    END;
+
+    -- 8. Trigger para rechazar solicitudes si los créditos de la asignatura origen son inferiores al mínimo permitido
+    DROP TRIGGER IF EXISTS tr_validate_creditos_homologacion;
+    CREATE TRIGGER tr_validate_creditos_homologacion
+    BEFORE INSERT ON homologacion_asignaturas
+    FOR EACH ROW
+    BEGIN
+        DECLARE creditos_origen DECIMAL(5,2);
+        DECLARE creditos_destino DECIMAL(5,2);
+        DECLARE min_creditos DECIMAL(5,2) DEFAULT 1.0;
+        DECLARE asignatura_origen_id INT;
+        DECLARE asignatura_destino_id INT;
+        
+        -- Extraer IDs de asignaturas del JSON
+        SET asignatura_origen_id = JSON_UNQUOTE(JSON_EXTRACT(NEW.homologaciones, '$.id_asignatura_origen'));
+        SET asignatura_destino_id = JSON_UNQUOTE(JSON_EXTRACT(NEW.homologaciones, '$.id_asignatura_destino'));
+        
+        -- Obtener créditos
+        SELECT creditos INTO creditos_origen FROM asignaturas WHERE id_asignatura = asignatura_origen_id;
+        SELECT creditos INTO creditos_destino FROM asignaturas WHERE id_asignatura = asignatura_destino_id;
+        
+        -- Validar créditos
+        IF creditos_origen < min_creditos OR creditos_origen < (creditos_destino * 0.7) THEN
+            -- Actualizar estado de la solicitud a rechazada
+            UPDATE solicitudes SET estado = 'rechazada' WHERE id_solicitud = NEW.solicitud_id;
+
+            -- Insertar en historial
+            INSERT INTO historial_homologaciones (
+                solicitud_id, usuario_id, estado, fecha, observaciones, created_at, updated_at
+            ) VALUES (
+                NEW.solicitud_id, NULL, 'rechazada', NOW(), 
+                'Créditos insuficientes para homologación', NOW(), NOW()
+            );
+
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Los créditos de la asignatura origen son insuficientes para homologación';
+        END IF;
+    END;
+
+    -- 9. Trigger para validar que no haya homologaciones activas a la misma facultad
+    DROP TRIGGER IF EXISTS tr_validate_facultad_homologacion;
+    CREATE TRIGGER tr_validate_facultad_homologacion
+    BEFORE INSERT ON solicitudes
+    FOR EACH ROW
+    BEGIN
+        DECLARE facultad_destino_id INT;
+        DECLARE existing_homologacion_count INT;
+        
+        -- Obtener ID de la facultad destino
+        SELECT facultad_id INTO facultad_destino_id 
+        FROM programas 
+        WHERE id_programa = NEW.programa_destino_id;
+        
+        -- Verificar si ya tiene una homologación activa en la misma facultad
+        SELECT COUNT(*) INTO existing_homologacion_count
+        FROM solicitudes s
+        JOIN programas p ON s.programa_destino_id = p.id_programa
+        WHERE s.usuario_id = NEW.usuario_id
+        AND p.facultad_id = facultad_destino_id
+        AND s.estado = 'aprobada';
+        
+        IF existing_homologacion_count > 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Ya existe una homologación activa para esta facultad';
+        END IF;
+    END;
+");
     }
 
     /**
