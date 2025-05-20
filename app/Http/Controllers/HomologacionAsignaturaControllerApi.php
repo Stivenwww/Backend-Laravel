@@ -880,4 +880,62 @@ public function eliminarAsignaturasDestino(Request $request, $id)
         ], 500);
     }
 }
+
+/**
+ * Actualiza únicamente el PDF de resolución de una homologación
+ *
+ * @param Request $request
+ * @param int $id ID de la homologación
+ * @return JsonResponse
+ */
+public function actualizarPDFResolucion(Request $request, $id)
+{
+    try {
+        // Validación del archivo PDF únicamente
+        $request->validate([
+            'ruta_pdf_resolucion' => 'required|file|mimes:pdf|max:10240', // Máximo 10 MB
+        ]);
+
+        // Obtener la homologación actual de la base de datos
+        $homologacion = HomologacionAsignatura::findOrFail($id);
+
+        // Manejar la actualización del archivo PDF
+        $pdfPath = $homologacion->ruta_pdf_resolucion; // Valor actual por defecto
+
+        // Si ya existe un PDF anterior, eliminarlo del storage
+        if ($pdfPath && Storage::disk('public')->exists($pdfPath)) {
+            Storage::disk('public')->delete($pdfPath);
+        }
+
+        // Guardar el nuevo archivo PDF
+        $pdfPath = $request->file('ruta_pdf_resolucion')->store('resoluciones_homologaciones', 'public');
+
+        // Actualizar mediante procedimiento almacenado manteniendo los demás datos intactos
+        DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
+            $id,
+            $homologacion->solicitud_id,
+            $homologacion->homologaciones, // Mantener las homologaciones existentes sin cambios
+            now()->toDateString(),
+            $pdfPath // Actualizar solo la ruta del PDF
+        ]);
+
+        // Generar URL pública para el PDF
+        $urlPDF = asset('storage/' . $pdfPath);
+
+        // Respuesta exitosa
+        return response()->json([
+            'mensaje' => 'PDF de resolución actualizado correctamente',
+            'ruta_pdf_resolucion' => $pdfPath,
+            'url_pdf_resolucion' => $urlPDF
+        ], 200);
+    } catch (\Exception $e) {
+        // Manejo detallado de errores
+        return response()->json([
+            'mensaje' => 'Error al actualizar el PDF de resolución',
+            'error' => $e->getMessage(),
+            'linea' => $e->getLine(),
+            'archivo' => $e->getFile()
+        ], 500);
+    }
+}
 }
