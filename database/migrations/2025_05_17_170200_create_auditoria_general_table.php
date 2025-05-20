@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('auditoria_general', function (Blueprint $table) {
             $table->id('id_auditoria');
             $table->string('tabla_afectada', 100);
-            $table->enum('tipo_accion', ['INSERT', 'UPDATE', 'DELETE']);
+            $table->enum('tipo_accion', ['INSERT', 'UPDATE', 'DELETE', 'INSERT-PENDIENTE']);
             $table->integer('id_registro');
             $table->json('datos_anteriores')->nullable();
             $table->json('datos_nuevos')->nullable();

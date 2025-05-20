@@ -65,9 +65,9 @@ return new class extends Migration
     END;
 ");
 
-// No use los trigger de auditoria para los departamentos y municipios porque conusme demasiados recursos.
+        // No use los trigger de auditoria para los departamentos y municipios porque conusme demasiados recursos.
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_institucion;
     CREATE TRIGGER tr_insert_institucion
@@ -121,7 +121,7 @@ DB::unprepared("
 ");
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_facultad;
     CREATE TRIGGER tr_insert_facultad
@@ -177,7 +177,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_programa;
     CREATE TRIGGER tr_insert_programa
@@ -265,7 +265,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_rol;
     CREATE TRIGGER tr_insert_rol
@@ -332,7 +332,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
 
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_user;
@@ -459,7 +459,7 @@ DB::unprepared("
 ");
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_asignatura;
     CREATE TRIGGER tr_insert_asignatura
@@ -569,19 +569,30 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
+
+    -- 7. MODIFICADO: Trigger simplificado para registrar solicitudes pendientes
+
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_solicitud;
     CREATE TRIGGER tr_insert_solicitud
     AFTER INSERT ON solicitudes
     FOR EACH ROW
     BEGIN
+        DECLARE accion VARCHAR(50);
+
+        IF NEW.estado = 'En revisión' THEN
+            SET accion = 'INSERT-PENDIENTE';
+        ELSE
+            SET accion = 'INSERT';
+        END IF;
+
         INSERT INTO auditoria_general (
             tabla_afectada, tipo_accion, id_registro,
             datos_anteriores, datos_nuevos,
             fecha, created_at, updated_at
         ) VALUES (
-            'solicitudes', 'INSERT', NEW.id_solicitud,
+            'solicitudes', accion, NEW.id_solicitud,
             NULL,
             JSON_OBJECT(
                 'usuario_id', NEW.usuario_id,
@@ -597,6 +608,7 @@ DB::unprepared("
             CURRENT_TIMESTAMP, NOW(), NOW()
         );
     END;
+
 
     -- TRIGGER UPDATE
     DROP TRIGGER IF EXISTS tr_update_solicitud;
@@ -668,7 +680,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_documento;
     CREATE TRIGGER tr_insert_documento
@@ -749,7 +761,7 @@ DB::unprepared("
 ");
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_historial_homologacion;
     CREATE TRIGGER tr_insert_historial_homologacion
@@ -835,7 +847,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_contenido_programatico;
     CREATE TRIGGER tr_insert_contenido_programatico
@@ -914,7 +926,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_solicitud_asignaturas;
     CREATE TRIGGER tr_insert_solicitud_asignaturas
@@ -984,7 +996,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- TRIGGER INSERT
     DROP TRIGGER IF EXISTS tr_insert_homologacion_asignaturas;
     CREATE TRIGGER tr_insert_homologacion_asignaturas
@@ -1061,7 +1073,7 @@ DB::unprepared("
 
 
 
-DB::unprepared("
+        DB::unprepared("
     -- 3. Trigger para bloquear solicitudes duplicadas del mismo estudiante para la misma asignatura
     DROP TRIGGER IF EXISTS tr_prevent_duplicate_solicitud;
     CREATE TRIGGER tr_prevent_duplicate_solicitud
@@ -1075,7 +1087,7 @@ DB::unprepared("
         FROM solicitudes
         WHERE usuario_id = NEW.usuario_id
         AND programa_destino_id = NEW.programa_destino_id
-        AND estado IN ('pendiente', 'en_revision', 'aprobada');
+        AND estado IN ('Radicado','En revisión','Aprobado','Rechazado','Cerrado');
         
         IF duplicate_count > 0 THEN
             SIGNAL SQLSTATE '45000'
@@ -1089,7 +1101,7 @@ DB::unprepared("
     BEFORE UPDATE ON solicitudes
     FOR EACH ROW
     BEGIN
-        IF OLD.estado = 'aprobada' THEN
+        IF OLD.estado = 'Aprobado' THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'No se permiten modificaciones en solicitudes ya aprobadas';
         END IF;
@@ -1124,37 +1136,26 @@ DB::unprepared("
     BEFORE INSERT ON solicitudes
     FOR EACH ROW
     BEGIN
-        DECLARE pending_count INT;
-        
-        -- Verificar si ya existe una solicitud en proceso del mismo estudiante
-        SELECT COUNT(*) INTO pending_count
+        DECLARE existe INT;
+
+        -- Verificar si ya existe al menos una solicitud en revisión
+        SELECT 1 INTO existe
         FROM solicitudes
         WHERE usuario_id = NEW.usuario_id
-        AND estado IN ('pendiente', 'en_revision');
-        
-        IF pending_count > 0 THEN
+        AND estado = 'En revisión'
+        LIMIT 1;
+
+        IF existe IS NOT NULL THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'El estudiante ya tiene una solicitud en proceso';
         END IF;
     END;
 
-    -- 7. MODIFICADO: Trigger simplificado para registrar solicitudes pendientes
-    -- (La notificación deberá manejarse desde la aplicación o con un job programado)
-    DROP TRIGGER IF EXISTS tr_register_pending_solicitud;
-    CREATE TRIGGER tr_register_pending_solicitud
-    AFTER INSERT ON solicitudes
-    FOR EACH ROW
-    BEGIN
-        -- Solo registrar en una tabla de seguimiento si es necesario
-        IF NEW.estado = 'pendiente' THEN
-            INSERT INTO solicitudes_pendientes_seguimiento (solicitud_id, fecha_creacion)
-            VALUES (NEW.id_solicitud, NOW());
-        END IF;
-    END;
-
+    
+    
     -- 8. Trigger para rechazar solicitudes si los créditos de la asignatura origen son inferiores al mínimo permitido
     DROP TRIGGER IF EXISTS tr_validate_creditos_homologacion;
-    CREATE TRIGGER tr_validate_creditos_homologacion
+        CREATE TRIGGER tr_validate_creditos_homologacion
     BEFORE INSERT ON homologacion_asignaturas
     FOR EACH ROW
     BEGIN
@@ -1163,28 +1164,22 @@ DB::unprepared("
         DECLARE min_creditos DECIMAL(5,2) DEFAULT 1.0;
         DECLARE asignatura_origen_id INT;
         DECLARE asignatura_destino_id INT;
-        
+
         -- Extraer IDs de asignaturas del JSON
-        SET asignatura_origen_id = JSON_UNQUOTE(JSON_EXTRACT(NEW.homologaciones, '$.id_asignatura_origen'));
-        SET asignatura_destino_id = JSON_UNQUOTE(JSON_EXTRACT(NEW.homologaciones, '$.id_asignatura_destino'));
-        
-        -- Obtener créditos
-        SELECT creditos INTO creditos_origen FROM asignaturas WHERE id_asignatura = asignatura_origen_id;
-        SELECT creditos INTO creditos_destino FROM asignaturas WHERE id_asignatura = asignatura_destino_id;
-        
+        SET asignatura_origen_id = CAST(JSON_UNQUOTE(JSON_EXTRACT(NEW.homologaciones, '$.id_asignatura_origen')) AS UNSIGNED);
+        SET asignatura_destino_id = CAST(JSON_UNQUOTE(JSON_EXTRACT(NEW.homologaciones, '$.id_asignatura_destino')) AS UNSIGNED);
+
+        -- Verificar que ambas asignaturas existen
+        SELECT creditos INTO creditos_origen 
+        FROM asignaturas WHERE id_asignatura = asignatura_origen_id;
+
+        SELECT creditos INTO creditos_destino 
+        FROM asignaturas WHERE id_asignatura = asignatura_destino_id;
+
         -- Validar créditos
         IF creditos_origen < min_creditos OR creditos_origen < (creditos_destino * 0.7) THEN
-            -- Actualizar estado de la solicitud a rechazada
-            UPDATE solicitudes SET estado = 'rechazada' WHERE id_solicitud = NEW.solicitud_id;
 
-            -- Insertar en historial
-            INSERT INTO historial_homologaciones (
-                solicitud_id, usuario_id, estado, fecha, observaciones, created_at, updated_at
-            ) VALUES (
-                NEW.solicitud_id, NULL, 'rechazada', NOW(), 
-                'Créditos insuficientes para homologación', NOW(), NOW()
-            );
-
+            -- Lanza error y evita la inserción
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Los créditos de la asignatura origen son insuficientes para homologación';
         END IF;
@@ -1210,7 +1205,7 @@ DB::unprepared("
         JOIN programas p ON s.programa_destino_id = p.id_programa
         WHERE s.usuario_id = NEW.usuario_id
         AND p.facultad_id = facultad_destino_id
-        AND s.estado = 'aprobada';
+        AND s.estado = 'Aprobado';
         
         IF existing_homologacion_count > 0 THEN
             SIGNAL SQLSTATE '45000'
