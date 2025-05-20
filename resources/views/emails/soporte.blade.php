@@ -29,7 +29,8 @@
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td align="center" style="padding-bottom: 15px;">
-                                        <img src="https://drive.google.com/file/d/170qY_o1LJqGbwufDAIBzrweJsgkalw2A/view?usp=sharing"
+                                        <!-- Logo corregido con formato de URL que funciona -->
+                                        <img src="https://drive.google.com/uc?export=view&id=170qY_o1LJqGbwufDAIBzrweJsgkalw2A"
                                             alt="Quimerito" width="100" height="100"
                                             style="display: block; margin: 0 auto;">
                                     </td>
@@ -137,9 +138,10 @@
                             style="background-color: #051835; color: #ffffff; padding: 30px 20px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; position: relative;">
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td align="center" style="padding-bottom: 20px;">
-                                        <img src="https://drive.google.com/file/d/170qY_o1LJqGbwufDAIBzrweJsgkalw2A/view?usp=sharing"
-                                            alt="Uniautónoma del Cauca" width="150"
+                                    <td align="center" style="padding-bottom: 15px;">
+                                        <!-- Logo en el footer corregido -->
+                                        <img src="https://drive.google.com/uc?export=view&id=170qY_o1LJqGbwufDAIBzrweJsgkalw2A"
+                                            alt="Quimerito" width="100" height="100"
                                             style="display: block; margin: 0 auto;">
                                     </td>
                                 </tr>
@@ -155,6 +157,42 @@
                                         <p style="margin: 5px 0; font-size: 15px; color: #ffffff;">Atentamente,</p>
                                         <p style="margin: 5px 0; font-size: 15px; color: #ffffff; font-weight: 600;">
                                             Equipo de Soporte de Homologaciones</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="https://www.uniautonoma.edu.co/" target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style="color: #a0c6ff; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer;">
+                                                        Autónoma del Cauca
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="https://www.uniautonoma.edu.co/programas" target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style="color: #a0c6ff; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer;">
+                                                        Programas Académicos
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="https://www.uniautonoma.edu.co/institucion/directorio/contactanos"
+                                                        target="_blank" rel="noopener noreferrer"
+                                                        style="color: #a0c6ff; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer;">
+                                                        Contacto
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="https://www.uniautonoma.edu.co/tutoriales-mesa-ayuda"
+                                                        target="_blank" rel="noopener noreferrer"
+                                                        style="color: #a0c6ff; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer;">
+                                                        Ayuda
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                                 <tr>
@@ -200,58 +238,17 @@
                                         </table>
                                     </td>
                                 </tr>
-                    </tr>
-                    <tr>
-                        <td align="center" style="padding-bottom: 15px;">
-                            <table cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td style="padding: 0 8px;">
-                                        <a href="#"
-                                            style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
-                                            <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png"
-                                                width="24" height="24" alt="Facebook"
-                                                style="vertical-align: middle;">
-                                        </a>
-                                    </td>
-                                    <td style="padding: 0 8px;">
-                                        <a href="#"
-                                            style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
-                                            <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/instagram_circle-512.png"
-                                                width="24" height="24" alt="Instagram"
-                                                style="vertical-align: middle;">
-                                        </a>
-                                    </td>
-                                    <td style="padding: 0 8px;">
-                                        <a href="#"
-                                            style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
-                                            <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png"
-                                                width="24" height="24" alt="Twitter"
-                                                style="vertical-align: middle;">
-                                        </a>
-                                    </td>
-                                    <td style="padding: 0 8px;">
-                                        <a href="#"
-                                            style="display: inline-block; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: #ffffff; text-decoration: none; text-align: center; vertical-align: middle; line-height: 36px;">
-                                            <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/linkedin_circle-512.png"
-                                                width="24" height="24" alt="LinkedIn"
-                                                style="vertical-align: middle;">
-                                        </a>
+                                    <td align="center" style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                                        &copy; 2025 Uniautónoma del Cauca. Todos los derechos reservados.
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    <tr>
-                        <td align="center" style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                            &copy; 2025 Uniautónoma del Cauca. Todos los derechos reservados.
-                        </td>
-                    </tr>
                 </table>
             </td>
         </tr>
-    </table>
-    </td>
-    </tr>
     </table>
 </body>
 
