@@ -139,7 +139,13 @@ class SolicitudControllerApi extends Controller
                 'id_solicitud' => $solicitud->id_solicitud
             ], 201);
         } catch (\Exception $e) {
+            log::error('Error al insertar la solicitud', [
+                'error' => $e->getMessage(),
+            ]);
             // Manejo de errores con respuesta 500
+            Log::error('Error al insertar la solicitud', [
+                'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'mensaje' => 'Error al insertar la solicitud',
                 'error' => $e->getMessage()
@@ -298,6 +304,9 @@ class SolicitudControllerApi extends Controller
                 'estado_actual' => $solicitud->estado
             ], 200);
         } catch (\Exception $e) {
+            log::error('Error al actualizar la solicitud', [
+                'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'mensaje' => 'Error al actualizar la solicitud',
                 'error' => $e->getMessage()

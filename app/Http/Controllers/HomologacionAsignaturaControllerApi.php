@@ -914,7 +914,7 @@ public function actualizarPDFResolucion(Request $request, $id)
         DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
             $id,
             $homologacion->solicitud_id,
-            $homologacion->homologaciones, // Mantener las homologaciones existentes sin cambios
+            json_encode($homologacion->homologaciones), // Mantener las homologaciones existentes sin cambios
             now()->toDateString(),
             $pdfPath // Actualizar solo la ruta del PDF
         ]);
