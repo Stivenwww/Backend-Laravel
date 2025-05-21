@@ -602,8 +602,8 @@ return new class extends Migration
                 'fecha_ultimo_semestre_cursado', NEW.fecha_ultimo_semestre_cursado,
                 'fecha_solicitud', NEW.fecha_solicitud,
                 'estado', NEW.estado,
-                'numero_radicado', NEW.numero_radicado,
-                'ruta_pdf_resolucion', NEW.ruta_pdf_resolucion
+                'numero_radicado', NEW.numero_radicado
+                
             ),
             CURRENT_TIMESTAMP, NOW(), NOW()
         );
@@ -630,8 +630,8 @@ return new class extends Migration
                 'fecha_ultimo_semestre_cursado', OLD.fecha_ultimo_semestre_cursado,
                 'fecha_solicitud', OLD.fecha_solicitud,
                 'estado', OLD.estado,
-                'numero_radicado', OLD.numero_radicado,
-                'ruta_pdf_resolucion', OLD.ruta_pdf_resolucion
+                'numero_radicado', OLD.numero_radicado
+                
             ),
             JSON_OBJECT(
                 'usuario_id', NEW.usuario_id,
@@ -641,8 +641,8 @@ return new class extends Migration
                 'fecha_ultimo_semestre_cursado', NEW.fecha_ultimo_semestre_cursado,
                 'fecha_solicitud', NEW.fecha_solicitud,
                 'estado', NEW.estado,
-                'numero_radicado', NEW.numero_radicado,
-                'ruta_pdf_resolucion', NEW.ruta_pdf_resolucion
+                'numero_radicado', NEW.numero_radicado
+                
             ),
             CURRENT_TIMESTAMP, NOW(), NOW()
         );
@@ -668,8 +668,8 @@ return new class extends Migration
                 'fecha_ultimo_semestre_cursado', OLD.fecha_ultimo_semestre_cursado,
                 'fecha_solicitud', OLD.fecha_solicitud,
                 'estado', OLD.estado,
-                'numero_radicado', OLD.numero_radicado,
-                'ruta_pdf_resolucion', OLD.ruta_pdf_resolucion
+                'numero_radicado', OLD.numero_radicado
+                
             ),
             NULL,
             CURRENT_TIMESTAMP, NOW(), NOW()
