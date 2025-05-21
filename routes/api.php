@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SolicitudCompletaControllerApi;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\PaisControllerApi;
@@ -47,10 +48,12 @@ Route::group(['middleware' => ['jwt.verify'], 'prefix' => 'auth'], function () {
     Route::get('user-profile', [AuthController::class, 'userProfile']);
 });
 
-// 🔓 Rutas públicas de recursos CRUD (actualmente sin autenticación)
-// Route::group(['middleware' => ['jwt.verify']], function () {
 
-// Países
+
+// 🔓 Rutas públicas de recursos CRUD (actualmente sin autenticación)
+/* Route::group(['middleware' => ['jwt.verify']], function () { */
+
+//Países
 Route::get('paises', [PaisControllerApi::class, 'traerPaises']);
 Route::get('paises/{id}', [PaisControllerApi::class, 'llevarPais']);
 Route::post('paises', [PaisControllerApi::class, 'insertarPais']);
@@ -99,6 +102,7 @@ Route::get('solicitudes', [SolicitudControllerApi::class, 'traerSolicitudes']);
 Route::get('solicitudes/{id}', [SolicitudControllerApi::class, 'llevarSolicitud']);
 Route::post('solicitudes', [SolicitudControllerApi::class, 'insertarSolicitud']);
 Route::put('solicitudes/{id}', [SolicitudControllerApi::class, 'actualizarSolicitud']);
+Route::patch('solicitudes/{id}/estado', [SolicitudControllerApi::class, 'actualizarEstadoSolicitud']);
 Route::delete('solicitudes/{id}', [SolicitudControllerApi::class, 'eliminarSolicitud']);
 
 // Solicitud - Asignaturas
@@ -107,6 +111,7 @@ Route::get('solicitud-asignaturas/{id}', [SolicitudAsignaturaControllerApi::clas
 Route::post('solicitud-asignaturas', [SolicitudAsignaturaControllerApi::class, 'insertarSolicitudAsignatura']);
 Route::put('solicitud-asignaturas/{id}', [SolicitudAsignaturaControllerApi::class, 'actualizarSolicitudAsignatura']);
 Route::delete('solicitud-asignaturas/{id}', [SolicitudAsignaturaControllerApi::class, 'eliminarSolicitudAsignatura']);
+Route::get('solicitudes/usuario/{id_usuario}', [SolicitudControllerApi::class, 'obtenerSolicitudesPorUsuario']);
 
 // Homologación - Asignaturas
 Route::get('homologacion-asignaturas', [HomologacionAsignaturaControllerApi::class, 'traerHomologacionAsignaturas']);
@@ -114,13 +119,14 @@ Route::get('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi
 Route::post('homologacion-asignaturas', [HomologacionAsignaturaControllerApi::class, 'insertarHomologacionAsignatura']);
 Route::put('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'actualizarHomologacionAsignatura']);
 Route::delete('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'eliminarHomologacionAsignatura']);
-
+Route::delete('homologacion-asignaturas/{id}/destinos', [HomologacionAsignaturaControllerApi::class, 'eliminarAsignaturasDestino']);
+Route::post('homologacion-asignaturas/{id}/pdf', [HomologacionAsignaturaControllerApi::class, 'actualizarPDFResolucion']);
 // Historial de homologaciones
 Route::get('historial-homologaciones', [HistorialHomologacionControllerApi::class, 'traerHistorialHomologaciones']);
 Route::get('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'llevarHistorialHomologacion']);
 Route::post('historial-homologaciones', [HistorialHomologacionControllerApi::class, 'insertarHistorialHomologacion']);
 Route::put('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'actualizarHistorialHomologacion']);
-Route::delete('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'eliminarHistorialHomologacion']);
+Route::delete('historial-homologaciones/{id}', action: [HistorialHomologacionControllerApi::class, 'eliminarHistorialHomologacion']);
 
 // Usuarios
 Route::get('usuarios', [UserControllerApi::class, 'traerUsuarios']);
@@ -161,8 +167,6 @@ Route::get('contenidos-programaticos/asignatura/{asignatura_id}', [ContenidoProg
 
 // });
 
-
-//Solcicitud Completa
-use App\Http\Controllers\SolicitudCompletaControllerApi;   
-
+// En routes/api.php
+Route::match(['post', 'put'], '/solicitud-actualizar', [SolicitudCompletaControllerApi::class, 'update']);
 Route::post('/solicitud-completa', [SolicitudCompletaControllerApi::class, 'store']);

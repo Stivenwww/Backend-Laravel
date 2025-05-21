@@ -1,65 +1,75 @@
 <?php
 
-// Se define el espacio de nombres de este controlador
 namespace App\Http\Controllers;
 
-// Se importan las clases necesarias para el funcionamiento
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail; // Permite enviar correos electrónicos
-use Illuminate\Support\Facades\Log;  // Permite registrar eventos o errores
-use App\Models\Solicitud; // Modelo que representa la solicitud en la base de datos
-use App\Mail\SecretariaMailable; // Clase mailable para la notificación a Secretaría
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Models\Solicitud;
+use App\Mail\SecretariaMailable;
 
-// Se declara el controlador NotificacionSecretariaController que extiende de Controller
 class NotificacionSecretariaController extends Controller
 {
-    // Método que envía un correo basado en una solicitud específica
-    public function enviarCorreoSolicitud($solicitud_id)
+    /**
+     * Dirección de correo de Secretaría (podría establecerse en config/mail.php)
+     */
+    protected $correoSecretaria = 'brayner.trochez.o@uniautonoma.edu.co';
+
+    /**
+     * Envía notificación por correo a Secretaría basada en una solicitud específica
+     *
+     * @param int $solicitud_id ID de la solicitud
+     * @return bool Resultado de la operación
+     */
+    public function notificarSecretariaPorSolicitud($solicitud_id)
     {
         try {
-            // Busca la solicitud junto con su relación 'usuario' usando el ID dado
-            // Lanza excepción si no la encuentra
-            $solicitud = Solicitud::with('usuario')->findOrFail($solicitud_id);
+            // Busca la solicitud con relaciones necesarias
+            $solicitud = Solicitud::with(['usuario', 'programaDestino'])->findOrFail($solicitud_id);
 
             // Obtiene el usuario relacionado con la solicitud
             $usuario = $solicitud->usuario;
 
-            // Arreglo con los datos que serán enviados en el correo
+            // Preparación de datos para el correo
             $datos = [
                 'primer_nombre' => $usuario->primer_nombre,
-                'segundo_nombre' => $usuario->segundo_nombre,
+                'segundo_nombre' => $usuario->segundo_nombre ?? '',
                 'primer_apellido' => $usuario->primer_apellido,
-                'segundo_apellido' => $usuario->segundo_apellido,
+                'segundo_apellido' => $usuario->segundo_apellido ?? '',
                 'email' => $usuario->email,
-
-                // Programa destino, con valor por defecto si no está definido
                 'programa_destino' => $solicitud->programaDestino->nombre ?? 'No especificado',
-
-                // Conversión de booleano a texto legible
                 'finalizo_estudios' => $solicitud->finalizo_estudios ? 'Sí' : 'No',
-
-                // Fecha de creación de la solicitud
                 'fecha_solicitud' => $solicitud->fecha_solicitud,
-
-                // Estado actual de la solicitud
                 'estado' => $solicitud->estado,
-
-                // Número de radicado asociado a la solicitud
-                'numero_radicado' => $solicitud->numero_radicado
+                'numero_radicado' => $solicitud->numero_radicado,
+                'solicitud_id' => $solicitud->id_solicitud
             ];
 
-            // Envía el correo a la dirección de Secretaría utilizando el mailable personalizado
-            Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new SecretariaMailable($datos));
+            // Obtiene mensaje personalizado según el estado
+            $mensaje = $this->obtenerMensajePorEstado($solicitud->estado);
 
-            // Si se envía con éxito, se registra el evento en el log
-            Log::info('Correo enviado exitosamente a Secretaría', ['radicado' => $solicitud->numero_radicado]);
+            // Envía el correo a la dirección de Secretaría
+            Mail::to($this->correoSecretaria)
+                ->send(new SecretariaMailable($datos, $mensaje));
 
-        } catch (\Exception $e) {
-            // Si ocurre algún error, se registra el mensaje y la traza completa en el log
-            Log::error('Error al enviar correo a Secretaría', [
-                'error email notificacion secretaria' => $e->getMessage(),
-                'trace email notificacion secretaria' => $e->getTraceAsString()
+            // Registra el envío exitoso
+            Log::info('Correo enviado exitosamente a Secretaría', [
+                'radicado' => $solicitud->numero_radicado,
+                'estado' => $solicitud->estado,
+                'mensaje' => substr($mensaje, 0, 50) . '...'
             ]);
+
+            return true;
+        } catch (\Exception $e) {
+            // Registra detalles del error
+            Log::error('Error al enviar correo a Secretaría', [
+                'solicitud_id' => $solicitud_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return false;
         }
     }
+
 }

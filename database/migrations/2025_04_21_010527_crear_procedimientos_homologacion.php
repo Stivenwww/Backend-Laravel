@@ -468,7 +468,6 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ActualizarUsuario;
             DROP PROCEDURE IF EXISTS EliminarUsuario;
 
-            -- OBTENER TODOS LOS USUARIOS ACTIVOS
             CREATE PROCEDURE ObtenerUsuarios()
             BEGIN
                 SELECT
@@ -478,6 +477,7 @@ return new class extends Migration {
                     u.primer_apellido,
                     u.segundo_apellido,
                     u.email,
+                    u.password,
                     u.tipo_identificacion,
                     u.numero_identificacion,
                     i.nombre AS institucion_origen,
@@ -487,6 +487,8 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
+                    r.nombre AS rol,               -- Nuevo: Nombre del rol
+                    u.activo,                     -- Nuevo: Estado activo/inactivo
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -495,6 +497,7 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
                 WHERE u.activo = 1
                 ORDER BY u.primer_nombre ASC;
             END;
@@ -509,6 +512,7 @@ return new class extends Migration {
                     u.primer_apellido,
                     u.segundo_apellido,
                     u.email,
+                    u.password,
                     u.tipo_identificacion,
                     u.numero_identificacion,
                     i.nombre AS institucion_origen,
@@ -518,6 +522,8 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
+                    r.nombre AS rol,               -- Nuevo: Nombre del rol
+                    u.activo,                     -- Nuevo: Estado activo/inactivo
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -526,9 +532,11 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
+                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
                 WHERE u.id_usuario = usuarioId
                 AND u.activo = 1;
             END;
+
 
             CREATE PROCEDURE InsertarUsuario(
                 IN p_primer_nombre VARCHAR(50),
@@ -788,8 +796,7 @@ return new class extends Migration {
                 IN p_finalizo_estudios ENUM('Si', 'No'),
                 IN p_fecha_finalizacion_estudios DATE,
                 IN p_fecha_ultimo_semestre_cursado DATE,
-                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'),
-                IN p_ruta_pdf_resolucion VARCHAR(255)
+                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado')
             )
             BEGIN
                 UPDATE solicitudes
@@ -800,7 +807,6 @@ return new class extends Migration {
                     fecha_finalizacion_estudios = p_fecha_finalizacion_estudios,
                     fecha_ultimo_semestre_cursado = p_fecha_ultimo_semestre_cursado,
                     estado = p_estado,
-                    ruta_pdf_resolucion = p_ruta_pdf_resolucion,
                     updated_at = NOW()
                 WHERE id_solicitud = p_id_solicitud;
             END;
@@ -820,8 +826,7 @@ return new class extends Migration {
                 IN p_finalizo_estudios ENUM('Si', 'No'),
                 IN p_fecha_finalizacion_estudios DATE,
                 IN p_fecha_ultimo_semestre_cursado DATE,
-                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'),
-                IN p_ruta_pdf_resolucion VARCHAR(255)
+                IN p_estado ENUM('Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado')
             )
             BEGIN
                 DECLARE v_year INT;
@@ -852,7 +857,6 @@ return new class extends Migration {
                     fecha_ultimo_semestre_cursado,
                     estado,
                     numero_radicado,
-                    ruta_pdf_resolucion,
                     created_at,
                     updated_at
                 ) VALUES (
@@ -863,7 +867,6 @@ return new class extends Migration {
                     p_fecha_ultimo_semestre_cursado,
                     p_estado,
                     v_nuevo_radicado,
-                    p_ruta_pdf_resolucion,
                     NOW(),
                     NOW()
                 );
@@ -882,7 +885,6 @@ return new class extends Migration {
                     s.fecha_solicitud,
                     s.estado,
                     s.numero_radicado,
-                    s.ruta_pdf_resolucion AS pdf_resolucion,
 
                     -- Datos del programa destino
                     prog.nombre AS programa_destino_nombre,
@@ -925,7 +927,6 @@ return new class extends Migration {
                     s.fecha_solicitud,
                     s.estado,
                     s.numero_radicado,
-                    s.ruta_pdf_resolucion AS pdf_resolucion,
 
                     -- Datos del programa destino
                     prog.nombre AS programa_destino_nombre,
@@ -967,45 +968,88 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ActualizarDocumento;
             DROP PROCEDURE IF EXISTS EliminarDocumento;
 
-            -- OBTENER TODOS LOS DOCUMENTOS
+            -- OBTENER TODOS LOS DOCUMENTOS (modificado)
             CREATE PROCEDURE ObtenerDocumentos()
             BEGIN
                 SELECT
                     d.id_documento,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-                    s.id_solicitud,
-                    s.numero_radicado,  -- Incluyendo el número de radicado
+                    d.solicitud_id,
+                    d.usuario_id,
                     d.tipo,
                     d.ruta,
                     d.fecha_subida,
                     d.created_at,
-                    d.updated_at
+                    d.updated_at,
+                    -- Datos de usuario
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.email,
+                    u.tipo_identificacion,
+                    u.numero_identificacion,
+                    u.telefono,
+                    u.direccion,
+                    u.institucion_origen_id,
+                    u.facultad_id,
+                    u.pais_id,
+                    u.departamento_id,
+                    u.municipio_id,
+                    -- Datos de solicitud
+                    s.programa_destino_id,
+                    s.finalizo_estudios,
+                    s.fecha_finalizacion_estudios,
+                    s.fecha_ultimo_semestre_cursado,
+                    s.estado,
+                    s.numero_radicado,
+                    s.fecha_solicitud
                 FROM documentos d
-                LEFT JOIN users
-                 u ON d.usuario_id = u.id_usuario
+                LEFT JOIN users u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 ORDER BY d.fecha_subida DESC;
             END;
 
-            -- OBTENER DOCUMENTO POR ID
+            -- OBTENER DOCUMENTO POR ID (modificado)
             CREATE PROCEDURE ObtenerDocumentoPorId(IN documentoId SMALLINT)
             BEGIN
                 SELECT
                     d.id_documento,
-                    CONCAT(u.primer_nombre, ' ', u.primer_apellido) AS estudiante,
-                    s.id_solicitud,
-                    s.numero_radicado,  -- Incluyendo el número de radicado
+                    d.solicitud_id,
+                    d.usuario_id,
                     d.tipo,
                     d.ruta,
                     d.fecha_subida,
                     d.created_at,
-                    d.updated_at
+                    d.updated_at,
+                    -- Datos de usuario
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.email,
+                    u.tipo_identificacion,
+                    u.numero_identificacion,
+                    u.telefono,
+                    u.direccion,
+                    u.institucion_origen_id,
+                    u.facultad_id,
+                    u.pais_id,
+                    u.departamento_id,
+                    u.municipio_id,
+                    -- Datos de solicitud
+                    s.programa_destino_id,
+                    s.finalizo_estudios,
+                    s.fecha_finalizacion_estudios,
+                    s.fecha_ultimo_semestre_cursado,
+                    s.estado,
+                    s.numero_radicado,
+                    s.fecha_solicitud
                 FROM documentos d
-                LEFT JOIN users
-                 u ON d.usuario_id = u.id_usuario
+                LEFT JOIN users u ON d.usuario_id = u.id_usuario
                 LEFT JOIN solicitudes s ON d.solicitud_id = s.id_solicitud
                 WHERE d.id_documento = documentoId;
             END;
+
 
             -- INSERTAR DOCUMENTO
             CREATE PROCEDURE InsertarDocumento(
@@ -1378,7 +1422,7 @@ return new class extends Migration {
 
 
 
-                -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
             DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
             DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
             DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
@@ -1400,6 +1444,7 @@ return new class extends Migration {
                     ) AS estudiante,
                     ha.homologaciones, -- Devolvemos el JSON tal cual
                     ha.fecha,
+                    ha.ruta_pdf_resolucion,
                     ha.created_at,
                     ha.updated_at
                 FROM homologacion_asignaturas ha
@@ -1423,6 +1468,7 @@ return new class extends Migration {
                     ) AS estudiante,
                     ha.homologaciones, -- Devolvemos el JSON tal cual
                     ha.fecha,
+                    ha.ruta_pdf_resolucion,
                     ha.created_at,
                     ha.updated_at
                 FROM homologacion_asignaturas ha
@@ -1435,7 +1481,8 @@ return new class extends Migration {
             CREATE PROCEDURE InsertarHomologacionAsignatura(
                 IN p_solicitud_id INT,
                 IN p_homologaciones JSON,
-                IN p_fecha DATE
+                IN p_fecha DATE,
+                IN p_ruta_pdf_resolucion VARCHAR(255)
             )
             BEGIN
                 -- Verificamos si ya existe un registro para esta solicitud
@@ -1452,10 +1499,10 @@ return new class extends Migration {
                 ELSE
                     -- Si no existe, insertamos nuevo
                     INSERT INTO homologacion_asignaturas (
-                        solicitud_id, homologaciones, fecha, created_at, updated_at
+                        solicitud_id, homologaciones, fecha, ruta_pdf_resolucion, created_at, updated_at
                     )
                     VALUES (
-                        p_solicitud_id, p_homologaciones, p_fecha, NOW(), NOW()
+                        p_solicitud_id, p_homologaciones, p_fecha, p_ruta_pdf_resolucion, NOW(), NOW()
                     );
                 END IF;
             END;
@@ -1465,13 +1512,15 @@ return new class extends Migration {
             IN p_id_homologacion INT,
             IN p_solicitud_id INT,
             IN p_homologaciones JSON,
-            IN p_fecha DATE
+            IN p_fecha DATE,
+            IN p_ruta_pdf_resolucion VARCHAR(255)
             )
             BEGIN
                 UPDATE homologacion_asignaturas
                 SET
                     homologaciones = p_homologaciones,
                     fecha = p_fecha,
+                    ruta_pdf_resolucion = p_ruta_pdf_resolucion,
                     updated_at = NOW()
                 WHERE id_homologacion = p_id_homologacion;
             END;

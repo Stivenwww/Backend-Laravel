@@ -69,6 +69,7 @@ class AuthController extends Controller
     {
         // Validación de campos para el registro
         $validator = Validator::make($request->all(), [
+            'name' => $request->name ?? explode('@', $request->email)[0],
             'email' => 'required|string|email|max:100|unique:users',
             'tipo_identificacion' => 'required|string',
             'numero_identificacion' => 'required|string|unique:users',

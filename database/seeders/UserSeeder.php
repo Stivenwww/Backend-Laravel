@@ -159,5 +159,48 @@ class UserSeeder extends Seeder
             'rol_id' => 2,
             'activo' => true,
         ]);
+
+        // Usuario con rol 4 - Administrador
+        User::create([
+            'primer_nombre' => 'Natalia',
+            'segundo_nombre' => 'Andrea',
+            'primer_apellido' => 'Rivas',
+            'segundo_apellido' => 'Torres',
+            'email' => 'natalia.rivas@example.com',
+            'password' => Hash::make('adminpassword'),
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '7788990011',
+            'institucion_origen_id' => 1,
+            'facultad_id' => null,
+            'telefono' => '3004567890',
+            'direccion' => 'Calle 8 #12-34',
+            'pais_id' => 1,
+            'departamento_id' => 12,
+            'municipio_id' => 703,
+            'rol_id' => 5,
+            'activo' => true,
+        ]);
+
+        // Usuario con rol 5 - Soporte
+        User::create([
+            'primer_nombre' => 'Jorge',
+            'segundo_nombre' => 'Esteban',
+            'primer_apellido' => 'Mejía',
+            'segundo_apellido' => 'Londoño',
+            'email' => 'jorge.mejia@example.com',
+            'password' => Hash::make('supportpassword'),
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '8899001122',
+            'institucion_origen_id' => 1,
+            'facultad_id' => null,
+            'telefono' => '3012345678',
+            'direccion' => 'Cra 9 #15-20',
+            'pais_id' => 1,
+            'departamento_id' => 12,
+            'municipio_id' => 703,
+            'rol_id' => 4,
+            'activo' => true,
+        ]);
+
     }
 }

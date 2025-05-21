@@ -18,6 +18,9 @@ class DocumentoControllerApi extends Controller
         try {
             // Llamada al procedimiento almacenado para obtener todos los documentos
             $documentos = DB::select('CALL ObtenerDocumentos()');
+
+            // Devolvemos directamente el resultado del procedimiento almacenado
+            // sin reorganizar la estructura
             return response()->json($documentos);
         } catch (\Exception $e) {
             // Manejo de errores con respuesta JSON y código 500 (Error del servidor)
@@ -45,7 +48,7 @@ class DocumentoControllerApi extends Controller
             if (!empty($documento)) {
                 return response()->json([
                     'mensaje' => 'Documento encontrado',
-                    'datos' => $documento[0] // Accede al primer resultado del array
+                    'datos' => $documento[0] // Devuelve el primer registro sin reorganizar
                 ], 200);
             } else {
                 // Respuesta si no se encuentra el documento, código 404 (No encontrado)
@@ -152,7 +155,7 @@ class DocumentoControllerApi extends Controller
                 'solicitud_id' => 'sometimes|required|integer',
                 'usuario_id' => 'sometimes|required|integer',
                 'tipo' => 'sometimes|required|string',
-                'ruta' => 'sometimes|required|string|max:255',
+                'ruta' => 'required|file|mimes:pdf|max:10240',
             ]);
 
             // Llamada al procedimiento almacenado para actualizar
@@ -205,7 +208,7 @@ class DocumentoControllerApi extends Controller
 
     /**
      * Método para obtener todos los documentos de un usuario específico.
-     * Utiliza una consulta directa a la base de datos sin procedimiento almacenado.
+     * Ahora utiliza un JOIN para traer toda la información relacionada.
      *
      * @param int $usuario_id ID del usuario cuyos documentos se buscan
      * @return \Illuminate\Http\JsonResponse
@@ -213,9 +216,43 @@ class DocumentoControllerApi extends Controller
     public function obtenerDocumentosPorUsuario($usuario_id)
     {
         try {
-            // Consulta directa para obtener documentos por usuario_id
-            $documentos = DB::table('documentos')
-                ->where('usuario_id', $usuario_id)
+            // Consulta utilizando JOIN para obtener todos los datos relacionados
+            $documentos = DB::table('documentos as d')
+                ->select(
+                    'd.id_documento',
+                    'd.solicitud_id',
+                    'd.usuario_id',
+                    'd.tipo',
+                    'd.ruta',
+                    'd.fecha_subida',
+                    'd.created_at',
+                    'd.updated_at',
+                    'u.primer_nombre',
+                    'u.segundo_nombre',
+                    'u.primer_apellido',
+                    'u.segundo_apellido',
+                    'u.email',
+                    'u.tipo_identificacion',
+                    'u.numero_identificacion',
+                    'u.telefono',
+                    'u.direccion',
+                    'u.institucion_origen_id',
+                    'u.facultad_id',
+                    'u.pais_id',
+                    'u.departamento_id',
+                    'u.municipio_id',
+                    's.programa_destino_id',
+                    's.finalizo_estudios',
+                    's.fecha_finalizacion_estudios',
+                    's.fecha_ultimo_semestre_cursado',
+                    's.estado',
+                    's.numero_radicado',
+                    's.fecha_solicitud'
+
+                )
+                ->leftJoin('users as u', 'd.usuario_id', '=', 'u.id_usuario')
+                ->leftJoin('solicitudes as s', 'd.solicitud_id', '=', 's.id_solicitud')
+                ->where('d.usuario_id', $usuario_id)
                 ->get();
 
             return response()->json([

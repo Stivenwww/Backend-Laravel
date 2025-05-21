@@ -46,7 +46,7 @@ class SolicitudAsignaturaSeeder extends Seeder
                 foreach ($asignaturasOrigen as $asignatura) {
                     $asignaturasData[] = [
                         'asignatura_id'  => $asignatura->id_asignatura,
-                        'nota_origen'    => null,
+                        'nota_origen'    => 4.5,
                         'horas_sena'     => $asignatura->horas_sena
                     ];
                 }
