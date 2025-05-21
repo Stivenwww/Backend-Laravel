@@ -1298,7 +1298,7 @@ BEGIN
                 SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = mensaje_error;
             END IF;
 
-            IF creditos_origen < (creditos_destino * 0.7) THEN
+            IF creditos_origen < (creditos_destino * 0.6) THEN
                 SET mensaje_error = CONCAT(\'La asignatura origen con ID \', asignatura_origen_id,
                                            \' tiene menos del 70% de los créditos de la asignatura destino con ID \',
                                            asignatura_destino_id);

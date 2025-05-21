@@ -421,6 +421,7 @@ class SolicitudControllerApi extends Controller
             ], 200);
         } catch (\Exception $e) {
             // Registra el error para diagnóstico
+
             Log::error('Error al obtener solicitudes por usuario', [
                 'usuario_id' => $id_usuario,
                 'error' => $e->getMessage(),
@@ -545,6 +546,9 @@ public function actualizarEstadoSolicitud(Request $request, $id)
             'estado_actual' => $nuevoEstado
         ], 200);
     } catch (\Exception $e) {
+        log::error('Error al actualizar el estado de la solicitud', [
+            'error' => $e->getMessage(),
+        ]);
         // Manejo de errores con respuesta 500
         return response()->json([
             'mensaje' => 'Error al actualizar el estado de la solicitud',
