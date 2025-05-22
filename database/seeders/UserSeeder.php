@@ -181,14 +181,14 @@ class UserSeeder extends Seeder
             'activo' => true,
         ]);
 
-        // Usuario con rol 5 - Soporte
+        // Usuario con rol VICERRECTOR
         User::create([
             'primer_nombre' => 'Jorge',
             'segundo_nombre' => 'Esteban',
             'primer_apellido' => 'Mejía',
             'segundo_apellido' => 'Londoño',
             'email' => 'jorge.mejia@example.com',
-            'password' => Hash::make('supportpassword'),
+            'password' => Hash::make('vicerrector'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '8899001122',
             'institucion_origen_id' => 1,
