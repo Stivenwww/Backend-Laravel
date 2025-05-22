@@ -121,6 +121,8 @@ Route::put('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi
 Route::delete('homologacion-asignaturas/{id}', [HomologacionAsignaturaControllerApi::class, 'eliminarHomologacionAsignatura']);
 Route::delete('homologacion-asignaturas/{id}/destinos', [HomologacionAsignaturaControllerApi::class, 'eliminarAsignaturasDestino']);
 Route::post('homologacion-asignaturas/{id}/pdf', [HomologacionAsignaturaControllerApi::class, 'actualizarPDFResolucion']);
+Route::put('homologacion-asignaturas/usuario/{usuarioId}/estado', [HomologacionAsignaturaControllerApi::class, 'actualizarEstadoHomologacionPorUsuario']);
+
 // Historial de homologaciones
 Route::get('historial-homologaciones', [HistorialHomologacionControllerApi::class, 'traerHistorialHomologaciones']);
 Route::get('historial-homologaciones/{id}', [HistorialHomologacionControllerApi::class, 'llevarHistorialHomologacion']);

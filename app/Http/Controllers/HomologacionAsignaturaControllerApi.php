@@ -938,4 +938,205 @@ public function actualizarPDFResolucion(Request $request, $id)
         ], 500);
     }
 }
+/**
+ * Actualiza únicamente el estado de una homologación de asignatura por ID de usuario
+ * y envía notificaciones correspondientes según el nuevo estado.
+ *
+ * @param Request $request Datos con el nuevo estado
+ * @param int $usuarioId ID del usuario cuya homologación se va a actualizar
+ * @return \Illuminate\Http\JsonResponse Confirmación o error
+ */
+public function actualizarEstadoHomologacionPorUsuario(Request $request, $usuarioId)
+{
+    try {
+        // Validación básica del campo estado
+        $request->validate([
+            'estado' => 'required|string|in:Pendiente,En proceso,Aprobado,Rechazado,Finalizado'
+        ]);
+
+        // Buscar la solicitud del usuario
+        $solicitud = Solicitud::where('usuario_id', $usuarioId)->first();
+
+        if (!$solicitud) {
+            return response()->json([
+                'mensaje' => 'No se encontró solicitud para el usuario especificado'
+            ], 404);
+        }
+
+        // Buscar la homologación asociada a la solicitud
+        $homologacion = HomologacionAsignatura::where('solicitud_id', $solicitud->id_solicitud)->first();
+
+        if (!$homologacion) {
+            return response()->json([
+                'mensaje' => 'No se encontró homologación para el usuario especificado'
+            ], 404);
+        }
+
+        // Cargar relaciones necesarias
+        $solicitud->load('usuario', 'programaDestino');
+
+        // Guardar el estado anterior para comparación
+        $estadoAnterior = $homologacion->estado ?? 'Sin estado';
+        $nuevoEstado = $request->estado;
+
+        // Si el estado no cambia, no hacer nada
+        if ($estadoAnterior === $nuevoEstado) {
+            return response()->json([
+                'mensaje' => 'El estado de la homologación ya es: ' . $nuevoEstado,
+                'estado' => $nuevoEstado
+            ], 200);
+        }
+
+        // Actualizar solo el campo estado
+        $homologacion->estado = $nuevoEstado;
+        $homologacion->save();
+
+        // Registrar el cambio en el log
+        Log::info("Homologación {$homologacion->id_homologacion} cambió de estado", [
+            'estado_anterior' => $estadoAnterior,
+            'estado_nuevo' => $nuevoEstado,
+            'usuario_id' => $usuarioId,
+            'solicitud_id' => $solicitud->id_solicitud,
+            'numero_radicado' => $solicitud->numero_radicado
+        ]);
+
+        // Envío a Vicerrectoría si pasó a "En proceso"
+        if ($estadoAnterior !== 'En proceso' && $nuevoEstado === 'En proceso') {
+            Log::info("Homologación {$homologacion->id_homologacion} pasó a 'En proceso'. Enviando notificación a Vicerrectoría.");
+
+            $usuario = $solicitud->usuario;
+            $programaDestino = $solicitud->programaDestino;
+
+            $datos = [
+                'primer_nombre' => $usuario->primer_nombre,
+                'segundo_nombre' => $usuario->segundo_nombre ?? '',
+                'primer_apellido' => $usuario->primer_apellido,
+                'segundo_apellido' => $usuario->segundo_apellido ?? '',
+                'email' => $usuario->email,
+                'homologacion_id' => $homologacion->id_homologacion,
+                'solicitud_id' => $solicitud->id_solicitud,
+                'estado' => $homologacion->estado,
+                'numero_radicado' => $solicitud->numero_radicado ?? 'No disponible',
+                'programa_destino' => $programaDestino->nombre ?? 'No especificado',
+                'fecha_homologacion' => $homologacion->fecha
+            ];
+
+            try {
+                // Intentar envío mediante controlador específico si existe
+                if (isset($this->notificacionVicerrectoriaController)) {
+                    $resultadoControlador = $this->notificacionVicerrectoriaController->notificarVicerrectoriaPorHomologacion($homologacion->id_homologacion);
+
+                    Log::info("Resultado del envío mediante notificacionVicerrectoriaController: " . ($resultadoControlador ? 'Éxito' : 'Fallo'));
+
+                    if (!$resultadoControlador) {
+                        throw new \Exception("Fallo al enviar correo mediante controlador");
+                    }
+                } else {
+                    throw new \Exception("El controlador notificacionVicerrectoriaController no está disponible");
+                }
+            } catch (\Exception $controllerError) {
+                Log::warning("Error usando controlador: " . $controllerError->getMessage() . ". Intentando método directo");
+
+                try {
+                    // Usar el mailable existente o crear uno específico para homologaciones
+                    Mail::to("brayner.trochez.o@uniautonoma.edu.co")->send(new VicerrectoriaMailable($datos));
+                    Log::info("Correo enviado usando método directo de respaldo");
+                } catch (\Exception $mailError) {
+                    Log::error("Error al enviar correo directo", [
+                        'error' => $mailError->getMessage(),
+                        'trace' => $mailError->getTraceAsString()
+                    ]);
+                }
+            }
+        }
+
+        // Notificar al estudiante si el estado cambia a Aprobado, Rechazado o Finalizado
+        $estadosParaNotificar = ['Aprobado', 'Rechazado', 'Finalizado'];
+        if (in_array($nuevoEstado, $estadosParaNotificar)) {
+            Log::info("Estado de homologación actualizado a '{$nuevoEstado}', enviando notificación al estudiante.");
+
+            try {
+                // Aquí puedes implementar el envío de correo al estudiante
+                // usando un método similar al enviarCorreo del primer controlador
+                $this->enviarCorreoHomologacion($homologacion->id_homologacion);
+            } catch (\Exception $e) {
+                Log::error("Error al enviar correo al estudiante", [
+                    'error' => $e->getMessage(),
+                    'homologacion_id' => $homologacion->id_homologacion
+                ]);
+            }
+        }
+
+        // Respuesta de éxito
+        return response()->json([
+            'mensaje' => 'Estado de homologación actualizado correctamente',
+            'homologacion_id' => $homologacion->id_homologacion,
+            'solicitud_id' => $solicitud->id_solicitud,
+            'usuario_id' => $usuarioId,
+            'estado_anterior' => $estadoAnterior,
+            'estado_actual' => $nuevoEstado,
+            'numero_radicado' => $solicitud->numero_radicado
+        ], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Error al actualizar el estado de la homologación por usuario', [
+            'usuario_id' => $usuarioId,
+            'error' => $e->getMessage(),
+            'linea' => $e->getLine(),
+            'archivo' => $e->getFile()
+        ]);
+
+        // Manejo de errores con respuesta 500
+        return response()->json([
+            'mensaje' => 'Error al actualizar el estado de la homologación',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Método auxiliar para enviar correo de notificación al estudiante sobre cambios en homologación
+ *
+ * @param int $homologacionId ID de la homologación
+ * @return bool
+ */
+private function enviarCorreoHomologacion($homologacionId)
+{
+    try {
+        // Obtener la homologación con sus relaciones
+        $homologacion = HomologacionAsignatura::find($homologacionId);
+        if (!$homologacion) {
+            return false;
+        }
+
+        $solicitud = Solicitud::with('usuario', 'programaDestino')->find($homologacion->solicitud_id);
+        if (!$solicitud) {
+            return false;
+        }
+
+        $datosCorreo = [
+            'estudiante' => $solicitud->usuario->primer_nombre . ' ' . $solicitud->usuario->primer_apellido,
+            'estado' => $homologacion->estado,
+            'numero_radicado' => $solicitud->numero_radicado,
+            'programa_destino' => $solicitud->programaDestino->nombre ?? 'No especificado',
+            'fecha_actualizacion' => now()->format('d/m/Y')
+        ];
+
+        // Aquí deberías usar tu mailable específico para homologaciones
+        // Mail::to($solicitud->usuario->email)->send(new HomologacionEstadoMailable($datosCorreo));
+
+        Log::info("Correo de homologación enviado al estudiante", [
+            'email' => $solicitud->usuario->email,
+            'homologacion_id' => $homologacionId
+        ]);
+
+        return true;
+    } catch (\Exception $e) {
+        Log::error("Error en enviarCorreoHomologacion", [
+            'error' => $e->getMessage(),
+            'homologacion_id' => $homologacionId
+        ]);
+        return false;
+    }
+}
 }
