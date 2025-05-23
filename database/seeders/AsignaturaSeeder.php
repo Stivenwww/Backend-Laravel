@@ -28,238 +28,325 @@ class AsignaturaSeeder extends Seeder
 
         // Listado de asignaturas por programa_id
         $pensum = [
-            // Universidad del Cauca
+            // UNIVERSIDAD DEL CAUCA
             1 => [ // Ing. Electrónica y Telecomunicaciones
-                'Circuitos Eléctricos',
-                'Electrónica Analógica',
-                'Electrónica Digital',
-                'Comunicación Digital',
-                'Microcontroladores',
-                'Procesamiento de Señales',
-                'Control Automático',
-                'Redes de Computadoras',
-                'Proyecto Electrónico I'
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Física I', 'Química General', 'Introducción a la Ingeniería', 'Inglés I'],
+                2 => ['Cálculo Integral', 'Física II', 'Circuitos Eléctricos I', 'Programación I', 'Inglés II', 'Expresión Gráfica'],
+                3 => ['Ecuaciones Diferenciales', 'Física III', 'Circuitos Eléctricos II', 'Electrónica Analógica I', 'Probabilidad y Estadística', 'Materiales Eléctricos'],
+                4 => ['Análisis Complejo', 'Electrónica Analógica II', 'Electrónica Digital I', 'Señales y Sistemas I', 'Campos Electromagnéticos', 'Métodos Numéricos'],
+                5 => ['Electrónica Digital II', 'Señales y Sistemas II', 'Sistemas de Comunicaciones I', 'Microprocesadores', 'Control Automático I', 'Economía'],
+                6 => ['Sistemas de Comunicaciones II', 'Procesamiento Digital de Señales', 'Microcontroladores', 'Control Automático II', 'Redes de Computadores', 'Gestión Empresarial'],
+                7 => ['Comunicaciones Digitales', 'Sistemas Embebidos', 'Antenas y Propagación', 'Instrumentación Electrónica', 'Electiva Profesional I', 'Formulación de Proyectos'],
+                8 => ['Comunicaciones Móviles', 'Redes de Telecomunicaciones', 'Sistemas de Control Digital', 'Electiva Profesional II', 'Seminario de Investigación', 'Ética Profesional'],
+                9 => ['Proyecto de Grado I', 'Electiva Profesional III', 'Práctica Académica'],
+                10 => ['Proyecto de Grado II', 'Electiva Profesional IV']
             ],
+
             2 => [ // Ing. Civil
-                'Matemáticas I',
-                'Topografía',
-                'Mecánica de Materiales',
-                'Hidráulica',
-                'Estructuras I',
-                'Materiales de Construcción',
-                'Geotecnia',
-                'Transporte y Vías',
-                'Gestión de Proyectos'
-            ],
-            3 => [ // Ing. de Sistemas
-                'Fundamentos de Programación',
-                'Estructuras de Datos',
-                'Sistemas Operativos',
-                'Redes de Computadores',
-                'Bases de Datos',
-                'Ingeniería de Software',
-                'Análisis de Algoritmos',
-                'Desarrollo Web',
-                'Sistemas Distribuidos'
-            ],
-            4 => [ // Ing. en Automática Industrial
-                'Control de Procesos',
-                'Instrumentación Industrial',
-                'Sistemas SCADA',
-                'Robótica Industrial',
-                'Electrónica de Potencia',
-                'PLC y Modulación',
-                'Redes Industriales',
-                'Mantenimiento Industrial',
-                'Metrología'
-            ],
-            5 => [ // Ing. Física
-                'Matemáticas I',
-                'Física I',
-                'Física II',
-                'Termodinámica',
-                'Mecánica Cuántica',
-                'Ondas y Óptica',
-                'Física Computacional',
-                'Electrónica para Físicos',
-                'Láseres y Fotónica'
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Física I', 'Química General', 'Dibujo de Ingeniería', 'Introducción a la Ingeniería Civil'],
+                2 => ['Cálculo Integral', 'Física II', 'Estática', 'Topografía I', 'Geología', 'Expresión Oral y Escrita'],
+                3 => ['Cálculo Vectorial', 'Dinámica', 'Resistencia de Materiales I', 'Topografía II', 'Materiales de Construcción', 'Probabilidad y Estadística'],
+                4 => ['Ecuaciones Diferenciales', 'Mecánica de Fluidos', 'Resistencia de Materiales II', 'Análisis Estructural I', 'Geotecnia I', 'Métodos Numéricos'],
+                5 => ['Hidrología', 'Hidráulica', 'Análisis Estructural II', 'Concreto Reforzado I', 'Geotecnia II', 'Vías I'],
+                6 => ['Acueductos', 'Alcantarillados', 'Concreto Reforzado II', 'Estructuras Metálicas', 'Pavimentos', 'Vías II'],
+                7 => ['Tratamiento de Aguas', 'Puentes', 'Construcción I', 'Programación y Control de Obras', 'Ingeniería Sísmica', 'Electiva Profesional I'],
+                8 => ['Ingeniería Sanitaria', 'Construcción II', 'Evaluación de Proyectos', 'Gerencia de Construcción', 'Electiva Profesional II', 'Seminario de Investigación'],
+                9 => ['Proyecto de Grado I', 'Práctica Académica', 'Electiva Profesional III'],
+                10 => ['Proyecto de Grado II', 'Ética Profesional']
             ],
 
-            // FUP
+            3 => [ // Ing. Ambiental
+                1 => ['Cálculo Diferencial', 'Química General', 'Biología General', 'Introducción a la Ingeniería Ambiental', 'Expresión Oral y Escrita', 'Dibujo Técnico'],
+                2 => ['Cálculo Integral', 'Química Orgánica', 'Microbiología', 'Física I', 'Estadística', 'Ecología General'],
+                3 => ['Ecuaciones Diferenciales', 'Química Analítica', 'Física II', 'Geología Ambiental', 'Meteorología y Climatología', 'Economía Ambiental'],
+                4 => ['Fisicoquímica', 'Mecánica de Fluidos', 'Hidrología', 'Química Ambiental', 'Evaluación de Impacto Ambiental', 'Métodos Numéricos'],
+                5 => ['Termodinámica', 'Hidráulica', 'Contaminación Atmosférica', 'Contaminación del Agua', 'Gestión Ambiental', 'Sistemas de Información Geográfica'],
+                6 => ['Procesos Unitarios', 'Tratamiento de Aguas Residuales', 'Control de Emisiones', 'Contaminación del Suelo', 'Auditoría Ambiental', 'Biotecnología Ambiental'],
+                7 => ['Tratamiento de Agua Potable', 'Residuos Sólidos', 'Modelación Ambiental', 'Restauración Ecológica', 'Legislación Ambiental', 'Electiva Profesional I'],
+                8 => ['Planeación Ambiental', 'Energías Alternativas', 'Toxicología Ambiental', 'Formulación de Proyectos', 'Electiva Profesional II', 'Seminario de Investigación'],
+                9 => ['Proyecto de Grado I', 'Práctica Académica', 'Electiva Profesional III'],
+                10 => ['Proyecto de Grado II', 'Ética Profesional']
+            ],
+
+            4 => [ // Ing. de Sistemas
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Lógica Matemática', 'Introducción a la Programación', 'Introducción a la Ingeniería de Sistemas', 'Inglés I'],
+                2 => ['Cálculo Integral', 'Matemáticas Discretas', 'Programación I', 'Arquitectura de Computadores', 'Física I', 'Inglés II'],
+                3 => ['Cálculo Vectorial', 'Probabilidad y Estadística', 'Programación II', 'Estructuras de Datos', 'Sistemas Digitales', 'Expresión Oral y Escrita'],
+                4 => ['Ecuaciones Diferenciales', 'Investigación de Operaciones', 'Programación Orientada a Objetos', 'Sistemas Operativos', 'Bases de Datos I', 'Redes de Computadores I'],
+                5 => ['Análisis Numérico', 'Análisis y Diseño de Algoritmos', 'Ingeniería de Software I', 'Bases de Datos II', 'Redes de Computadores II', 'Economía'],
+                6 => ['Inteligencia Artificial', 'Ingeniería de Software II', 'Sistemas Distribuidos', 'Seguridad Informática', 'Desarrollo Web', 'Gestión de Proyectos'],
+                7 => ['Computación Gráfica', 'Arquitectura de Software', 'Sistemas de Información', 'Electiva Profesional I', 'Seminario de Investigación I', 'Formulación de Proyectos'],
+                8 => ['Minería de Datos', 'Auditoría de Sistemas', 'Electiva Profesional II', 'Electiva Profesional III', 'Seminario de Investigación II', 'Ética Profesional'],
+                9 => ['Proyecto de Grado I', 'Práctica Académica', 'Electiva Profesional IV'],
+                10 => ['Proyecto de Grado II']
+            ],
+
+            5 => [ // Ing. en Automática Industrial
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Física I', 'Química General', 'Dibujo Técnico', 'Introducción a la Automática'],
+                2 => ['Cálculo Integral', 'Física II', 'Circuitos Eléctricos I', 'Programación I', 'Materiales de Ingeniería', 'Expresión Oral y Escrita'],
+                3 => ['Ecuaciones Diferenciales', 'Física III', 'Circuitos Eléctricos II', 'Electrónica Analógica', 'Mecánica de Fluidos', 'Probabilidad y Estadística'],
+                4 => ['Métodos Numéricos', 'Electrónica Digital', 'Electrónica de Potencia', 'Termodinámica', 'Señales y Sistemas', 'Instrumentación I'],
+                5 => ['Control Clásico', 'Microprocesadores', 'Máquinas Eléctricas', 'Instrumentación II', 'Sistemas Hidráulicos y Neumáticos', 'Economía'],
+                6 => ['Control Moderno', 'Microcontroladores', 'Accionamientos Eléctricos', 'PLC y Automatización', 'Robótica I', 'Gestión Industrial'],
+                7 => ['Control Digital', 'Sistemas SCADA', 'Robótica II', 'Redes Industriales', 'Mantenimiento Industrial', 'Electiva Profesional I'],
+                8 => ['Control Avanzado', 'Visión Artificial', 'Simulación de Procesos', 'Seguridad Industrial', 'Electiva Profesional II', 'Seminario de Investigación'],
+                9 => ['Proyecto de Grado I', 'Práctica Académica', 'Electiva Profesional III'],
+                10 => ['Proyecto de Grado II', 'Ética Profesional']
+            ],
+
+            // FUNDACIÓN UNIVERSITARIA DE POPAYÁN (FUP)
             6 => [ // Ing. de Sistemas
-                'Programación I',
-                'Estructuras de Datos',
-                'Arquitectura de Computadores',
-                'Bases de Datos',
-                'Ingeniería de Software',
-                'Redes y Comunicaciones',
-                'Sistemas Operativos',
-                'Seguridad Informática',
-                'Gestión de Proyectos'
+                1 => ['Matemáticas I', 'Lógica Matemática', 'Introducción a la Programación', 'Fundamentos de Computación', 'Comunicación Oral y Escrita', 'Inglés I'],
+                2 => ['Matemáticas II', 'Matemáticas Discretas', 'Programación I', 'Arquitectura del Computador', 'Física I', 'Inglés II'],
+                3 => ['Matemáticas III', 'Estadística', 'Programación II', 'Estructuras de Datos', 'Sistemas Digitales', 'Metodología de la Investigación'],
+                4 => ['Investigación de Operaciones', 'Programación Orientada a Objetos', 'Sistemas Operativos', 'Base de Datos I', 'Redes I', 'Física II'],
+                5 => ['Análisis Numérico', 'Ingeniería de Software I', 'Base de Datos II', 'Redes II', 'Programación Web', 'Economía'],
+                6 => ['Inteligencia Artificial', 'Ingeniería de Software II', 'Sistemas Distribuidos', 'Seguridad Informática', 'Programación Móvil', 'Administración'],
+                7 => ['Minería de Datos', 'Arquitectura de Software', 'Sistemas de Información', 'Electiva Profesional I', 'Gerencia de Proyectos', 'Constitución Política'],
+                8 => ['Auditoría de Sistemas', 'Electiva Profesional II', 'Electiva Profesional III', 'Seminario de Investigación', 'Emprendimiento', 'Ética Profesional'],
+                9 => ['Proyecto de Grado I', 'Práctica Empresarial'],
+                10 => ['Proyecto de Grado II']
             ],
+
             7 => [ // Ing. Industrial
-                'Investigación de Operaciones',
-                'Estadística Aplicada',
-                'Gestión de Calidad',
-                'Procesos de Manufactura',
-                'Ingeniería de Métodos',
-                'Logística',
-                'Gestión de la Producción',
-                'Seguridad Industrial',
-                'Ergonomía'
+                1 => ['Matemáticas I', 'Física I', 'Química General', 'Introducción a la Ingeniería Industrial', 'Comunicación Oral y Escrita', 'Inglés I'],
+                2 => ['Matemáticas II', 'Física II', 'Dibujo Técnico', 'Materiales de Ingeniería', 'Contabilidad', 'Inglés II'],
+                3 => ['Matemáticas III', 'Estadística I', 'Resistencia de Materiales', 'Procesos de Manufactura I', 'Microeconomía', 'Metodología de la Investigación'],
+                4 => ['Investigación de Operaciones I', 'Estadística II', 'Termodinámica', 'Procesos de Manufactura II', 'Macroeconomía', 'Psicología Organizacional'],
+                5 => ['Investigación de Operaciones II', 'Control Estadístico de Calidad', 'Ingeniería de Métodos', 'Sistemas de Manufactura', 'Costos Industriales', 'Administración'],
+                6 => ['Simulación', 'Gestión de Calidad Total', 'Estudio del Trabajo', 'Logística', 'Finanzas', 'Mercadeo'],
+                7 => ['Planeación y Control de la Producción', 'Diseño y Distribución de Plantas', 'Cadena de Suministro', 'Evaluación de Proyectos', 'Electiva Profesional I', 'Constitución Política'],
+                8 => ['Mantenimiento Industrial', 'Seguridad Industrial', 'Gestión Ambiental', 'Formulación de Proyectos', 'Electiva Profesional II', 'Ética Profesional'],
+                9 => ['Proyecto de Grado I', 'Práctica Empresarial', 'Seminario de Investigación'],
+                10 => ['Proyecto de Grado II', 'Emprendimiento']
             ],
+
             8 => [ // Arquitectura
-                'Diseño Arquitectónico',
-                'Historia de la Arquitectura',
-                'Construcción I',
-                'Dibujo Arquitectónico',
-                'Urbanismo',
-                'Tecnología de la Construcción',
-                'Paisajismo',
-                'BIM',
-                'Diseño Urbano'
+                1 => ['Dibujo Arquitectónico I', 'Geometría Descriptiva', 'Taller de Diseño I', 'Historia de la Arquitectura I', 'Matemáticas I', 'Comunicación Oral y Escrita'],
+                2 => ['Dibujo Arquitectónico II', 'Taller de Diseño II', 'Historia de la Arquitectura II', 'Matemáticas II', 'Física I', 'Inglés I'],
+                3 => ['Taller de Diseño III', 'Construcción I', 'Historia de la Arquitectura III', 'Topografía', 'Física II', 'Inglés II'],
+                4 => ['Taller de Diseño IV', 'Construcción II', 'Estructuras I', 'Instalaciones I', 'Teoría de la Arquitectura I', 'Metodología de la Investigación'],
+                5 => ['Taller de Diseño V', 'Construcción III', 'Estructuras II', 'Instalaciones II', 'Teoría de la Arquitectura II', 'Presupuestos'],
+                6 => ['Taller de Diseño VI', 'Construcción IV', 'Estructuras III', 'Urbanismo I', 'Paisajismo', 'Administración de Obras'],
+                7 => ['Taller de Diseño VII', 'Urbanismo II', 'Restauración', 'Electiva Profesional I', 'Programación Arquitectónica', 'Legislación'],
+                8 => ['Taller de Diseño VIII', 'Urbanismo III', 'Electiva Profesional II', 'Formulación de Proyectos', 'Ética Profesional', 'Constitución Política'],
+                9 => ['Proyecto de Grado I', 'Práctica Profesional', 'Seminario de Investigación'],
+                10 => ['Proyecto de Grado II', 'Emprendimiento']
             ],
 
-            // Colegio Mayor del Cauca
+            // INSTITUCIÓN UNIVERSITARIA COLEGIO MAYOR DEL CAUCA (UNIMAYOR)
             9 => [ // Ing. Informática
-                'Fundamentos de Programación',
-                'Estructuras de Datos',
-                'Sistemas Operativos',
-                'Bases de Datos',
-                'Redes de Computadores',
-                'Desarrollo Web',
-                'Programación Móvil',
-                'Inteligencia Artificial',
-                'Seguridad Informática'
-            ],
-            10 => [ // Ing. Electrónica
-                'Circuitos Eléctricos',
-                'Electrónica Analógica',
-                'Electrónica Digital',
-                'Microcontroladores',
-                'Señales y Sistemas',
-                'Electrónica de Potencia',
-                'Control Automático',
-                'Redes de Comunicaciones',
-                'Proyecto Electrónico I'
-            ],
-            11 => [ // Tecnología en Desarrollo de Software
-                'Análisis de Requisitos',
-                'Diseño de Software',
-                'Programación Orientada a Objetos',
-                'Bases de Datos',
-                'Desarrollo Web',
-                'Pruebas de Software',
-                'Metodologías Ágiles',
-                'DevOps Básico',
-                'Cloud Computing',
-                'Proyecto Integrador'
+                1 => ['Matemáticas I', 'Lógica Matemática', 'Introducción a la Programación', 'Fundamentos de Informática', 'Comunicación Escrita', 'Inglés I'],
+                2 => ['Matemáticas II', 'Álgebra Lineal', 'Programación I', 'Arquitectura de Computadores', 'Física I', 'Inglés II'],
+                3 => ['Matemáticas III', 'Estadística', 'Programación II', 'Estructuras de Datos', 'Sistemas Digitales', 'Metodología de la Investigación'],
+                4 => ['Investigación de Operaciones', 'Programación Orientada a Objetos', 'Sistemas Operativos', 'Base de Datos I', 'Redes de Computadores I', 'Ética'],
+                5 => ['Análisis de Algoritmos', 'Ingeniería de Software I', 'Base de Datos II', 'Redes de Computadores II', 'Desarrollo Web I', 'Economía'],
+                6 => ['Inteligencia Artificial', 'Ingeniería de Software II', 'Programación Móvil', 'Seguridad Informática', 'Desarrollo Web II', 'Gestión de Proyectos'],
+                7 => ['Arquitectura de Software', 'Sistemas Distribuidos', 'Computación Gráfica', 'Electiva Profesional I', 'Seminario de Investigación I', 'Emprendimiento'],
+                8 => ['Auditoría de Sistemas', 'Minería de Datos', 'Electiva Profesional II', 'Electiva Profesional III', 'Seminario de Investigación II', 'Constitución Política'],
+                9 => ['Proyecto de Grado I', 'Práctica Profesional'],
+                10 => ['Proyecto de Grado II']
             ],
 
-            // SENA Regional Cauca (IDs 16–23)
-            16 => [ // Tecnólogo en Análisis y Desarrollo de Software
-                'Analizar Requerimientos',
-                'Diseñar Soluciones Software',
-                'Desarrollar Aplicaciones',
-                'Realizar Pruebas de Software',
-                'Implementar Front‑end',
-                'Desplegar en Servidor',
-                'Mantener Software',
-                'Documentar Proyectos'
+            10 => [ // Ing. Multimedia
+                1 => ['Matemáticas I', 'Física I', 'Fundamentos de Multimedia', 'Dibujo Técnico', 'Comunicación Visual', 'Inglés I'],
+                2 => ['Matemáticas II', 'Física II', 'Programación I', 'Diseño Gráfico Digital', 'Color y Composición', 'Inglés II'],
+                3 => ['Matemáticas III', 'Estadística', 'Programación II', 'Animación 2D', 'Fotografía Digital', 'Metodología de la Investigación'],
+                4 => ['Álgebra Lineal', 'Arquitectura de Computadores', 'Estructuras de Datos', 'Animación 3D I', 'Edición de Video', 'Comunicación Audiovisual'],
+                5 => ['Análisis de Algoritmos', 'Sistemas Operativos', 'Bases de Datos', 'Animación 3D II', 'Producción de Audio', 'Psicología del Color'],
+                6 => ['Redes de Computadores', 'Programación Web', 'Modelado 3D', 'Efectos Visuales', 'Diseño de Interfaces', 'Gestión de Proyectos'],
+                7 => ['Sistemas Multimedia', 'Realidad Virtual', 'Videojuegos I', 'Postproducción', 'Electiva Profesional I', 'Mercadeo Digital'],
+                8 => ['Computación Gráfica', 'Realidad Aumentada', 'Videojuegos II', 'Electiva Profesional II', 'Seminario de Investigación', 'Ética'],
+9 => ['Proyecto de Grado I', 'Práctica Profesional', 'Emprendimiento'],
+                10 => ['Proyecto de Grado II', 'Constitución Política']
             ],
-            17 => [ // Técnico en Sistemas
-                'Instalar Software',
-                'Configurar Hardware',
-                'Administrar Sistemas Operativos',
-                'Montar Redes Locales',
-                'Mantenimiento Preventivo',
-                'Administrar Cuentas de Usuario',
-                'Instalación de Periféricos',
-                'Monitoreo de Sistemas'
+
+            11 => [ // Tecnología en Desarrollo de Software
+                1 => ['Matemáticas Básicas', 'Lógica de Programación', 'Fundamentos de Computación', 'Comunicación Escrita', 'Inglés Técnico I'],
+                2 => ['Matemáticas Aplicadas', 'Programación I', 'Sistemas Operativos', 'Base de Datos I', 'Inglés Técnico II'],
+                3 => ['Estadística', 'Programación II', 'Estructuras de Datos', 'Base de Datos II', 'Metodología de la Investigación'],
+                4 => ['Programación Orientada a Objetos', 'Análisis y Diseño de Sistemas', 'Programación Web I', 'Redes de Computadores', 'Ética Profesional'],
+                5 => ['Ingeniería de Software', 'Programación Web II', 'Programación Móvil', 'Seguridad Informática', 'Gestión de Proyectos'],
+                6 => ['Proyecto Integrador', 'Práctica Empresarial', 'Emprendimiento', 'Constitución Política']
             ],
-            18 => [ // Tecnólogo en Gestión de Redes de Datos
-                'Diseñar Topologías de Red',
-                'Configurar Routers y Switches',
-                'Implementar VLAN',
-                'Asegurar Redes',
-                'Monitorizar Tráfico',
-                'Administrar VPN',
-                'Optimizar Rendimiento',
-                'Gestionar Proyectos de Redes'
+
+            // CORPORACIÓN UNIVERSITARIA AUTÓNOMA DEL CAUCA (UNIAUTÓNOMA)
+            12 => [ // Ing. de Software y Computación
+                1 => ['Matemáticas I', 'Física I', 'Programación I', 'Comunicación Oral y Escrita', 'Fundamentos de Ingeniería de Software'],
+                2 => ['Matemáticas II', 'Física II', 'Programación II', 'Lógica y Matemática Discreta', 'Arquitectura de Computadores'],
+                3 => ['Estructuras de Datos', 'Bases de Datos I', 'Ingeniería de Requisitos', 'Probabilidad y Estadística', 'Sistemas Operativos'],
+                4 => ['Bases de Datos II', 'Diseño de Software', 'Ingeniería de Software I', 'Análisis y Diseño de Algoritmos', 'Redes de Computadores'],
+                5 => ['Lenguajes de Programación', 'Seguridad Informática', 'Gestión de Proyectos de Software', 'Desarrollo Web', 'Electiva Profesional I'],
+                6 => ['Ingeniería de Software II', 'Desarrollo de Aplicaciones Móviles', 'Computación en la Nube', 'Interacción Humano-Computador', 'Electiva Profesional II'],
+                7 => ['Inteligencia Artificial', 'Arquitectura de Software', 'Auditoría y Normatividad en Software', 'Electiva Profesional III', 'Práctica Empresarial I'],
+                8 => ['Minería de Datos', 'DevOps y Automatización', 'Ética Profesional', 'Electiva Profesional IV', 'Práctica Empresarial II'],
+                9 => ['Trabajo de Grado', 'Emprendimiento y Nuevas Tecnologías']
             ],
-            19 => [ // Tecnólogo en Producción Multimedia
-                'Diseñar Gráficos',
-                'Edición de Video',
-                'Creación de Animaciones',
-                'Producción de Audio',
-                'Maquetación Web',
-                'Modelado 3D',
-                'UX/UI Básico',
-                'Publicación Multimedia'
+
+            13 => [ // Ing. Electrónica
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Física I', 'Química General', 'Introducción a la Ingeniería', 'Inglés I'],
+                2 => ['Cálculo Integral', 'Física II', 'Circuitos Eléctricos I', 'Programación I', 'Dibujo Técnico', 'Inglés II'],
+                3 => ['Ecuaciones Diferenciales', 'Física III', 'Circuitos Eléctricos II', 'Electrónica Analógica I', 'Probabilidad y Estadística', 'Materiales Eléctricos'],
+                4 => ['Métodos Numéricos', 'Electrónica Analógica II', 'Electrónica Digital I', 'Señales y Sistemas I', 'Campos Electromagnéticos', 'Economía'],
+                5 => ['Electrónica Digital II', 'Señales y Sistemas II', 'Sistemas de Comunicaciones', 'Microprocesadores', 'Control Automático', 'Administración'],
+                6 => ['Microcontroladores', 'Procesamiento Digital de Señales', 'Instrumentación Electrónica', 'Electrónica de Potencia', 'Sistemas Embebidos', 'Gestión de Proyectos'],
+                7 => ['Robótica', 'Comunicaciones Digitales', 'Control Digital', 'Electiva Profesional I', 'Seminario de Investigación', 'Formulación de Proyectos'],
+                8 => ['Automatización Industrial', 'Electiva Profesional II', 'Electiva Profesional III', 'Práctica Empresarial', 'Ética Profesional', 'Emprendimiento'],
+                9 => ['Proyecto de Grado I'],
+                10 => ['Proyecto de Grado II']
             ],
-            20 => [ // Técnico en Programación de Software
-                'Codificar Módulos',
-                'Depurar Código',
-                'Gestionar Repositorios',
-                'Documentar Código',
-                'Ejecutar Compilaciones',
-                'Pruebas Unitarias',
-                'Asistir en Análisis',
-                'Soporte a Usuario'
+
+            14 => [ // Ing. Civil
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Física I', 'Química General', 'Dibujo de Ingeniería', 'Introducción a la Ingeniería Civil'],
+                2 => ['Cálculo Integral', 'Física II', 'Estática', 'Topografía I', 'Geología', 'Expresión Oral y Escrita'],
+                3 => ['Cálculo Vectorial', 'Dinámica', 'Resistencia de Materiales I', 'Topografía II', 'Materiales de Construcción', 'Probabilidad y Estadística'],
+                4 => ['Ecuaciones Diferenciales', 'Mecánica de Fluidos', 'Resistencia de Materiales II', 'Análisis Estructural I', 'Geotecnia I', 'Métodos Numéricos'],
+                5 => ['Hidrología', 'Hidráulica', 'Análisis Estructural II', 'Concreto Reforzado I', 'Geotecnia II', 'Vías I'],
+                6 => ['Acueductos', 'Alcantarillados', 'Concreto Reforzado II', 'Estructuras Metálicas', 'Pavimentos', 'Vías II'],
+                7 => ['Tratamiento de Aguas', 'Construcción I', 'Puentes', 'Programación y Control de Obras', 'Electiva Profesional I', 'Gestión de Proyectos'],
+                8 => ['Ingeniería Sísmica', 'Construcción II', 'Evaluación de Proyectos', 'Electiva Profesional II', 'Seminario de Investigación', 'Ética Profesional'],
+                9 => ['Proyecto de Grado I', 'Práctica Empresarial'],
+                10 => ['Proyecto de Grado II', 'Emprendimiento']
             ],
-            21 => [ // Tecnólogo en Implementación de Infraestructura TIC
-                'Instalar Servidores',
-                'Configurar Redes',
-                'Desplegar Servicios',
-                'Virtualización',
-                'Administrar Almacenamiento',
-                'Asegurar Infraestructura',
-                'Automatizar Despliegues',
-                'Monitorizar Servicios'
+
+            15 => [ // Ing. Energética
+                1 => ['Cálculo Diferencial', 'Álgebra Lineal', 'Física I', 'Química General', 'Introducción a la Ingeniería Energética', 'Inglés I'],
+                2 => ['Cálculo Integral', 'Física II', 'Termodinámica I', 'Circuitos Eléctricos', 'Programación', 'Inglés II'],
+                3 => ['Ecuaciones Diferenciales', 'Física III', 'Termodinámica II', 'Mecánica de Fluidos I', 'Transferencia de Calor', 'Probabilidad y Estadística'],
+                4 => ['Métodos Numéricos', 'Electrotecnia', 'Mecánica de Fluidos II', 'Máquinas Térmicas', 'Combustibles y Combustión', 'Economía'],
+                5 => ['Máquinas Eléctricas', 'Energías Renovables I', 'Centrales Térmicas', 'Instalaciones Eléctricas', 'Instrumentación y Control', 'Administración'],
+                6 => ['Sistemas de Potencia', 'Energías Renovables II', 'Centrales Hidroeléctricas', 'Cogeneración', 'Eficiencia Energética', 'Gestión Energética'],
+                7 => ['Distribución de Energía', 'Energía Solar', 'Energía Eólica', 'Almacenamiento de Energía', 'Electiva Profesional I', 'Formulación de Proyectos'],
+                8 => ['Mercados Energéticos', 'Auditoría Energética', 'Electiva Profesional II', 'Seminario de Investigación', 'Práctica Empresarial', 'Ética Profesional'],
+                9 => ['Proyecto de Grado I', 'Emprendimiento'],
+                10 => ['Proyecto de Grado II']
             ],
-            22 => [ // Tecnólogo en Gestión de Seguridad y Salud en el Trabajo
-                'Identificar Riesgos',
-                'Implementar Medidas Preventivas',
-                'Elaborar Planes SST',
-                'Capacitar Personal',
-                'Realizar Auditorías',
-                'Gestionar Incidentes',
-                'Reportar Accidentes',
-                'Actualizar Normatividad'
+
+            16 => [ // Ing. Ambiental y de Saneamiento
+                1 => ['Cálculo Diferencial', 'Química General', 'Biología General', 'Introducción a la Ingeniería Ambiental', 'Expresión Oral y Escrita', 'Inglés I'],
+                2 => ['Cálculo Integral', 'Química Orgánica', 'Microbiología', 'Física I', 'Estadística', 'Inglés II'],
+                3 => ['Ecuaciones Diferenciales', 'Química Analítica', 'Física II', 'Geología Ambiental', 'Meteorología', 'Ecología'],
+                4 => ['Fisicoquímica', 'Mecánica de Fluidos', 'Hidrología', 'Química Ambiental', 'Evaluación de Impacto Ambiental', 'Métodos Numéricos'],
+                5 => ['Termodinámica', 'Hidráulica', 'Contaminación Atmosférica', 'Contaminación del Agua', 'Gestión Ambiental', 'SIG Ambiental'],
+                6 => ['Procesos Unitarios', 'Tratamiento de Aguas Residuales', 'Control de Emisiones', 'Contaminación del Suelo', 'Auditoría Ambiental', 'Biotecnología Ambiental'],
+                7 => ['Tratamiento de Agua Potable', 'Residuos Sólidos', 'Modelación Ambiental', 'Restauración Ecológica', 'Legislación Ambiental', 'Electiva Profesional I'],
+                8 => ['Planeación Ambiental', 'Energías Limpias', 'Toxicología Ambiental', 'Formulación de Proyectos', 'Electiva Profesional II', 'Seminario de Investigación'],
+                9 => ['Proyecto de Grado I', 'Práctica Empresarial', 'Ética Profesional'],
+                10 => ['Proyecto de Grado II', 'Emprendimiento']
             ],
-            23 => [ // Tecnólogo en Gestión de Proyectos de Desarrollo de Software
-                'Definir Alcance',
-                'Elaborar Cronogramas',
-                'Administrar Recursos',
-                'Gestionar Riesgos',
-                'Liderar Equipos',
-                'Controlar Calidad',
-                'Comunicar Stakeholders',
-                'Entregar Entregables'
+
+            // SENA REGIONAL CAUCA
+            17 => [ // Tecnólogo en Análisis y Desarrollo de Software
+                'Analizar los Requerimientos del Cliente',
+                'Aplicar Herramientas Ofimáticas',
+                'Aplicar Estructura del Lenguaje de Programación',
+                'Modelar Bases de Datos',
+                'Desarrollar la Interfaz que Permita la Interacción',
+                'Construir el Sistema que Cumpla con los Requerimientos',
+                'Realizar Mantenimiento de Software',
+                'Documentar el Sistema de Información',
+                'Realizar Pruebas del Sistema de Información',
+                'Implementar la Estructura de la Base de Datos',
+                'Desarrollar Componentes de Acceso a Datos',
+                'Publicar el Sistema de Información'
             ],
+
+            18 => [ // Técnico en Sistemas
+                'Ensamblar y Desensamblar los Componentes Hardware',
+                'Instalar el Sistema Operativo y Software de Aplicación',
+                'Aplicar Herramientas Ofimáticas',
+                'Configurar la Conectividad entre Dispositivos',
+                'Implementar la Estructura de la Red de Acuerdo con un Diseño Preestablecido',
+                'Realizar Mantenimiento Preventivo y Predictivo',
+                'Instalar y Configurar el Cableado Estructurado',
+                'Realizar el Diagnóstico y Mantenimiento de los Equipos de Cómputo',
+                'Participar en el Proceso de Actualización Tecnológica',
+                'Aplicar Controles de Acceso a la Información'
+            ],
+
+            19 => [ // Tecnólogo en Gestión de Redes de Datos
+                'Construir el Sistema que Cumpla con los Requerimientos',
+                'Diseñar la Red de Acuerdo con las Necesidades',
+                'Configurar los Dispositivos de Red de Acuerdo con los Estándares',
+                'Verificar el Estado de la Operación del Sistema',
+                'Implementar las Políticas de Seguridad en la Red',
+                'Monitorear el Tráfico de la Red',
+                'Planear Actividades de Mejora en la Red de Datos',
+                'Diagnosticar Fallas en la Red'
+            ],
+
+            20 => [ // Tecnólogo en Producción Multimedia
+                'Planificar la Producción Multimedia',
+                'Diseñar Recursos Multimedia',
+                'Desarrollar Animaciones Multimedia',
+                'Integrar Elementos Multimedia',
+                'Construir Aplicaciones Multimedia Interactivas',
+                'Publicar Contenidos Multimedia',
+                'Realizar Post-producción de Audio y Video',
+                'Evaluar el Producto Multimedia'
+            ],
+
+            21 => [ // Técnico en Programación de Software
+                'Construir Algoritmos Aplicando Metodologías de Desarrollo',
+                'Identificar las Estructuras de Datos',
+                'Codificar el Módulo de Software',
+                'Realizar Pruebas de los Módulos de Software',
+                'Generar la Documentación del Módulo de Software',
+                'Participar en el Proceso de Implantación del Software',
+                'Realizar Mantenimiento del Módulo de Software',
+                'Aplicar Buenas Prácticas de Calidad'
+            ],
+
+            22 => [ // Tecnólogo en Implementación de Infraestructura TIC
+                'Implementar la Estructura de la Red',
+                'Instalar Componentes Software de Acuerdo con el Análisis de Requerimientos',
+                'Configurar el Hardware de Acuerdo con el Análisis de Requerimientos',
+                'Implementar el Cableado Estructurado',
+                'Realizar Mantenimiento Preventivo y Predictivo que Garantice el Funcionamiento del Hardware',
+                'Implementar Políticas de Seguridad',
+                'Gestionar la Información de Acuerdo con las Necesidades de la Organización',
+                'Participar en el Proceso de Actualización Tecnológica'
+            ],
+
+            23 => [ // Tecnólogo en Gestión de la Seguridad y Salud en el Trabajo
+                'Identificar Peligros y Evaluar Riesgos',
+                'Elaborar Procedimientos e Instructivos de Trabajo Seguro',
+                'Planificar Acciones de Promoción y Prevención',
+                'Implementar Actividades de Promoción y Prevención',
+                'Evaluar Indicadores del Sistema de Gestión',
+                'Gestionar el Mejoramiento Continuo del Sistema',
+                'Participar en la Investigación de Incidentes',
+                'Fomentar Prácticas y Comportamientos Seguros'
+            ],
+
+            24 => [ // Tecnólogo en Gestión de Proyectos de Desarrollo de Software
+                'Planificar el Proyecto de Software',
+                'Definir los Requerimientos del Sistema',
+                'Coordinar las Actividades del Equipo de Desarrollo',
+                'Gestionar los Recursos del Proyecto',
+                'Controlar los Cambios del Sistema de Información',
+                'Evaluar el Sistema de Información',
+                'Implantar el Sistema de Información',
+                'Gestionar la Calidad del Proyecto de Software'
+            ]
         ];
 
         // Lista de IDs de programas del SENA (institución 2)
-        $programasSena = [16, 17, 18, 19, 20, 21, 22, 23];
+        $programasSena = [17, 18, 19, 20, 21, 22, 23, 24];
 
-        foreach ($pensum as $programaId => $asigs) {
+        foreach ($pensum as $programaId => $contenido) {
             $esSena = in_array($programaId, $programasSena);
 
-            foreach ($asigs as $index => $nombre) {
-                // Generar un código único combinando programa_id y un hash corto del nombre
-                $slug = Str::slug($nombre, '_');
-                // Limitar la longitud del slug para asegurar que el código no exceda $maxLength
-                $codigoLength = strlen($programaId . '_') + 10; // 10 es un tamaño seguro para la parte del slug
-                $codigo = $programaId . '_' . strtoupper(substr($slug, 0, min(strlen($slug), $maxLength - $codigoLength)));
+            if ($esSena) {
+                // Para programas del SENA (estructura plana - array simple)
+                foreach ($contenido as $index => $nombre) {
+                    // Verificar que $nombre sea string
+                    if (!is_string($nombre)) {
+                        continue; // Saltar si no es string
+                    }
 
-                // Asegurar que el código no exceda $maxLength
-                if (strlen($codigo) > $maxLength) {
-                    $codigo = substr($codigo, 0, $maxLength);
-                }
+                    $codigo = $this->generarCodigoAsignatura($programaId, $nombre, $maxLength, $index + 1);
 
-                // Configuración para programas del SENA vs no-SENA
-                if ($esSena) {
-                    // Para programas del SENA
                     Asignatura::updateOrCreate(
                         ['codigo_asignatura' => $codigo],
                         [
@@ -268,7 +355,7 @@ class AsignaturaSeeder extends Seeder
                             'tipo' => 'Competencia',
                             'creditos' => null,
                             'horas_sena' => $this->calcularHorasSena($nombre),
-                            'semestre' => floor($index / ceil(count($asigs) / 4)) + 1,
+                            'semestre' => floor($index / ceil(count($contenido) / 4)) + 1,
                             'tiempo_presencial' => null,
                             'tiempo_independiente' => null,
                             'horas_totales_semanales' => null,
@@ -278,87 +365,66 @@ class AsignaturaSeeder extends Seeder
                             'updated_at' => now(),
                         ]
                     );
-                } else {
-                    // Para programas que no son del SENA
-                    $creditos = $this->calcularCreditos($nombre);
-                    $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
-                    $tiempoIndependiente = $creditos * 2;
-                    $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
+                }
+            } else {
+                // Para programas universitarios (estructura por semestres)
+                foreach ($contenido as $semestre => $asignaturas) {
+                    foreach ($asignaturas as $index => $nombre) {
+                        // Verificar que $nombre sea string
+                        if (!is_string($nombre)) {
+                            continue; // Saltar si no es string
+                        }
 
-                    Asignatura::updateOrCreate(
-                        ['codigo_asignatura' => $codigo],
-                        [
-                            'programa_id' => $programaId,
-                            'nombre' => $nombre,
-                            'tipo' => 'Materia',
-                            'creditos' => $creditos,
-                            'horas_sena' => null,
-                            'semestre' => floor($index / 2) + 1,
-                            'tiempo_presencial' => $tiempoPresencial,
-                            'tiempo_independiente' => $tiempoIndependiente,
-                            'horas_totales_semanales' => $horasTotalesSemanales,
-                            'modalidad' => $this->determinarModalidad($nombre),
-                            'metodologia' => 'Presencial',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]
-                    );
+                        $codigo = $this->generarCodigoAsignatura($programaId, $nombre, $maxLength, null, $semestre, $index + 1);
+
+                        $creditos = $this->calcularCreditos($nombre);
+                        $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
+                        $tiempoIndependiente = $creditos * 2;
+                        $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
+
+                        Asignatura::updateOrCreate(
+                            ['codigo_asignatura' => $codigo],
+                            [
+                                'programa_id' => $programaId,
+                                'nombre' => $nombre,
+                                'tipo' => 'Materia',
+                                'creditos' => $creditos,
+                                'horas_sena' => null,
+                                'semestre' => $semestre,
+                                'tiempo_presencial' => $tiempoPresencial,
+                                'tiempo_independiente' => $tiempoIndependiente,
+                                'horas_totales_semanales' => $horasTotalesSemanales,
+                                'modalidad' => $this->determinarModalidad($nombre),
+                                'metodologia' => 'Presencial',
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]
+                        );
+                    }
                 }
             }
         }
+    }
 
-        // AUTÓNOMA DEL CAUCA - Ingeniería de Software
-        $programaId = 12; // ID del programa de Ingeniería de Software en la Autónoma
-        $codigoBase = 'IS'; // Prefijo base para Ingeniería de Software
-
-        $pensum = [
-            1 => ['Matemáticas I', 'Física I', 'Programación I', 'Comunicación Oral y Escrita', 'Fundamentos de Ingeniería de Software'],
-            2 => ['Matemáticas II', 'Física II', 'Programación II', 'Lógica y Matemática Discreta', 'Arquitectura de Computadores'],
-            3 => ['Estructuras de Datos', 'Bases de Datos I', 'Ingeniería de Requisitos', 'Probabilidad y Estadística', 'Sistemas Operativos'],
-            4 => ['Bases de Datos II', 'Diseño de Software', 'Ingeniería de Software I', 'Análisis y Diseño de Algoritmos', 'Redes de Computadores'],
-            5 => ['Lenguajes de Programación', 'Seguridad Informática', 'Gestión de Proyectos de Software', 'Desarrollo Web', 'Electiva Profesional I'],
-            6 => ['Ingeniería de Software II', 'Desarrollo de Aplicaciones Móviles', 'Computación en la Nube', 'Interacción Humano-Computador', 'Electiva Profesional II'],
-            7 => ['Inteligencia Artificial', 'Arquitectura de Software', 'Auditoría y Normatividad en Software', 'Electiva Profesional III', 'Práctica Empresarial I'],
-            8 => ['Minería de Datos', 'DevOps y Automatización', 'Ética Profesional', 'Electiva Profesional IV', 'Práctica Empresarial II'],
-            9 => ['Trabajo de Grado', 'Emprendimiento y Nuevas Tecnologías'],
-        ];
-
-        foreach ($pensum as $semestre => $asignaturas) {
-            foreach ($asignaturas as $index => $nombre) {
-                // Generar código único para evitar duplicados, asegurando que no exceda $maxLength
-                $codigo = $codigoBase . '_S' . $semestre . '_M' . ($index + 1);
-
-                // Asegurar que el código no exceda $maxLength
-                if (strlen($codigo) > $maxLength) {
-                    $codigo = substr($codigo, 0, $maxLength);
-                }
-
-                // Calcular créditos y tiempos más realistas
-                $creditos = $this->calcularCreditos($nombre);
-                $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
-                $tiempoIndependiente = $creditos * 2;
-                $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
-
-                Asignatura::updateOrCreate(
-                    ['codigo_asignatura' => $codigo],
-                    [
-                        'programa_id' => $programaId,
-                        'nombre' => $nombre,
-                        'tipo' => 'Materia',
-                        'creditos' => $creditos,
-                        'semestre' => $semestre,
-                        'horas_sena' => null,
-                        'tiempo_presencial' => $tiempoPresencial,
-                        'tiempo_independiente' => $tiempoIndependiente,
-                        'horas_totales_semanales' => $horasTotalesSemanales,
-                        'modalidad' => $this->determinarModalidad($nombre),
-                        'metodologia' => 'Presencial',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]
-                );
-            }
+    /**
+     * Genera un código único para la asignatura
+     */
+    private function generarCodigoAsignatura($programaId, $nombre, $maxLength, $secuencia = null, $semestre = null, $orden = null)
+    {
+        if ($semestre && $orden) {
+            // Para programas universitarios: PROG_S1_M1
+            $codigo = "P{$programaId}_S{$semestre}_M{$orden}";
+        } else {
+            // Para programas SENA: PROG_COMP_1
+            $codigo = "P{$programaId}_C" . ($secuencia ?: 1);
         }
+
+        // Asegurar que el código no exceda la longitud máxima
+        if (strlen($codigo) > $maxLength) {
+            $codigo = substr($codigo, 0, $maxLength);
+        }
+
+        return $codigo;
     }
 
     /**
@@ -366,43 +432,49 @@ class AsignaturaSeeder extends Seeder
      */
     private function calcularCreditos($nombre)
     {
-        // Materias con mayor intensidad académica
+        // Verificar que $nombre sea string
+        if (!is_string($nombre)) {
+            return 3; // Valor por defecto
+        }
+
+        // Materias con mayor intensidad académica (4-5 créditos)
         $materiasAvanzadas = [
-            'Proyecto',
-            'Trabajo de Grado',
-            'Práctica',
-            'Tesis',
-            'Laboratorio',
-            'Diseño',
-            'Arquitectura',
-            'Inteligencia Artificial',
-            'Bases de Datos',
-            'Desarrollo Web',
-            'Computación en la Nube',
-            'Desarrollo de Aplicaciones'
+            'Proyecto', 'Trabajo de Grado', 'Práctica', 'Tesis', 'Laboratorio', 'Diseño',
+            'Arquitectura', 'Inteligencia Artificial', 'Bases de Datos', 'Desarrollo Web',
+            'Computación en la Nube', 'Desarrollo de Aplicaciones', 'Análisis Estructural',
+            'Concreto Reforzado', 'Estructuras', 'Construcción', 'Urbanismo', 'Taller de Diseño',
+            'Control Automático', 'Procesamiento', 'Sistemas de Comunicaciones', 'Electrónica',
+            'Tratamiento', 'Modelación', 'Simulación', 'Automatización', 'Robótica'
         ];
 
-        // Materias básicas o introductorias
+        // Materias básicas o introductorias (2-3 créditos)
         $materiasBasicas = [
-            'Fundamentos',
-            'Introducción',
-            'Comunicación',
-            'Oral',
-            'Escrita',
-            'Ética',
-            'Emprendimiento'
+            'Fundamentos', 'Introducción', 'Comunicación', 'Oral', 'Escrita', 'Ética',
+            'Emprendimiento', 'Inglés', 'Constitución', 'Metodología', 'Historia'
         ];
 
-        // Verificar si el nombre contiene palabras clave
+        // Materias matemáticas y de ciencias básicas (3-4 créditos)
+        $materiasMatematicas = [
+            'Cálculo', 'Álgebra', 'Matemáticas', 'Física', 'Química', 'Estadística',
+            'Probabilidad', 'Ecuaciones Diferenciales', 'Métodos Numéricos'
+        ];
+
+        // Verificar categoría de la materia
         foreach ($materiasAvanzadas as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
-                return rand(4, 5); // Materias avanzadas: 4-5 créditos
+                return rand(4, 5);
             }
         }
 
         foreach ($materiasBasicas as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
-                return rand(2, 3); // Materias básicas: 2-3 créditos
+                return rand(2, 3);
+            }
+        }
+
+        foreach ($materiasMatematicas as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return rand(3, 4);
             }
         }
 
@@ -414,30 +486,38 @@ class AsignaturaSeeder extends Seeder
      */
     private function calcularTiempoPresencial($creditos, $nombre)
     {
-        // Palabras clave para materias con mayor componente práctico
+        // Verificar que $nombre sea string
+        if (!is_string($nombre)) {
+            return $creditos; // Valor por defecto
+        }
+
+        // Materias con mayor componente práctico necesitan más tiempo presencial
         $componentePractico = [
-            'Laboratorio',
-            'Práctica',
-            'Proyecto',
-            'Taller',
-            'Desarrollo',
-            'Implementación',
-            'Diseño',
-            'Programación',
-            'DevOps',
-            'Front-end'
+            'Laboratorio', 'Práctica', 'Proyecto', 'Taller', 'Desarrollo', 'Implementación',
+            'Diseño', 'Programación', 'DevOps', 'Construcción', 'Dibujo', 'Topografía',
+            'Instalaciones', 'Electrónica', 'Circuitos', 'Instrumentación', 'Control',
+            'Manufactura', 'Procesos', 'Sistemas', 'Redes', 'Base de Datos'
         ];
 
-        // Verificar si la materia tiene componente práctico
+        // Materias principalmente teóricas
+        $componenteTeorico = [
+            'Historia', 'Teoría', 'Fundamentos', 'Introducción', 'Matemáticas', 'Cálculo',
+            'Álgebra', 'Física', 'Química', 'Ética', 'Administración', 'Economía', 'Gestión'
+        ];
+
         foreach ($componentePractico as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
-                // Para materias prácticas: más tiempo presencial
-                return ceil($creditos * 0.75);
+                return min($creditos + 1, 6); // Máximo 6 horas presenciales
             }
         }
 
-        // Para materias más teóricas
-        return ceil($creditos * 0.5);
+        foreach ($componenteTeorico as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return max($creditos - 1, 2); // Mínimo 2 horas presenciales
+            }
+        }
+
+        return $creditos; // Por defecto, créditos = horas presenciales
     }
 
     /**
@@ -445,49 +525,41 @@ class AsignaturaSeeder extends Seeder
      */
     private function determinarModalidad($nombre)
     {
-        // Palabras clave para materias principalmente teóricas
+        // Verificar que $nombre sea string
+        if (!is_string($nombre)) {
+            return 'Teórico-Práctico'; // Valor por defecto
+        }
+
+        // Materias principalmente teóricas
         $materiasTeoricas = [
-            'Matemáticas',
-            'Física',
-            'Historia',
-            'Teoría',
-            'Lógica',
-            'Ética',
-            'Normatividad',
-            'Probabilidad',
-            'Estadística'
+            'Historia', 'Teoría', 'Fundamentos', 'Introducción', 'Matemáticas', 'Cálculo',
+            'Álgebra Lineal', 'Física I', 'Física II', 'Química General', 'Ética',
+            'Administración', 'Economía', 'Gestión', 'Legislación', 'Normatividad',
+            'Probabilidad', 'Estadística', 'Metodología', 'Comunicación', 'Inglés'
         ];
 
-        // Palabras clave para materias principalmente prácticas
+        // Materias principalmente prácticas
         $materiasPracticas = [
-            'Laboratorio',
-            'Taller',
-            'Práctica',
-            'Desarrollo',
-            'Implementación',
-            'Pruebas',
-            'Programación',
-            'Diseño',
-            'DevOps',
-            'Front-end'
+            'Laboratorio', 'Taller', 'Práctica', 'Desarrollo', 'Implementación', 'Programación',
+            'Diseño', 'DevOps', 'Dibujo', 'Topografía', 'Construcción', 'Instalaciones',
+            'Proyecto', 'Trabajo de Grado', 'Seminario', 'Electrónica', 'Circuitos'
         ];
 
-        // Verificar si la materia es principalmente teórica
+        // Verificar si es principalmente teórica
         foreach ($materiasTeoricas as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
                 return 'Teórico';
             }
         }
 
-        // Verificar si la materia es principalmente práctica
+        // Verificar si es principalmente práctica
         foreach ($materiasPracticas as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
                 return 'Práctico';
             }
         }
 
-        // Por defecto, se considera teórico-práctico
-        return 'Teórico-Práctico';
+        return 'Teórico-Práctico'; // Por defecto
     }
 
     /**
@@ -495,43 +567,47 @@ class AsignaturaSeeder extends Seeder
      */
     private function calcularHorasSena($nombre)
     {
-        // Competencias más complejas generalmente tienen más horas
+        // Verificar que $nombre sea string
+        if (!is_string($nombre)) {
+            return 120; // Valor por defecto
+        }
+
+        // Competencias más complejas (200-280 horas)
         $competenciasComplejas = [
-            'Desarrollar',
-            'Implementar',
-            'Gestionar',
-            'Diseñar',
-            'Administrar',
-            'Liderar',
-            'Desplegar',
-            'Virtualización',
-            'Optimizar'
+            'Desarrollar', 'Implementar', 'Gestionar', 'Diseñar', 'Administrar', 'Liderar',
+            'Construir', 'Planificar', 'Coordinar', 'Evaluar', 'Analizar', 'Modelar'
         ];
 
-        // Competencias básicas o más simples
+        // Competencias básicas (80-150 horas)
         $competenciasBasicas = [
-            'Instalar',
-            'Configurar',
-            'Documentar',
-            'Monitorear',
-            'Reportar',
-            'Mantener',
-            'Asistir'
+            'Instalar', 'Configurar', 'Documentar', 'Monitorear', 'Reportar', 'Mantener',
+            'Asistir', 'Aplicar', 'Identificar', 'Participar', 'Realizar', 'Generar'
         ];
 
-        // Verificar complejidad de la competencia
+        // Competencias intermedias (160-220 horas)
+        $competenciasIntermedias = [
+            'Controlar', 'Verificar', 'Diagnosticar', 'Integrar', 'Publicar', 'Fomentar',
+            'Elaborar', 'Codificar', 'Ensamblar', 'Implantar'
+        ];
+
         foreach ($competenciasComplejas as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
-                return rand(160, 240); // Competencias complejas: 160-240 horas
+                return rand(200, 280);
             }
         }
 
         foreach ($competenciasBasicas as $palabra) {
             if (stripos($nombre, $palabra) !== false) {
-                return rand(80, 140); // Competencias básicas: 80-140 horas
+                return rand(80, 150);
             }
         }
 
-        return rand(120, 200); // Competencias estándar: 120-200 horas
+        foreach ($competenciasIntermedias as $palabra) {
+            if (stripos($nombre, $palabra) !== false) {
+                return rand(160, 220);
+            }
+        }
+
+        return rand(120, 200); // Por defecto
     }
 }

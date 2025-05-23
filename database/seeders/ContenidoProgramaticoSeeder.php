@@ -48,54 +48,128 @@ class ContenidoProgramaticoSeeder extends Seeder
     private function crearContenidosUniversidadCauca(): void
     {
         // Ingeniería Electrónica y Telecomunicaciones (programa_id = 1)
-        $this->crearContenidoPorNombre('Circuitos Eléctricos', 1,
+        $this->crearContenidoPorNombre('Circuitos Eléctricos I', 1,
             'Análisis de Circuitos Resistivos',
             'El estudiante será capaz de aplicar las leyes de Kirchhoff para resolver circuitos resistivos y entender los conceptos fundamentales de corriente, voltaje y potencia.',
-            'Este tema cubre el análisis de circuitos eléctricos utilizando las leyes de Kirchhoff, teoremas de circuitos y técnicas de simplificación. Se analizan circuitos con resistencias, capacitores e inductores en régimen transitorio y permanente.'
+            'Este tema cubre el análisis de circuitos eléctricos utilizando las leyes de Kirchhoff, teoremas de circuitos y técnicas de simplificación. Se analizan circuitos con resistencias en serie, paralelo y mixtos.'
         );
 
-        $this->crearContenidoPorNombre('Electrónica Analógica', 1,
-            'Dispositivos Semiconductores',
-            'El estudiante será capaz de analizar circuitos con diodos, transistores y amplificadores operacionales.',
-            'Se estudian los dispositivos semiconductores como diodos, transistores BJT, FET y amplificadores operacionales. Se analizan circuitos básicos y aplicaciones prácticas de estos componentes.'
+        $this->crearContenidoPorNombre('Circuitos Eléctricos II', 1,
+            'Análisis de Circuitos en Corriente Alterna',
+            'El estudiante será capaz de analizar circuitos eléctricos en régimen permanente sinusoidal usando fasores.',
+            'Se estudian los circuitos AC, fasores, impedancia, admitancia, potencia en AC, circuitos resonantes y análisis en el dominio de la frecuencia.'
         );
 
-        $this->crearContenidoPorNombre('Electrónica Digital', 1,
-            'Sistemas Combinacionales y Secuenciales',
-            'El estudiante podrá diseñar e implementar circuitos lógicos combinacionales y secuenciales.',
-            'Este tema aborda los sistemas numéricos, álgebra de Boole, compuertas lógicas, minimización de funciones, circuitos combinacionales y secuenciales como flip-flops, contadores y registros.'
+        $this->crearContenidoPorNombre('Electrónica Analógica I', 1,
+            'Dispositivos Semiconductores Básicos',
+            'El estudiante será capaz de analizar circuitos con diodos y transistores bipolares.',
+            'Se estudian los diodos de unión PN, circuitos rectificadores, transistores BJT, polarización y amplificadores básicos con transistores.'
+        );
+
+        $this->crearContenidoPorNombre('Electrónica Analógica II', 1,
+            'Amplificadores y Transistores FET',
+            'El estudiante será capaz de diseñar amplificadores utilizando transistores FET y amplificadores operacionales.',
+            'Este tema aborda los transistores de efecto de campo, amplificadores operacionales, filtros activos y aplicaciones lineales de los op-amps.'
+        );
+
+        $this->crearContenidoPorNombre('Electrónica Digital I', 1,
+            'Sistemas Combinacionales',
+            'El estudiante podrá diseñar e implementar circuitos lógicos combinacionales.',
+            'Se estudian los sistemas numéricos, álgebra de Boole, compuertas lógicas, minimización de funciones y diseño de circuitos combinacionales.'
+        );
+
+        $this->crearContenidoPorNombre('Electrónica Digital II', 1,
+            'Sistemas Secuenciales',
+            'El estudiante podrá diseñar circuitos secuenciales síncronos y asíncronos.',
+            'Este tema cubre flip-flops, latches, contadores, registros, máquinas de estado finito y diseño de sistemas secuenciales.'
+        );
+
+        $this->crearContenidoPorNombre('Microprocesadores', 1,
+            'Arquitectura y Programación de Microprocesadores',
+            'El estudiante podrá programar microprocesadores y entender su arquitectura interna.',
+            'Se estudia la arquitectura de microprocesadores, conjunto de instrucciones, programación en ensamblador, interfaces de entrada/salida y sistemas mínimos.'
         );
 
         $this->crearContenidoPorNombre('Microcontroladores', 1,
-            'Arquitectura y Programación de Microcontroladores',
-            'El estudiante podrá programar microcontroladores y diseñar sistemas embebidos básicos.',
-            'Se estudia la arquitectura interna de los microcontroladores, programación en lenguaje C y ensamblador, periféricos, interrupciones y protocolos de comunicación como UART, SPI e I2C.'
+            'Sistemas Embebidos con Microcontroladores',
+            'El estudiante podrá diseñar sistemas embebidos utilizando microcontroladores.',
+            'Este tema aborda la programación de microcontroladores, periféricos internos, temporizadores, interrupciones, comunicaciones seriales y aplicaciones prácticas.'
         );
 
         // Ingeniería Civil (programa_id = 2)
-        $this->crearContenidoPorNombre('Topografía', 2,
-            'Métodos de Levantamiento Topográfico',
-            'El estudiante podrá realizar levantamientos topográficos utilizando diferentes instrumentos y técnicas.',
-            'Este tema cubre los métodos de medición de distancias, ángulos y elevaciones, así como el uso de equipos como estación total, nivel y GPS. Se estudian también los métodos de representación del terreno.'
+        $this->crearContenidoPorNombre('Topografía I', 2,
+            'Fundamentos de Topografía',
+            'El estudiante podrá realizar mediciones básicas de distancias y ángulos en el terreno.',
+            'Se estudian los fundamentos de topografía, instrumentos básicos, medición de distancias, ángulos horizontales y verticales, y cálculos topográficos elementales.'
         );
 
-        $this->crearContenidoPorNombre('Mecánica de Materiales', 2,
-            'Esfuerzo y Deformación',
-            'El estudiante podrá calcular esfuerzos y deformaciones en elementos estructurales sometidos a diferentes cargas.',
-            'Se estudian los conceptos de esfuerzo, deformación, propiedades mecánicas de los materiales, carga axial, torsión, flexión y deflexión de vigas, así como esfuerzos combinados.'
+        $this->crearContenidoPorNombre('Topografía II', 2,
+            'Levantamientos Topográficos',
+            'El estudiante podrá realizar levantamientos topográficos completos y elaborar planos.',
+            'Este tema cubre métodos de levantamiento, poligonación, triangulación, nivelación, curvas de nivel, perfiles longitudinales y transversales.'
         );
 
-        // Ingeniería de Sistemas (programa_id = 3)
-        $this->crearContenidoPorNombre('Fundamentos de Programación', 3,
-            'Algoritmos y Estructuras de Control',
-            'El estudiante podrá diseñar algoritmos y codificarlos utilizando estructuras de control en un lenguaje de programación.',
-            'Este tema aborda los conceptos fundamentales de la programación, incluyendo variables, tipos de datos, operadores, estructuras de control condicionales y repetitivas, así como la modularización mediante funciones.'
+        $this->crearContenidoPorNombre('Resistencia de Materiales I', 2,
+            'Esfuerzo y Deformación Axial',
+            'El estudiante podrá calcular esfuerzos y deformaciones en elementos sometidos a carga axial.',
+            'Se estudian los conceptos de esfuerzo, deformación, propiedades mecánicas, carga axial, concentración de esfuerzos y elementos estaticamente indeterminados.'
         );
 
-        $this->crearContenidoPorNombre('Estructuras de Datos', 3,
-            'Estructuras de Datos Lineales y No Lineales',
-            'El estudiante podrá implementar y utilizar estructuras de datos eficientes para diferentes problemas computacionales.',
-            'Se estudian las estructuras de datos como arreglos, listas enlazadas, pilas, colas, árboles, grafos y tablas hash, así como sus algoritmos de manipulación y aplicaciones prácticas.'
+        $this->crearContenidoPorNombre('Resistencia de Materiales II', 2,
+            'Flexión y Torsión',
+            'El estudiante podrá analizar elementos estructurales sometidos a flexión y torsión.',
+            'Este tema aborda la flexión pura, esfuerzos de flexión, deflexión de vigas, torsión en ejes circulares y combinación de cargas.'
+        );
+
+        // Ingeniería Ambiental (programa_id = 3)
+        $this->crearContenidoPorNombre('Química Ambiental', 3,
+            'Procesos Químicos en el Medio Ambiente',
+            'El estudiante podrá comprender los procesos químicos que ocurren en los diferentes compartimentos ambientales.',
+            'Se estudian las reacciones químicas en la atmósfera, hidrosfera y geosfera, ciclos biogeoquímicos, contaminantes químicos y su transformación.'
+        );
+
+        $this->crearContenidoPorNombre('Evaluación de Impacto Ambiental', 3,
+            'Metodologías de Evaluación Ambiental',
+            'El estudiante podrá evaluar impactos ambientales de proyectos y proponer medidas de mitigación.',
+            'Este tema cubre las metodologías de evaluación, identificación de impactos, matrices de evaluación, estudios de línea base y planes de manejo ambiental.'
+        );
+
+        // Ingeniería de Sistemas (programa_id = 4)
+        $this->crearContenidoPorNombre('Introducción a la Programación', 4,
+            'Fundamentos de Algoritmos',
+            'El estudiante podrá diseñar algoritmos básicos y representarlos mediante pseudocódigo y diagramas de flujo.',
+            'Este tema introduce los conceptos de algoritmo, variables, tipos de datos, operadores y estructuras de control básicas.'
+        );
+
+        $this->crearContenidoPorNombre('Programación I', 4,
+            'Programación Estructurada',
+            'El estudiante podrá desarrollar programas utilizando un lenguaje de programación de alto nivel.',
+            'Se estudian las estructuras de control, arreglos, funciones, recursividad y manejo de archivos en un lenguaje de programación estructurado.'
+        );
+
+        $this->crearContenidoPorNombre('Programación II', 4,
+            'Estructuras de Datos y Algoritmos',
+            'El estudiante podrá implementar estructuras de datos y algoritmos eficientes.',
+            'Este tema aborda listas enlazadas, pilas, colas, árboles, algoritmos de ordenamiento y búsqueda, y análisis de complejidad.'
+        );
+
+        $this->crearContenidoPorNombre('Estructuras de Datos', 4,
+            'Estructuras de Datos Avanzadas',
+            'El estudiante podrá implementar y utilizar estructuras de datos complejas.',
+            'Se estudian árboles balanceados, grafos, tablas hash, algoritmos sobre grafos y aplicaciones prácticas de las estructuras de datos.'
+        );
+
+        // Ingeniería en Automática Industrial (programa_id = 5)
+        $this->crearContenidoPorNombre('Control Clásico', 5,
+            'Teoría de Control Clásico',
+            'El estudiante podrá diseñar controladores utilizando técnicas de control clásico.',
+            'Se estudian las funciones de transferencia, análisis de estabilidad, lugar geométrico de las raíces, respuesta en frecuencia y diseño de controladores PID.'
+        );
+
+        $this->crearContenidoPorNombre('PLC y Automatización', 5,
+            'Programación de Controladores Lógicos Programables',
+            'El estudiante podrá programar PLCs y diseñar sistemas de automatización industrial.',
+            'Este tema cubre la arquitectura de PLCs, lenguajes de programación, sensores, actuadores, redes industriales y aplicaciones de automatización.'
         );
     }
 
@@ -105,36 +179,54 @@ class ContenidoProgramaticoSeeder extends Seeder
     private function crearContenidosFUP(): void
     {
         // Ing. de Sistemas (programa_id = 6)
-        $this->crearContenidoPorNombre('Programación I', 6,
-            'Introducción a la Programación',
+        $this->crearContenidoPorNombre('Introducción a la Programación', 6,
+            'Fundamentos de Programación',
             'El estudiante podrá desarrollar algoritmos básicos y traducirlos a un lenguaje de programación.',
-            'Este tema introduce los conceptos fundamentales de la programación, como variables, tipos de datos, estructuras de control, arreglos y funciones utilizando un lenguaje de alto nivel.'
+            'Este tema introduce los conceptos fundamentales de la programación, como variables, tipos de datos, estructuras de control y funciones.'
         );
 
-        $this->crearContenidoPorNombre('Bases de Datos', 6,
-            'Diseño y Modelado de Bases de Datos Relacionales',
-            'El estudiante podrá diseñar bases de datos relacionales aplicando normalización y utilizar SQL para consultas.',
-            'Se estudian los conceptos de modelado de datos, modelo entidad-relación, normalización, lenguaje SQL para definición, manipulación y consulta de datos, y transacciones.'
+        $this->crearContenidoPorNombre('Programación I', 6,
+            'Programación Estructurada',
+            'El estudiante podrá desarrollar programas utilizando el paradigma de programación estructurada.',
+            'Se estudian las estructuras de control, arreglos, funciones, modularización y buenas prácticas de programación.'
+        );
+
+        $this->crearContenidoPorNombre('Base de Datos I', 6,
+            'Fundamentos de Bases de Datos',
+            'El estudiante podrá diseñar bases de datos relacionales básicas.',
+            'Este tema cubre el modelo entidad-relación, modelo relacional, normalización básica y lenguaje SQL para consultas simples.'
+        );
+
+        $this->crearContenidoPorNombre('Base de Datos II', 6,
+            'Bases de Datos Avanzadas',
+            'El estudiante podrá diseñar y administrar bases de datos complejas.',
+            'Se estudian técnicas avanzadas de SQL, procedimientos almacenados, triggers, optimización de consultas y administración de bases de datos.'
         );
 
         // Ing. Industrial (programa_id = 7)
-        $this->crearContenidoPorNombre('Investigación de Operaciones', 7,
+        $this->crearContenidoPorNombre('Investigación de Operaciones I', 7,
             'Programación Lineal',
             'El estudiante podrá formular y resolver problemas de optimización mediante programación lineal.',
-            'Este tema cubre la formulación de modelos de programación lineal, método simplex, dualidad, análisis de sensibilidad y aplicaciones en problemas de transporte, asignación y redes.'
+            'Este tema cubre la formulación de modelos, método simplex, dualidad y análisis de sensibilidad en programación lineal.'
+        );
+
+        $this->crearContenidoPorNombre('Investigación de Operaciones II', 7,
+            'Programación Entera y Teoría de Colas',
+            'El estudiante podrá resolver problemas de optimización discreta y analizar sistemas de colas.',
+            'Se estudian técnicas de programación entera, teoría de colas, simulación y modelos de inventarios.'
         );
 
         // Arquitectura (programa_id = 8)
-        $this->crearContenidoPorNombre('Diseño Arquitectónico', 8,
-            'Principios del Diseño Arquitectónico',
-            'El estudiante podrá aplicar principios fundamentales de diseño en proyectos arquitectónicos.',
-            'Se estudian los conceptos de forma, espacio, escala, proporción, ritmo, jerarquía y organización espacial, así como metodologías de diseño y representación arquitectónica.'
+        $this->crearContenidoPorNombre('Taller de Diseño I', 8,
+            'Fundamentos del Diseño Arquitectónico',
+            'El estudiante podrá aplicar principios básicos de diseño en ejercicios arquitectónicos simples.',
+            'Este tema introduce los conceptos de espacio, forma, función, escala y proporción en el diseño arquitectónico.'
         );
 
-        $this->crearContenidoPorNombre('Historia de la Arquitectura', 8,
-            'Arquitectura Clásica y Renacentista',
-            'El estudiante podrá identificar y analizar las características de la arquitectura clásica y renacentista.',
-            'Este tema aborda la evolución de la arquitectura desde la antigüedad hasta el Renacimiento, estudiando sus características estilísticas, técnicas constructivas, contexto histórico y cultural.'
+        $this->crearContenidoPorNombre('Historia de la Arquitectura I', 8,
+            'Arquitectura Antigua y Clásica',
+            'El estudiante podrá identificar las características de la arquitectura antigua y clásica.',
+            'Se estudia la evolución arquitectónica desde las civilizaciones antiguas hasta el período clásico grecorromano.'
         );
     }
 
@@ -144,30 +236,42 @@ class ContenidoProgramaticoSeeder extends Seeder
     private function crearContenidosColegioMayor(): void
     {
         // Ing. Informática (programa_id = 9)
-        $this->crearContenidoPorNombre('Fundamentos de Programación', 9,
-            'Paradigmas de Programación',
-            'El estudiante podrá identificar y aplicar diferentes paradigmas de programación en la solución de problemas.',
-            'Este tema cubre los paradigmas de programación estructurada, orientada a objetos, funcional y lógica, sus características, ventajas y aplicaciones prácticas.'
+        $this->crearContenidoPorNombre('Introducción a la Programación', 9,
+            'Algoritmos y Lógica de Programación',
+            'El estudiante podrá desarrollar algoritmos y aplicar lógica de programación.',
+            'Este tema aborda los fundamentos algorítmicos, pseudocódigo, diagramas de flujo y estructuras de control básicas.'
         );
 
-        $this->crearContenidoPorNombre('Bases de Datos', 9,
-            'Sistemas de Gestión de Bases de Datos',
-            'El estudiante podrá diseñar, implementar y administrar bases de datos utilizando un SGBD.',
-            'Se estudian los sistemas de gestión de bases de datos, arquitectura, diseño lógico y físico, normalización, SQL avanzado, optimización de consultas y administración de bases de datos.'
+        $this->crearContenidoPorNombre('Base de Datos I', 9,
+            'Diseño de Bases de Datos Relacionales',
+            'El estudiante podrá diseñar bases de datos utilizando el modelo relacional.',
+            'Se estudian el modelado entidad-relación, normalización, diseño lógico y físico de bases de datos.'
         );
 
-        // Ing. Electrónica (programa_id = 10)
-        $this->crearContenidoPorNombre('Circuitos Eléctricos', 10,
-            'Análisis de Circuitos en Corriente Alterna',
-            'El estudiante podrá analizar circuitos eléctricos en régimen permanente sinusoidal.',
-            'Este tema aborda el análisis de circuitos en el dominio de la frecuencia, fasores, impedancia, admitancia, potencia en AC, circuitos resonantes y filtros pasivos.'
+        // Ing. Multimedia (programa_id = 10)
+        $this->crearContenidoPorNombre('Fundamentos de Multimedia', 10,
+            'Conceptos Básicos de Multimedia',
+            'El estudiante podrá comprender los fundamentos teóricos de los sistemas multimedia.',
+            'Este tema cubre los tipos de medios, digitalización, compresión, formatos y estándares multimedia.'
+        );
+
+        $this->crearContenidoPorNombre('Diseño Gráfico Digital', 10,
+            'Principios de Diseño Gráfico',
+            'El estudiante podrá aplicar principios de diseño gráfico en medios digitales.',
+            'Se estudian los elementos del diseño, teoría del color, tipografía, composición y herramientas de diseño digital.'
         );
 
         // Tecnología en Desarrollo de Software (programa_id = 11)
-        $this->crearContenidoPorNombre('Análisis de Requisitos', 11,
-            'Ingeniería de Requisitos',
-            'El estudiante podrá identificar, analizar, especificar y validar requisitos de software siguiendo metodologías estándar.',
-            'Se estudian las técnicas de elicitación, análisis, especificación, validación y gestión de requisitos, así como la documentación mediante historias de usuario y casos de uso.'
+        $this->crearContenidoPorNombre('Lógica de Programación', 11,
+            'Fundamentos de Lógica Computacional',
+            'El aprendiz será capaz de aplicar lógica computacional para resolver problemas.',
+            'Este tema introduce los conceptos de algoritmo, estructuras de datos básicas y técnicas de resolución de problemas.'
+        );
+
+        $this->crearContenidoPorNombre('Programación I', 11,
+            'Programación Básica',
+            'El aprendiz podrá desarrollar programas básicos utilizando un lenguaje de programación.',
+            'Se estudian variables, operadores, estructuras de control, arreglos y funciones en un lenguaje de alto nivel.'
         );
     }
 
@@ -176,90 +280,81 @@ class ContenidoProgramaticoSeeder extends Seeder
      */
     private function crearContenidosAutonoma(): void
     {
-        // Ing. de Software (programa_id = 12)
+        // Ing. de Software y Computación (programa_id = 12)
         $this->crearContenidoPorNombre('Matemáticas I', 12,
             'Cálculo Diferencial',
-            'El estudiante podrá comprender y aplicar los conceptos y técnicas del cálculo diferencial en una variable.',
-            'Este tema cubre los conceptos de límites, continuidad, derivadas y sus aplicaciones en problemas de optimización, trazado de curvas y aproximaciones lineales.'
+            'El estudiante podrá comprender y aplicar los conceptos del cálculo diferencial.',
+            'Este tema cubre límites, continuidad, derivadas, aplicaciones de derivadas y optimización.'
         );
 
         $this->crearContenidoPorNombre('Física I', 12,
-            'Mecánica Newtoniana',
-            'El estudiante podrá aplicar las leyes de Newton para resolver problemas de movimiento de partículas y cuerpos rígidos.',
-            'Se estudian los conceptos de cinemática, dinámica de partículas, trabajo y energía, conservación del momento lineal y angular, y movimiento circular.'
+            'Mecánica Clásica',
+            'El estudiante podrá aplicar las leyes de la mecánica clásica.',
+            'Se estudian cinemática, dinámica, trabajo, energía, momentum y movimiento circular.'
         );
 
         $this->crearContenidoPorNombre('Programación I', 12,
-            'Fundamentos de Algoritmos y Programación',
-            'El estudiante podrá desarrollar algoritmos y programas básicos utilizando un lenguaje de programación.',
-            'Este tema introduce los conceptos de algoritmos, variables, tipos de datos, operadores, estructuras de control, arreglos y funciones en un lenguaje orientado a objetos.'
-        );
-
-        $this->crearContenidoPorNombre('Comunicación Oral y Escrita', 12,
-            'Técnicas de Comunicación Efectiva',
-            'El estudiante podrá comunicarse efectivamente de forma oral y escrita en contextos académicos y profesionales.',
-            'Se estudian las técnicas de redacción, argumentación, exposición oral, comprensión lectora y producción de textos académicos y técnicos.'
+            'Introducción a la Programación',
+            'El estudiante podrá desarrollar programas básicos en un lenguaje orientado a objetos.',
+            'Este tema introduce variables, tipos de datos, estructuras de control, arreglos y métodos.'
         );
 
         $this->crearContenidoPorNombre('Fundamentos de Ingeniería de Software', 12,
             'Introducción a la Ingeniería de Software',
-            'El estudiante podrá comprender los conceptos fundamentales y procesos de la ingeniería de software.',
-            'Este tema aborda la definición, características y áreas de la ingeniería de software, ciclos de vida, procesos de desarrollo, roles y metodologías tradicionales y ágiles.'
+            'El estudiante podrá comprender los conceptos fundamentales de la ingeniería de software.',
+            'Se estudian procesos de desarrollo, ciclos de vida, metodologías y principios de la ingeniería de software.'
         );
 
-        $this->crearContenidoPorNombre('Matemáticas II', 12,
-            'Cálculo Integral',
-            'El estudiante podrá comprender y aplicar los conceptos y técnicas del cálculo integral en una variable.',
-            'Se estudian los conceptos de antiderivadas, integración definida e indefinida, métodos de integración, aplicaciones geométricas y físicas de la integral, y series numéricas.'
+        // Ing. Electrónica (programa_id = 13)
+        $this->crearContenidoPorNombre('Circuitos Eléctricos I', 13,
+            'Análisis de Circuitos DC',
+            'El estudiante podrá analizar circuitos eléctricos de corriente continua.',
+            'Este tema cubre las leyes de Kirchhoff, teoremas de circuitos, análisis nodal y de mallas.'
         );
 
-        $this->crearContenidoPorNombre('Física II', 12,
-            'Electricidad y Magnetismo',
-            'El estudiante podrá comprender y aplicar los conceptos de electrostática, electrodinámica y magnetismo.',
-            'Este tema cubre los campos eléctricos, ley de Coulomb, potencial eléctrico, capacitancia, corriente, resistencia, circuitos DC, campos magnéticos y ley de Faraday.'
+        $this->crearContenidoPorNombre('Electrónica Analógica I', 13,
+            'Dispositivos Semiconductores',
+            'El estudiante podrá analizar circuitos con dispositivos semiconductores básicos.',
+            'Se estudian diodos, transistores BJT, amplificadores y aplicaciones básicas.'
         );
 
-        $this->crearContenidoPorNombre('Programación II', 12,
-            'Programación Orientada a Objetos',
-            'El estudiante podrá aplicar el paradigma de programación orientada a objetos en el desarrollo de software.',
-            'Se estudian los conceptos de clases, objetos, herencia, polimorfismo, encapsulamiento, abstracción, interfaces y manejo de excepciones en un lenguaje orientado a objetos.'
+        // Ing. Civil (programa_id = 14)
+        $this->crearContenidoPorNombre('Estática', 14,
+            'Equilibrio de Partículas y Cuerpos Rígidos',
+            'El estudiante podrá analizar sistemas en equilibrio estático.',
+            'Este tema cubre fuerzas, momentos, equilibrio, diagramas de cuerpo libre y análisis de estructuras simples.'
         );
 
-        // Continuar con más asignaturas de Ing. de Software...
-        $this->crearContenidoPorNombre('Estructuras de Datos', 12,
-            'Implementación y Análisis de Estructuras de Datos',
-            'El estudiante podrá implementar y analizar diferentes estructuras de datos y sus algoritmos asociados.',
-            'Este tema aborda la implementación, análisis de complejidad y aplicaciones de estructuras de datos como listas, pilas, colas, árboles, tablas hash y grafos.'
+        $this->crearContenidoPorNombre('Topografía I', 14,
+            'Fundamentos de Topografía',
+            'El estudiante podrá realizar mediciones topográficas básicas.',
+            'Se estudian instrumentos topográficos, medición de distancias, ángulos y elaboración de planos básicos.'
         );
 
-        $this->crearContenidoPorNombre('Bases de Datos I', 12,
-            'Modelado y Diseño de Bases de Datos',
-            'El estudiante podrá diseñar e implementar modelos de datos utilizando el enfoque relacional.',
-            'Se estudian los conceptos de modelado entidad-relación, modelo relacional, normalización, álgebra relacional y lenguaje SQL para definición y manipulación de datos.'
+        // Ing. Energética (programa_id = 15)
+        $this->crearContenidoPorNombre('Termodinámica I', 15,
+            'Primera Ley de la Termodinámica',
+            'El estudiante podrá aplicar la primera ley de la termodinámica.',
+            'Este tema cubre conceptos básicos, sistemas, propiedades, procesos y la primera ley para sistemas cerrados y abiertos.'
         );
 
-        $this->crearContenidoPorNombre('Ingeniería de Requisitos', 12,
-            'Técnicas de Elicitación y Análisis de Requisitos',
-            'El estudiante podrá aplicar técnicas para identificar, especificar y validar requisitos de software.',
-            'Este tema cubre las técnicas de elicitación de requisitos, análisis, especificación, validación, priorización y gestión de cambios de requisitos.'
+        $this->crearContenidoPorNombre('Energías Renovables I', 15,
+            'Fundamentos de Energías Renovables',
+            'El estudiante podrá comprender los principios de las energías renovables.',
+            'Se estudian tipos de energías renovables, potencial energético, tecnologías y aspectos económicos.'
         );
 
-        $this->crearContenidoPorNombre('Desarrollo Web', 12,
-            'Desarrollo de Aplicaciones Web',
-            'El estudiante podrá diseñar e implementar aplicaciones web utilizando tecnologías front-end y back-end.',
-            'Se estudian tecnologías como HTML, CSS, JavaScript, frameworks front-end, lenguajes back-end, servicios web, APIs RESTful y despliegue de aplicaciones.'
+        // Ing. Ambiental y de Saneamiento (programa_id = 16)
+        $this->crearContenidoPorNombre('Química Ambiental', 16,
+            'Procesos Químicos Ambientales',
+            'El estudiante podrá comprender los procesos químicos en el medio ambiente.',
+            'Este tema aborda reacciones químicas ambientales, contaminantes, transformaciones y ciclos biogeoquímicos.'
         );
 
-        $this->crearContenidoPorNombre('Inteligencia Artificial', 12,
-            'Fundamentos de Inteligencia Artificial y Aprendizaje Automático',
-            'El estudiante podrá aplicar técnicas de inteligencia artificial y aprendizaje automático en la solución de problemas.',
-            'Este tema aborda búsqueda heurística, representación del conocimiento, razonamiento, aprendizaje supervisado y no supervisado, redes neuronales y procesamiento de lenguaje natural.'
-        );
-
-        $this->crearContenidoPorNombre('Arquitectura de Software', 12,
-            'Diseño y Evaluación de Arquitecturas de Software',
-            'El estudiante podrá diseñar, documentar y evaluar arquitecturas de software para diferentes tipos de sistemas.',
-            'Se estudian los patrones arquitectónicos, estilos, vistas, documentación, evaluación mediante atributos de calidad y métodos como ATAM, y arquitecturas emergentes.'
+        $this->crearContenidoPorNombre('Contaminación del Agua', 16,
+            'Fuentes y Control de Contaminación Hídrica',
+            'El estudiante podrá identificar fuentes de contaminación del agua y proponer medidas de control.',
+            'Se estudian tipos de contaminantes hídricos, fuentes puntuales y difusas, efectos ambientales y tecnologías de tratamiento.'
         );
     }
 
@@ -268,31 +363,108 @@ class ContenidoProgramaticoSeeder extends Seeder
      */
     private function crearContenidosSENA(): void
     {
-        // Tecnólogo en Análisis y Desarrollo de Software (programa_id = 16)
-        $this->crearContenidoPorNombre('Analizar Requerimientos', 16,
+        // Tecnólogo en Análisis y Desarrollo de Software (programa_id = 17)
+        $this->crearContenidoPorNombre('Analizar los Requerimientos del Cliente', 17,
             'Análisis de Requerimientos de Software',
-            'El aprendiz será capaz de identificar, documentar y gestionar requisitos de software según metodologías vigentes.',
-            'Este tema aborda la definición, clasificación y priorización de requisitos, técnicas de elicitación, documentación con historias de usuario y casos de uso, y herramientas de gestión.'
+            'El aprendiz será capaz de identificar, documentar y gestionar requisitos de software.',
+            'Esta competencia aborda técnicas de elicitación, análisis, especificación y validación de requerimientos funcionales y no funcionales.'
         );
 
-        $this->crearContenidoPorNombre('Diseñar Soluciones Software', 16,
-            'Diseño de Soluciones de Software',
-            'El aprendiz será capaz de diseñar soluciones de software aplicando patrones y principios de diseño.',
-            'Se estudian los diagramas UML, patrones de diseño, arquitectura de software, diseño de interfaces, bases de datos y componentes según especificaciones técnicas.'
+        $this->crearContenidoPorNombre('Construir el Sistema que Cumpla con los Requerimientos', 17,
+            'Desarrollo de Sistemas de Información',
+            'El aprendiz será capaz de desarrollar sistemas de información que satisfagan los requerimientos.',
+            'Se estudian metodologías de desarrollo, patrones de diseño, implementación y pruebas de software.'
         );
 
-        // Técnico en Sistemas (programa_id = 17)
-        $this->crearContenidoPorNombre('Instalar Software', 17,
+        // Técnico en Sistemas (programa_id = 18)
+        $this->crearContenidoPorNombre('Ensamblar y Desensamblar los Componentes Hardware', 18,
+            'Mantenimiento de Hardware',
+            'El aprendiz será capaz de ensamblar, desensamblar y mantener componentes de hardware.',
+            'Esta competencia cubre arquitectura de computadores, componentes internos, compatibilidad y técnicas de ensamble.'
+        );
+
+        $this->crearContenidoPorNombre('Instalar el Sistema Operativo y Software de Aplicación', 18,
             'Instalación y Configuración de Software',
-            'El aprendiz será capaz de instalar y configurar software según requerimientos y normas técnicas.',
-            'Este tema cubre la instalación de sistemas operativos, aplicaciones de oficina, utilitarios, licenciamiento, configuración básica y resolución de problemas post-instalación.'
+            'El aprendiz podrá instalar y configurar sistemas operativos y aplicaciones.',
+            'Se estudian tipos de sistemas operativos, procesos de instalación, configuración básica y resolución de problemas.'
         );
 
-        // Tecnólogo en Gestión de Redes de Datos (programa_id = 18)
-        $this->crearContenidoPorNombre('Diseñar Topologías de Red', 18,
-            'Diseño de Topologías de Red',
-            'El aprendiz será capaz de diseñar topologías de red según requerimientos y mejores prácticas.',
-            'Se estudian topologías físicas y lógicas, direccionamiento IP, subredes, enrutamiento, cableado estructurado, equipos de conectividad y simulación de redes.'
+        // Tecnólogo en Gestión de Redes de Datos (programa_id = 19)
+        $this->crearContenidoPorNombre('Diseñar la Red de Acuerdo con las Necesidades', 19,
+            'Diseño de Redes de Datos',
+            'El aprendiz será capaz de diseñar topologías de red según requerimientos organizacionales.',
+            'Esta competencia aborda topologías, protocolos, direccionamiento IP, cableado estructurado y equipos de conectividad.'
+        );
+
+        $this->crearContenidoPorNombre('Configurar los Dispositivos de Red de Acuerdo con los Estándares', 19,
+            'Configuración de Equipos de Red',
+            'El aprendiz podrá configurar dispositivos de red siguiendo estándares internacionales.',
+            'Se estudian switches, routers, puntos de acceso, VLANs, enrutamiento y protocolos de red.'
+        );
+
+        // Tecnólogo en Producción Multimedia (programa_id = 20)
+        $this->crearContenidoPorNombre('Planificar la Producción Multimedia', 20,
+            'Gestión de Proyectos Multimedia',
+            'El aprendiz será capaz de planificar proyectos de producción multimedia.',
+            'Esta competencia cubre metodologías de gestión, cronogramas, recursos, presupuestos y equipos multimedia.'
+        );
+
+        $this->crearContenidoPorNombre('Diseñar Recursos Multimedia', 20,
+            'Diseño de Contenidos Multimedia',
+            'El aprendiz podrá diseñar recursos multimedia aplicando principios de diseño.',
+            'Se estudian elementos de diseño, color, tipografía, composición y herramientas de diseño multimedia.'
+        );
+
+        // Técnico en Programación de Software (programa_id = 21)
+        $this->crearContenidoPorNombre('Construir Algoritmos Aplicando Metodologías de Desarrollo', 21,
+            'Desarrollo de Algoritmos',
+            'El aprendiz será capaz de construir algoritmos eficientes para resolver problemas.',
+            'Esta competencia aborda lógica de programación, estructuras de datos, algoritmos y metodologías de desarrollo.'
+        );
+
+        $this->crearContenidoPorNombre('Codificar el Módulo de Software', 21,
+            'Programación de Módulos de Software',
+            'El aprendiz podrá codificar módulos de software siguiendo estándares de calidad.',
+            'Se estudian lenguajes de programación, buenas prácticas, documentación de código y control de versiones.'
+        );
+
+        // Tecnólogo en Implementación de Infraestructura TIC (programa_id = 22)
+        $this->crearContenidoPorNombre('Implementar la Estructura de la Red', 22,
+            'Implementación de Infraestructura de Red',
+            'El aprendiz será capaz de implementar infraestructuras de red según especificaciones.',
+            'Esta competencia cubre instalación de cableado, configuración de equipos, protocolos y servicios de red.'
+        );
+
+        $this->crearContenidoPorNombre('Configurar el Hardware de Acuerdo con el Análisis de Requerimientos', 22,
+            'Configuración de Hardware',
+            'El aprendiz podrá configurar hardware según análisis de requerimientos.',
+            'Se estudian servidores, estaciones de trabajo, dispositivos móviles, compatibilidad y optimización.'
+        );
+
+        // Tecnólogo en Gestión de la Seguridad y Salud en el Trabajo (programa_id = 23)
+        $this->crearContenidoPorNombre('Identificar Peligros y Evaluar Riesgos', 23,
+            'Identificación y Evaluación de Riesgos Laborales',
+            'El aprendiz será capaz de identificar peligros y evaluar riesgos en el ambiente laboral.',
+            'Esta competencia aborda metodologías de identificación, matrices de riesgo, valoración y priorización de riesgos.'
+        );
+
+        $this->crearContenidoPorNombre('Planificar Acciones de Promoción y Prevención', 23,
+            'Planificación de Programas de SST',
+            'El aprendiz podrá planificar programas de promoción y prevención en seguridad y salud.',
+            'Se estudian planes de acción, cronogramas, recursos, indicadores y seguimiento de programas de SST.'
+        );
+
+        // Tecnólogo en Gestión de Proyectos de Desarrollo de Software (programa_id = 24)
+        $this->crearContenidoPorNombre('Planificar el Proyecto de Software', 24,
+            'Planificación de Proyectos de Software',
+            'El aprendiz será capaz de planificar proyectos de desarrollo de software.',
+            'Esta competencia cubre metodologías de gestión, cronogramas, recursos, riesgos y comunicaciones del proyecto.'
+        );
+
+        $this->crearContenidoPorNombre('Coordinar las Actividades del Equipo de Desarrollo', 24,
+            'Coordinación de Equipos de Desarrollo',
+            'El aprendiz podrá coordinar equipos de desarrollo aplicando técnicas de liderazgo.',
+            'Se estudian técnicas de liderazgo, comunicación, resolución de conflictos y metodologías ágiles.'
         );
     }
 
@@ -326,7 +498,7 @@ class ContenidoProgramaticoSeeder extends Seeder
     private function crearContenidoPorNombre($nombreAsignatura, $programaId, $tema, $resultadosAprendizaje, $descripcion): void
     {
         // Buscar la asignatura por nombre y programa_id
-        $asignatura = Asignatura::where('nombre', $nombreAsignatura)
+        $asignatura = Asignatura::where('nombre', 'LIKE', '%' . $nombreAsignatura . '%')
                               ->where('programa_id', $programaId)
                               ->first();
 

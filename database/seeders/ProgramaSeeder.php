@@ -34,6 +34,15 @@ class ProgramaSeeder extends Seeder
 
         Programa::create([
             'institucion_id' => 5,
+            'facultad_id' => 1, // Facultad de Ingeniería Civil
+            'nombre' => 'Ingeniería Ambiental',
+            'codigo_snies' => '8704',
+            'tipo_formacion' => 'Profesional',
+            'metodologia' => 'Presencial',
+        ]);
+
+        Programa::create([
+            'institucion_id' => 5,
             'facultad_id' => 2,
             'nombre' => 'Ingeniería de Sistemas',
             'codigo_snies' => '1050',
@@ -49,16 +58,6 @@ class ProgramaSeeder extends Seeder
             'tipo_formacion' => 'Profesional',
             'metodologia' => 'Presencial',
         ]);
-
-        Programa::create([
-            'institucion_id' => 5,
-            'facultad_id' => 2,
-            'nombre' => 'Ingeniería Física',
-            'codigo_snies' => '1107',
-            'tipo_formacion' => 'Profesional',
-            'metodologia' => 'Presencial',
-        ]);
-
 
 
         // Fundación Universitaria de Popayán (FUP)
@@ -104,8 +103,8 @@ class ProgramaSeeder extends Seeder
         Programa::create([
             'institucion_id' => 3,
             'facultad_id' => 4,
-            'nombre' => 'Ingeniería Electrónica',
-            'codigo_snies' => '54559',
+            'nombre' => 'Ingeniería Multimedia',
+            'codigo_snies' => '116679',
             'tipo_formacion' => 'Profesional',
             'metodologia' => 'Presencial',
         ]);
@@ -158,8 +157,18 @@ class ProgramaSeeder extends Seeder
             'metodologia' => 'Presencial',
         ]);
 
+         Programa::create([
+            'institucion_id' => 1,
+            'facultad_id' => 5,
+            'nombre' => 'Ingeniería Ambiental y de Saneamiento',
+            'codigo_snies' => '110683',
+            'tipo_formacion' => 'Profesional',
+            'metodologia' => 'Presencial',
+        ]);
 
-        
+
+
+
         // SENA Regional Cauca
         Programa::create([
             'institucion_id' => 2,
