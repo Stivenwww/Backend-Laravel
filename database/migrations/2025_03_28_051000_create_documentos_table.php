@@ -33,7 +33,8 @@ return new class extends Migration {
 
             //Foráneas
             $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes');
-            $table->foreign('usuario_id')->references('id_usuario')->on('users');
+            $table->foreign('usuario_id')->references('id_usuario')->on('users')->onDelete('cascade');
+
 
         });
     }

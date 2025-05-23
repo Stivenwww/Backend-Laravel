@@ -17,7 +17,7 @@ return new class extends Migration
             $table->json('asignaturas'); // Guardará un array de asignaturas con estructura {asignatura_id, nota_origen, horas_sena}
             $table->timestamps();
 
-            $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes');
+            $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes')->onDelete('cascade');
         });
     }
 

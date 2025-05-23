@@ -1593,7 +1593,7 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerSolicitudes;
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (users)
-            )
+            
             DROP PROCEDURE IF EXISTS ObtenerUsuarios;
             DROP PROCEDURE IF EXISTS ObtenerUsuarioPorId;
             DROP PROCEDURE IF EXISTS InsertarUsuario;

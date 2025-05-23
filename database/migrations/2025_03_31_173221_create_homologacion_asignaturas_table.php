@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('ruta_pdf_resolucion', 255)->nullable();
             $table->timestamps();
 
-            $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes');
+            $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes')->onDelete('cascade');
         });
     }
 

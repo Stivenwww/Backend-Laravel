@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->timestamp('fecha_solicitud')->useCurrent();
 
             // llaves foráneas
-            $table->foreign('usuario_id')->references('id_usuario')->on('users');
+            $table->foreign('usuario_id')->references('id_usuario')->on('users')->onDelete('cascade');
             $table->foreign('programa_destino_id')->references('id_programa')->on('programas');
 
             $table->timestamps();
