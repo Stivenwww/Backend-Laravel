@@ -102,7 +102,7 @@ Route::get('solicitudes', [SolicitudControllerApi::class, 'traerSolicitudes']);
 Route::get('solicitudes/{id}', [SolicitudControllerApi::class, 'llevarSolicitud']);
 Route::post('solicitudes', [SolicitudControllerApi::class, 'insertarSolicitud']);
 Route::put('solicitudes/{id}', [SolicitudControllerApi::class, 'actualizarSolicitud']);
-Route::patch('solicitudes/{id}/estado', [SolicitudControllerApi::class, 'actualizarEstadoSolicitud']);
+Route::put('solicitudes/{id}/estado', [SolicitudControllerApi::class, 'actualizarEstadoSolicitud']);
 Route::delete('solicitudes/{id}', [SolicitudControllerApi::class, 'eliminarSolicitud']);
 
 // Solicitud - Asignaturas
