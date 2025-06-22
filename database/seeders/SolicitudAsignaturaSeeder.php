@@ -7,6 +7,7 @@ use App\Models\Solicitud;
 use App\Models\Asignatura;
 use App\Models\SolicitudAsignatura;
 use App\Models\User;
+use App\Models\Pensum;
 use Illuminate\Support\Facades\DB;
 
 class SolicitudAsignaturaSeeder extends Seeder
@@ -36,8 +37,9 @@ class SolicitudAsignaturaSeeder extends Seeder
 
             // Obtener asignaturas de origen según institución
             if ($institucionOrigenId == 2) { // SENA (usuario 6)
-                // Para SENA, usar competencias (programa_id entre 16-23)
-                $asignaturasOrigen = Asignatura::whereBetween('programa_id', [16, 23])
+                // Para SENA, usar competencias (programa_id entre 17-24)
+                $pensumIds = Pensum::whereBetween('programa_id', [17, 24])->pluck('id_pensum');
+                $asignaturasOrigen = Asignatura::whereIn('pensum_id', $pensumIds)
                     ->inRandomOrder()
                     ->limit(6)
                     ->get();
@@ -52,28 +54,33 @@ class SolicitudAsignaturaSeeder extends Seeder
                 }
             } else {
                 // Para universidades, usar materias del programa correspondiente
-                $asignaturasOrigen = Asignatura::where('programa_id', $programaOrigenId)
-                    ->inRandomOrder()
-                    ->limit(6)
-                    ->get();
+                $pensum = Pensum::where('programa_id', $programaOrigenId)->first();
+                if ($pensum) {
+                    $asignaturasOrigen = Asignatura::where('pensum_id', $pensum->id_pensum)
+                        ->inRandomOrder()
+                        ->limit(6)
+                        ->get();
 
-                // Preparar datos de asignaturas de origen universitarias (con notas)
-                foreach ($asignaturasOrigen as $asignatura) {
-                    $asignaturasData[] = [
-                        'asignatura_id'  => $asignatura->id_asignatura,
-                        'nota_origen'    => $this->generarNotaAprobatoria(), // Nota superior a 3.5
-                        'horas_sena'     => null
-                    ];
+                    // Preparar datos de asignaturas de origen universitarias (con notas)
+                    foreach ($asignaturasOrigen as $asignatura) {
+                        $asignaturasData[] = [
+                            'asignatura_id'  => $asignatura->id_asignatura,
+                            'nota_origen'    => $this->generarNotaAprobatoria(), // Nota superior a 3.5
+                            'horas_sena'     => null
+                        ];
+                    }
                 }
             }
 
             // Crear un único registro para esta solicitud con todas sus asignaturas
-            SolicitudAsignatura::create([
-                'solicitud_id' => $solicitud->id_solicitud,
-                'asignaturas'  => $asignaturasData,
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ]);
+            if (!empty($asignaturasData)) {
+                SolicitudAsignatura::create([
+                    'solicitud_id' => $solicitud->id_solicitud,
+                    'asignaturas'  => $asignaturasData,
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ]);
+            }
         }
     }
 
@@ -100,9 +107,9 @@ class SolicitudAsignaturaSeeder extends Seeder
             5 => [
                 2 => 1, // Ing. Electrónica y Telecomunicaciones (2) -> Mismo programa (1)
             ],
-            // SENA (2) - Vamos a usar programa 16 como default
+            // SENA (2) - Vamos a usar programa 17 como default
             2 => [
-                null => 16, // Sin facultad -> Tecnólogo en Análisis y Desarrollo de Software (16)
+                null => 17, // Sin facultad -> Tecnólogo en Análisis y Desarrollo de Software (17)
             ],
         ];
 
@@ -111,13 +118,13 @@ class SolicitudAsignaturaSeeder extends Seeder
             // Valores por defecto para cada institución
             $defaults = [
                 1 => 12, // Autónoma -> Ing. Software
-                2 => 16, // SENA -> Tecnólogo en Análisis y Desarrollo
+                2 => 17, // SENA -> Tecnólogo en Análisis y Desarrollo
                 3 => 9,  // Colegio Mayor -> Ing. Informática
                 4 => 6,  // FUP -> Ing. de Sistemas
-                5 => 3,  // UniCauca -> Ing. de Sistemas
+                5 => 1,  // UniCauca -> Ing. Electrónica
             ];
 
-            return $defaults[$institucionId] ?? 3; // Por defecto Ing. de Sistemas en UniCauca
+            return $defaults[$institucionId] ?? 1; // Por defecto Ing. Electrónica en UniCauca
         }
 
         return $programas[$institucionId][$facultadId];

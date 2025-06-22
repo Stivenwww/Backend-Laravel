@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('asignaturas', function (Blueprint $table) {
             $table->smallIncrements('id_asignatura');
-            $table->unsignedSmallInteger('programa_id');
-            $table->string('nombre',255);
-            $table->enum('tipo',['Materia','Competencia']);
+
+            // Relación con pensums (no con programas directamente)
+            $table->unsignedSmallInteger('pensum_id');
+
+            $table->string('nombre', 255);
+            $table->enum('tipo', ['Materia', 'Competencia']);
             $table->string('codigo_asignatura', 30)->unique();
             $table->unsignedInteger('creditos')->nullable();
             $table->unsignedInteger('semestre')->nullable();
@@ -27,10 +30,8 @@ return new class extends Migration
             $table->enum('metodologia', ['Presencial', 'Virtual', 'Híbrido']);
             $table->timestamps();
 
-
-            //Foráneas
-            $table->foreign('programa_id')->references('id_programa')->on('programas');
-
+            // Clave foránea con pensums
+            $table->foreign('pensum_id')->references('id_pensum')->on('pensums')->onDelete('cascade');
         });
     }
 

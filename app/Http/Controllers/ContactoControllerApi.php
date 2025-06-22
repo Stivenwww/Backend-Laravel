@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactoMail;
 
-class ContactoApiController extends Controller
+class ContactoControllerApi extends Controller
 {
     public function enviar(Request $request)
     {

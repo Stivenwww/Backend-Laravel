@@ -630,6 +630,73 @@ return new class extends Migration {
 
 
 
+            -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (PENSUMS)
+            DROP PROCEDURE IF EXISTS ObtenerPensums;
+            DROP PROCEDURE IF EXISTS ObtenerPensumPorId;
+            DROP PROCEDURE IF EXISTS InsertarPensum;
+            DROP PROCEDURE IF EXISTS ActualizarPensum;
+            DROP PROCEDURE IF EXISTS EliminarPensum;
+
+            -- OBTENER TODOS LOS PENSUMS
+            CREATE PROCEDURE ObtenerPensums()
+            BEGIN
+                SELECT
+                    pe.id_pensum,
+                    pe.anio,
+                    pr.id_programa,
+                    pr.nombre AS nombre_programa
+                FROM pensums pe
+                INNER JOIN programas pr ON pr.id_programa = pe.programa_id
+                ORDER BY pe.anio DESC;
+            END;
+
+            -- OBTENER UN PENSUM POR ID
+            CREATE PROCEDURE ObtenerPensumPorId(IN idPensum SMALLINT)
+            BEGIN
+                SELECT
+                    pe.id_pensum,
+                    pe.anio,
+                    pr.id_programa,
+                    pr.nombre AS nombre_programa
+                FROM pensums pe
+                INNER JOIN programas pr ON pr.id_programa = pe.programa_id
+                WHERE pe.id_pensum = idPensum;
+            END;
+
+            -- INSERTAR UN PENSUM
+            CREATE PROCEDURE InsertarPensum(
+                IN programaId SMALLINT,
+                IN anioPensum YEAR
+            )
+            BEGIN
+                INSERT INTO pensums (programa_id, anio, created_at, updated_at)
+                VALUES (programaId, anioPensum, NOW(), NOW());
+            END;
+
+            -- ACTUALIZAR UN PENSUM
+            CREATE PROCEDURE ActualizarPensum(
+                IN idPensum SMALLINT,
+                IN programaId SMALLINT,
+                IN anioPensum YEAR
+            )
+            BEGIN
+                UPDATE pensums
+                SET
+                    programa_id = programaId,
+                    anio = anioPensum,
+                    updated_at = NOW()
+                WHERE id_pensum = idPensum;
+            END;
+
+            -- ELIMINAR UN PENSUM
+            CREATE PROCEDURE EliminarPensum(IN idPensum SMALLINT)
+            BEGIN
+                DELETE FROM pensums WHERE id_pensum = idPensum;
+            END;
+
+
+
+
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (ASIGNATURAS)
             DROP PROCEDURE IF EXISTS ActualizarAsignatura;
@@ -641,7 +708,7 @@ return new class extends Migration {
             -- ACTUALIZAR ASIGNATURA
             CREATE PROCEDURE ActualizarAsignatura(
                 IN p_id_asignatura SMALLINT,
-                IN p_programa_id SMALLINT,
+                IN p_pensum_id SMALLINT,
                 IN p_nombre VARCHAR(255),
                 IN p_tipo ENUM('Materia', 'Competencia'),
                 IN p_codigo_asignatura VARCHAR(30),
@@ -656,7 +723,7 @@ return new class extends Migration {
             )
             BEGIN
                 UPDATE asignaturas
-                SET programa_id = p_programa_id,
+                SET pensum_id = p_pensum_id,
                     nombre = p_nombre,
                     tipo = p_tipo,
                     codigo_asignatura = p_codigo_asignatura,
@@ -680,7 +747,7 @@ return new class extends Migration {
 
             -- INSERTAR ASIGNATURA
             CREATE PROCEDURE InsertarAsignatura(
-                IN p_programa_id SMALLINT,
+                IN p_pensum_id SMALLINT,
                 IN p_nombre VARCHAR(255),
                 IN p_tipo ENUM('Materia', 'Competencia'),
                 IN p_codigo_asignatura VARCHAR(30),
@@ -695,7 +762,7 @@ return new class extends Migration {
             )
             BEGIN
                 INSERT INTO asignaturas (
-                    programa_id,
+                    pensum_id,
                     nombre,
                     tipo,
                     codigo_asignatura,
@@ -710,7 +777,7 @@ return new class extends Migration {
                     created_at,
                     updated_at
                 ) VALUES (
-                    p_programa_id,
+                    p_pensum_id,
                     p_nombre,
                     p_tipo,
                     p_codigo_asignatura,
@@ -727,55 +794,58 @@ return new class extends Migration {
                 );
             END;
 
-            -- OBTENER TODAS LAS ASIGNATURAS
             CREATE PROCEDURE ObtenerAsignaturas()
-            BEGIN
-                SELECT a.id_asignatura,
-                    a.nombre,
-                    a.tipo,
-                    a.codigo_asignatura,
-                    a.creditos,
-                    a.semestre,
-                    a.horas_sena,
-                    a.tiempo_presencial,
-                    a.tiempo_independiente,
-                    a.horas_totales_semanales,
-                    a.modalidad,
-                    a.metodologia,
-                    a.created_at,
-                    a.updated_at,
-                    p.nombre AS programa,
-                    i.nombre AS institucion
-                FROM asignaturas a
-                JOIN programas p ON a.programa_id = p.id_programa
-                JOIN instituciones i ON p.institucion_id = i.id_institucion
-                ORDER BY a.nombre ASC;
-            END;
+BEGIN
+    SELECT a.id_asignatura,
+        a.nombre,
+        a.tipo,
+        a.codigo_asignatura,
+        a.creditos,
+        a.semestre,
+        a.horas_sena,
+        a.tiempo_presencial,
+        a.tiempo_independiente,
+        a.horas_totales_semanales,
+        a.modalidad,
+        a.metodologia,
+        a.created_at,
+        a.updated_at,
+        ps.anio AS año_pensum,
+        p.nombre AS programa,
+        i.nombre AS institucion
+    FROM asignaturas a
+    JOIN pensums ps ON a.pensum_id = ps.id_pensum  -- Cambiado de 'pensums' a 'pensum'
+    JOIN programas p ON ps.programa_id = p.id_programa
+    JOIN instituciones i ON p.institucion_id = i.id_institucion
+    ORDER BY a.nombre ASC;
+END;
 
-            -- OBTENER ASIGNATURA POR ID
-            CREATE PROCEDURE ObtenerAsignaturaPorId(IN asignaturaId SMALLINT)
-            BEGIN
-                SELECT a.id_asignatura,
-                    a.nombre,
-                    a.tipo,
-                    a.codigo_asignatura,
-                    a.creditos,
-                    a.semestre,
-                    a.horas_sena,
-                    a.tiempo_presencial,
-                    a.tiempo_independiente,
-                    a.horas_totales_semanales,
-                    a.modalidad,
-                    a.metodologia,
-                    a.created_at,
-                    a.updated_at,
-                    p.nombre AS programa,
-                    i.nombre AS institucion
-                FROM asignaturas a
-                JOIN programas p ON a.programa_id = p.id_programa
-                JOIN instituciones i ON p.institucion_id = i.id_institucion
-                WHERE a.id_asignatura = asignaturaId;
-            END;
+          CREATE PROCEDURE ObtenerAsignaturaPorId(IN asignaturaId SMALLINT)
+BEGIN
+    SELECT a.id_asignatura,
+        a.nombre,
+        a.tipo,
+        a.codigo_asignatura,
+        a.creditos,
+        a.semestre,
+        a.horas_sena,
+        a.tiempo_presencial,
+        a.tiempo_independiente,
+        a.horas_totales_semanales,
+        a.modalidad,
+        a.metodologia,
+        a.created_at,
+        a.updated_at,
+        ps.anio AS año_pensum,
+        p.nombre AS programa,
+        i.nombre AS institucion
+    FROM asignaturas a
+    JOIN pensums ps ON a.pensum_id = ps.id_pensum  -- Cambiado de 'pensums' a 'pensum'
+    JOIN programas p ON ps.programa_id = p.id_programa
+    JOIN instituciones i ON p.institucion_id = i.id_institucion
+    WHERE a.id_asignatura = asignaturaId;
+END;
+
 
 
 
@@ -1578,6 +1648,13 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerProgramaPorId;
             DROP PROCEDURE IF EXISTS ObtenerProgramas;
 
+            -- ELIMINAR PROCEDIMIENTOS PENSUM
+            DROP PROCEDURE IF EXISTS ObtenerPensums;
+            DROP PROCEDURE IF EXISTS ObtenerPensumPorId;
+            DROP PROCEDURE IF EXISTS InsertarPensum;
+            DROP PROCEDURE IF EXISTS ActualizarPensum;
+            DROP PROCEDURE IF EXISTS EliminarPensum;
+
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (ASIGNATURAS)
             DROP PROCEDURE IF EXISTS ActualizarAsignatura;
             DROP PROCEDURE IF EXISTS EliminarAsignatura;
@@ -1593,7 +1670,7 @@ return new class extends Migration {
             DROP PROCEDURE IF EXISTS ObtenerSolicitudes;
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (users)
-            
+
             DROP PROCEDURE IF EXISTS ObtenerUsuarios;
             DROP PROCEDURE IF EXISTS ObtenerUsuarioPorId;
             DROP PROCEDURE IF EXISTS InsertarUsuario;

@@ -497,10 +497,12 @@ class ContenidoProgramaticoSeeder extends Seeder
      */
     private function crearContenidoPorNombre($nombreAsignatura, $programaId, $tema, $resultadosAprendizaje, $descripcion): void
     {
-        // Buscar la asignatura por nombre y programa_id
-        $asignatura = Asignatura::where('nombre', 'LIKE', '%' . $nombreAsignatura . '%')
-                              ->where('programa_id', $programaId)
-                              ->first();
+         // Buscar la asignatura por nombre y programa_id a través de la relación con pensum
+         $asignatura = Asignatura::join('pensums', 'asignaturas.pensum_id', '=', 'pensums.id_pensum')
+                          ->where('asignaturas.nombre', 'LIKE', '%' . $nombreAsignatura . '%')
+                          ->where('pensums.programa_id', $programaId)
+                          ->select('asignaturas.*')
+                          ->first();
 
         if ($asignatura) {
             // Crear contenido programático

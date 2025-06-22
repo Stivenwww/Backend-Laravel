@@ -18,7 +18,8 @@ use App\Http\Controllers\DocumentoControllerApi;
 use App\Http\Controllers\FacultadControllerApi;
 use App\Http\Controllers\RolControllerApi;
 use App\Http\Controllers\ContenidoProgramaticoControllerApi;
-use App\Http\Controllers\ContactoApiController;
+use App\Http\Controllers\ContactoControllerApi;
+use App\Http\Controllers\PensumControllerApi;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +89,14 @@ Route::get('programas/{id}', [ProgramaControllerApi::class, 'llevarPrograma']);
 Route::post('programas', [ProgramaControllerApi::class, 'insertarPrograma']);
 Route::put('programas/{id}', [ProgramaControllerApi::class, 'actualizarPrograma']);
 Route::delete('programas/{id}', [ProgramaControllerApi::class, 'eliminarPrograma']);
+
+// Pensum
+// Programas
+Route::get('pensum', [PensumControllerApi::class, 'traerPensums']);
+Route::get('pensum/{id}', [PensumControllerApi::class, 'llevarPensums']);
+Route::post('pensum', [PensumControllerApi::class, 'insertarPensum']);
+Route::put('pensum/{id}', [PensumControllerApi::class, 'actualizarPensum']);
+Route::delete('pensum/{id}', [PensumControllerApi::class, 'eliminarPensum']);
 
 // Asignaturas
 Route::get('asignaturas', [AsignaturaControllerApi::class, 'traerAsignaturas']);
@@ -176,4 +185,4 @@ Route::post('/solicitud-completa', [SolicitudCompletaControllerApi::class, 'stor
 
 // Informacion de Contacto
 
-Route::post('/contacto', [ContactoApiController::class, 'enviar'])->middleware('throttle:3,1');
+Route::post('/contacto', [ContactoControllerApi::class, 'enviar'])->middleware('throttle:3,1');

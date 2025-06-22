@@ -13,9 +13,8 @@ class Asignatura extends Model
 
     protected $primaryKey = 'id_asignatura';
 
-
     protected $fillable = [
-        'programa_id',
+        'pensum_id',
         'nombre',
         'tipo',
         'codigo_asignatura',
@@ -29,15 +28,13 @@ class Asignatura extends Model
         'metodologia',
     ];
 
-    // Definir las relaciones
-    public function programa()
+    // Relación con pensum
+    public function pensum()
     {
-        return $this->belongsTo(Programa::class, 'programa_id', 'id_programa');
+        return $this->belongsTo(Pensum::class, 'pensum_id', 'id_pensum');
     }
 
-    /**
-     * Relación con la tabla de contenidos programáticos
-     */
+    // Relación con contenidos programáticos
     public function contenidosProgramaticos()
     {
         return $this->hasMany(ContenidoProgramatico::class, 'asignatura_id', 'id_asignatura');

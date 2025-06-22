@@ -76,7 +76,7 @@ class AsignaturaControllerApi extends Controller
         try {
             // Llamada al procedimiento almacenado con múltiples parámetros
             DB::statement('CALL InsertarAsignatura(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-                $request->programa_id,
+                $request->pensum_id,
                 $request->nombre,
                 $request->tipo,
                 $request->codigo_asignatura,
@@ -117,7 +117,7 @@ class AsignaturaControllerApi extends Controller
             // Llamada al procedimiento almacenado con ID y demás parámetros
             DB::statement('CALL ActualizarAsignatura(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
                 $id,
-                $request->programa_id,
+                $request->pensum_id,
                 $request->nombre,
                 $request->tipo,
                 $request->codigo_asignatura,
@@ -174,7 +174,7 @@ class AsignaturaControllerApi extends Controller
     {
         try {
             // Consulta Eloquent con relaciones "programa" y "contenidosProgramaticos"
-            $asignaturas = Asignatura::where('programa_id', $id_programa)
+            $asignaturas = Asignatura::where('pensum_id', $id_programa)
                 ->with(['programa.facultad', 'contenidosProgramaticos']) // relación anidada
                 ->get();
 
@@ -185,7 +185,7 @@ class AsignaturaControllerApi extends Controller
                 $datosAsignatura = [
                     'nombre_programa' => $asignatura->programa->nombre,
                     'id_asignatura' => $asignatura->id_asignatura,
-                    'programa_id' => $asignatura->programa_id,
+                    'pensum_id' => $asignatura->pensum_id,
                     'facultad' => $asignatura->programa->facultad->nombre ?? null,
                     'nombre' => $asignatura->nombre,
                     'tipo' => $asignatura->tipo,
@@ -239,7 +239,7 @@ class AsignaturaControllerApi extends Controller
     {
         try {
             // Consulta Eloquent
-            $asignatura = Asignatura::where('programa_id', $id_programa)
+            $asignatura = Asignatura::where('pensum_id', $id_programa)
                 ->where('id_asignatura', $id_asignatura)
                 ->with(['programa.facultad', 'contenidosProgramaticos'])
                 ->first();
@@ -257,7 +257,7 @@ class AsignaturaControllerApi extends Controller
             $datosAsignatura = [
                 'nombre_programa' => $asignatura->programa->nombre,
                 'id_asignatura' => $asignatura->id_asignatura,
-                'programa_id' => $asignatura->programa_id,
+                'pensum_id' => $asignatura->pensum_id,
                 'facultad' => $asignatura->programa->facultad->nombre ?? null,
                 'nombre' => $asignatura->nombre,
                 'tipo' => $asignatura->tipo,

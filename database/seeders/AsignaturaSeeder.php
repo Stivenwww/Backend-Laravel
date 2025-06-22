@@ -26,6 +26,9 @@ class AsignaturaSeeder extends Seeder
         // Máximo largo para el código de asignatura
         $maxLength = 20;
 
+        // Año actual para el pensum
+        $anioActual = 2025;
+
         // Listado de asignaturas por programa_id
         $pensum = [
             // UNIVERSIDAD DEL CAUCA
@@ -331,283 +334,290 @@ class AsignaturaSeeder extends Seeder
             ]
         ];
 
-        // Lista de IDs de programas del SENA (institución 2)
-        $programasSena = [17, 18, 19, 20, 21, 22, 23, 24];
+// Lista de IDs de programas del SENA (institución 2)
+$programasSena = [17, 18, 19, 20, 21, 22, 23, 24];
 
-        foreach ($pensum as $programaId => $contenido) {
-            $esSena = in_array($programaId, $programasSena);
+foreach ($pensum as $programaId => $contenido) {
+    $esSena = in_array($programaId, $programasSena);
 
-            if ($esSena) {
-                // Para programas del SENA (estructura plana - array simple)
-                foreach ($contenido as $index => $nombre) {
-                    // Verificar que $nombre sea string
-                    if (!is_string($nombre)) {
-                        continue; // Saltar si no es string
-                    }
+    // Crear o obtener el pensum para este programa
+    $pensum_record = \App\Models\Pensum::updateOrCreate(
+        ['programa_id' => $programaId, 'anio' => $anioActual],
+        ['programa_id' => $programaId, 'anio' => $anioActual]
+    );
 
-                    $codigo = $this->generarCodigoAsignatura($programaId, $nombre, $maxLength, $index + 1);
+    if ($esSena) {
+        // Para programas del SENA (estructura plana - array simple)
+        foreach ($contenido as $index => $nombre) {
+            // Verificar que $nombre sea string
+            if (!is_string($nombre)) {
+                continue; // Saltar si no es string
+            }
 
-                    Asignatura::updateOrCreate(
-                        ['codigo_asignatura' => $codigo],
-                        [
-                            'programa_id' => $programaId,
-                            'nombre' => $nombre,
-                            'tipo' => 'Competencia',
-                            'creditos' => null,
-                            'horas_sena' => $this->calcularHorasSena($nombre),
-                            'semestre' => floor($index / ceil(count($contenido) / 4)) + 1,
-                            'tiempo_presencial' => null,
-                            'tiempo_independiente' => null,
-                            'horas_totales_semanales' => null,
-                            'modalidad' => 'Práctico',
-                            'metodologia' => 'Presencial',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]
-                    );
+            $codigo = $this->generarCodigoAsignatura($programaId, $nombre, $maxLength, $index + 1);
+
+            Asignatura::updateOrCreate(
+                ['codigo_asignatura' => $codigo],
+                [
+                    'pensum_id' => $pensum_record->id_pensum,
+                    'nombre' => $nombre,
+                    'tipo' => 'Competencia',
+                    'creditos' => null,
+                    'horas_sena' => $this->calcularHorasSena($nombre),
+                    'semestre' => floor($index / ceil(count($contenido) / 4)) + 1,
+                    'tiempo_presencial' => null,
+                    'tiempo_independiente' => null,
+                    'horas_totales_semanales' => null,
+                    'modalidad' => 'Práctico',
+                    'metodologia' => 'Presencial',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+    } else {
+        // Para programas universitarios (estructura por semestres)
+        foreach ($contenido as $semestre => $asignaturas) {
+            foreach ($asignaturas as $index => $nombre) {
+                // Verificar que $nombre sea string
+                if (!is_string($nombre)) {
+                    continue; // Saltar si no es string
                 }
-            } else {
-                // Para programas universitarios (estructura por semestres)
-                foreach ($contenido as $semestre => $asignaturas) {
-                    foreach ($asignaturas as $index => $nombre) {
-                        // Verificar que $nombre sea string
-                        if (!is_string($nombre)) {
-                            continue; // Saltar si no es string
-                        }
 
-                        $codigo = $this->generarCodigoAsignatura($programaId, $nombre, $maxLength, null, $semestre, $index + 1);
+                $codigo = $this->generarCodigoAsignatura($programaId, $nombre, $maxLength, null, $semestre, $index + 1);
 
-                        $creditos = $this->calcularCreditos($nombre);
-                        $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
-                        $tiempoIndependiente = $creditos * 2;
-                        $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
+                $creditos = $this->calcularCreditos($nombre);
+                $tiempoPresencial = $this->calcularTiempoPresencial($creditos, $nombre);
+                $tiempoIndependiente = $creditos * 2;
+                $horasTotalesSemanales = $tiempoPresencial + $tiempoIndependiente;
 
-                        Asignatura::updateOrCreate(
-                            ['codigo_asignatura' => $codigo],
-                            [
-                                'programa_id' => $programaId,
-                                'nombre' => $nombre,
-                                'tipo' => 'Materia',
-                                'creditos' => $creditos,
-                                'horas_sena' => null,
-                                'semestre' => $semestre,
-                                'tiempo_presencial' => $tiempoPresencial,
-                                'tiempo_independiente' => $tiempoIndependiente,
-                                'horas_totales_semanales' => $horasTotalesSemanales,
-                                'modalidad' => $this->determinarModalidad($nombre),
-                                'metodologia' => 'Presencial',
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]
-                        );
-                    }
-                }
+                Asignatura::updateOrCreate(
+                    ['codigo_asignatura' => $codigo],
+                    [
+                        'pensum_id' => $pensum_record->id_pensum,
+                        'nombre' => $nombre,
+                        'tipo' => 'Materia',
+                        'creditos' => $creditos,
+                        'horas_sena' => null,
+                        'semestre' => $semestre,
+                        'tiempo_presencial' => $tiempoPresencial,
+                        'tiempo_independiente' => $tiempoIndependiente,
+                        'horas_totales_semanales' => $horasTotalesSemanales,
+                        'modalidad' => $this->determinarModalidad($nombre),
+                        'metodologia' => 'Presencial',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                );
             }
         }
-    }
-
-    /**
-     * Genera un código único para la asignatura
-     */
-    private function generarCodigoAsignatura($programaId, $nombre, $maxLength, $secuencia = null, $semestre = null, $orden = null)
-    {
-        if ($semestre && $orden) {
-            // Para programas universitarios: PROG_S1_M1
-            $codigo = "P{$programaId}_S{$semestre}_M{$orden}";
-        } else {
-            // Para programas SENA: PROG_COMP_1
-            $codigo = "P{$programaId}_C" . ($secuencia ?: 1);
-        }
-
-        // Asegurar que el código no exceda la longitud máxima
-        if (strlen($codigo) > $maxLength) {
-            $codigo = substr($codigo, 0, $maxLength);
-        }
-
-        return $codigo;
-    }
-
-    /**
-     * Calcula el número de créditos basado en el nombre de la asignatura
-     */
-    private function calcularCreditos($nombre)
-    {
-        // Verificar que $nombre sea string
-        if (!is_string($nombre)) {
-            return 3; // Valor por defecto
-        }
-
-        // Materias con mayor intensidad académica (4-5 créditos)
-        $materiasAvanzadas = [
-            'Proyecto', 'Trabajo de Grado', 'Práctica', 'Tesis', 'Laboratorio', 'Diseño',
-            'Arquitectura', 'Inteligencia Artificial', 'Bases de Datos', 'Desarrollo Web',
-            'Computación en la Nube', 'Desarrollo de Aplicaciones', 'Análisis Estructural',
-            'Concreto Reforzado', 'Estructuras', 'Construcción', 'Urbanismo', 'Taller de Diseño',
-            'Control Automático', 'Procesamiento', 'Sistemas de Comunicaciones', 'Electrónica',
-            'Tratamiento', 'Modelación', 'Simulación', 'Automatización', 'Robótica'
-        ];
-
-        // Materias básicas o introductorias (2-3 créditos)
-        $materiasBasicas = [
-            'Fundamentos', 'Introducción', 'Comunicación', 'Oral', 'Escrita', 'Ética',
-            'Emprendimiento', 'Inglés', 'Constitución', 'Metodología', 'Historia'
-        ];
-
-        // Materias matemáticas y de ciencias básicas (3-4 créditos)
-        $materiasMatematicas = [
-            'Cálculo', 'Álgebra', 'Matemáticas', 'Física', 'Química', 'Estadística',
-            'Probabilidad', 'Ecuaciones Diferenciales', 'Métodos Numéricos'
-        ];
-
-        // Verificar categoría de la materia
-        foreach ($materiasAvanzadas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return rand(4, 5);
-            }
-        }
-
-        foreach ($materiasBasicas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return rand(2, 3);
-            }
-        }
-
-        foreach ($materiasMatematicas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return rand(3, 4);
-            }
-        }
-
-        return rand(3, 4); // Materias regulares: 3-4 créditos
-    }
-
-    /**
-     * Calcula el tiempo presencial basado en los créditos y el nombre de la asignatura
-     */
-    private function calcularTiempoPresencial($creditos, $nombre)
-    {
-        // Verificar que $nombre sea string
-        if (!is_string($nombre)) {
-            return $creditos; // Valor por defecto
-        }
-
-        // Materias con mayor componente práctico necesitan más tiempo presencial
-        $componentePractico = [
-            'Laboratorio', 'Práctica', 'Proyecto', 'Taller', 'Desarrollo', 'Implementación',
-            'Diseño', 'Programación', 'DevOps', 'Construcción', 'Dibujo', 'Topografía',
-            'Instalaciones', 'Electrónica', 'Circuitos', 'Instrumentación', 'Control',
-            'Manufactura', 'Procesos', 'Sistemas', 'Redes', 'Base de Datos'
-        ];
-
-        // Materias principalmente teóricas
-        $componenteTeorico = [
-            'Historia', 'Teoría', 'Fundamentos', 'Introducción', 'Matemáticas', 'Cálculo',
-            'Álgebra', 'Física', 'Química', 'Ética', 'Administración', 'Economía', 'Gestión'
-        ];
-
-        foreach ($componentePractico as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return min($creditos + 1, 6); // Máximo 6 horas presenciales
-            }
-        }
-
-        foreach ($componenteTeorico as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return max($creditos - 1, 2); // Mínimo 2 horas presenciales
-            }
-        }
-
-        return $creditos; // Por defecto, créditos = horas presenciales
-    }
-
-    /**
-     * Determina la modalidad basado en el nombre de la asignatura
-     */
-    private function determinarModalidad($nombre)
-    {
-        // Verificar que $nombre sea string
-        if (!is_string($nombre)) {
-            return 'Teórico-Práctico'; // Valor por defecto
-        }
-
-        // Materias principalmente teóricas
-        $materiasTeoricas = [
-            'Historia', 'Teoría', 'Fundamentos', 'Introducción', 'Matemáticas', 'Cálculo',
-            'Álgebra Lineal', 'Física I', 'Física II', 'Química General', 'Ética',
-            'Administración', 'Economía', 'Gestión', 'Legislación', 'Normatividad',
-            'Probabilidad', 'Estadística', 'Metodología', 'Comunicación', 'Inglés'
-        ];
-
-        // Materias principalmente prácticas
-        $materiasPracticas = [
-            'Laboratorio', 'Taller', 'Práctica', 'Desarrollo', 'Implementación', 'Programación',
-            'Diseño', 'DevOps', 'Dibujo', 'Topografía', 'Construcción', 'Instalaciones',
-            'Proyecto', 'Trabajo de Grado', 'Seminario', 'Electrónica', 'Circuitos'
-        ];
-
-        // Verificar si es principalmente teórica
-        foreach ($materiasTeoricas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return 'Teórico';
-            }
-        }
-
-        // Verificar si es principalmente práctica
-        foreach ($materiasPracticas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return 'Práctico';
-            }
-        }
-
-        return 'Teórico-Práctico'; // Por defecto
-    }
-
-    /**
-     * Calcula las horas SENA basado en el nombre de la competencia
-     */
-    private function calcularHorasSena($nombre)
-    {
-        // Verificar que $nombre sea string
-        if (!is_string($nombre)) {
-            return 120; // Valor por defecto
-        }
-
-        // Competencias más complejas (200-280 horas)
-        $competenciasComplejas = [
-            'Desarrollar', 'Implementar', 'Gestionar', 'Diseñar', 'Administrar', 'Liderar',
-            'Construir', 'Planificar', 'Coordinar', 'Evaluar', 'Analizar', 'Modelar'
-        ];
-
-        // Competencias básicas (80-150 horas)
-        $competenciasBasicas = [
-            'Instalar', 'Configurar', 'Documentar', 'Monitorear', 'Reportar', 'Mantener',
-            'Asistir', 'Aplicar', 'Identificar', 'Participar', 'Realizar', 'Generar'
-        ];
-
-        // Competencias intermedias (160-220 horas)
-        $competenciasIntermedias = [
-            'Controlar', 'Verificar', 'Diagnosticar', 'Integrar', 'Publicar', 'Fomentar',
-            'Elaborar', 'Codificar', 'Ensamblar', 'Implantar'
-        ];
-
-        foreach ($competenciasComplejas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return rand(200, 280);
-            }
-        }
-
-        foreach ($competenciasBasicas as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return rand(80, 150);
-            }
-        }
-
-        foreach ($competenciasIntermedias as $palabra) {
-            if (stripos($nombre, $palabra) !== false) {
-                return rand(160, 220);
-            }
-        }
-
-        return rand(120, 200); // Por defecto
     }
 }
+} // <- CIERRE DEL MÉTODO run()
+
+/**
+ * Genera un código único para la asignatura
+ */
+private function generarCodigoAsignatura($programaId, $nombre, $maxLength, $secuencia = null, $semestre = null, $orden = null)
+{
+    if ($semestre && $orden) {
+        // Para programas universitarios: PROG_S1_M1
+        $codigo = "P{$programaId}_S{$semestre}_M{$orden}";
+    } else {
+        // Para programas SENA: PROG_COMP_1
+        $codigo = "P{$programaId}_C" . ($secuencia ?: 1);
+    }
+
+    // Asegurar que el código no exceda la longitud máxima
+    if (strlen($codigo) > $maxLength) {
+        $codigo = substr($codigo, 0, $maxLength);
+    }
+
+    return $codigo;
+}
+
+/**
+ * Calcula el número de créditos basado en el nombre de la asignatura
+ */
+private function calcularCreditos($nombre)
+{
+    // Verificar que $nombre sea string
+    if (!is_string($nombre)) {
+        return 3; // Valor por defecto
+    }
+
+    // Materias con mayor intensidad académica (4-5 créditos)
+    $materiasAvanzadas = [
+        'Proyecto', 'Trabajo de Grado', 'Práctica', 'Tesis', 'Laboratorio', 'Diseño',
+        'Arquitectura', 'Inteligencia Artificial', 'Bases de Datos', 'Desarrollo Web',
+        'Computación en la Nube', 'Desarrollo de Aplicaciones', 'Análisis Estructural',
+        'Concreto Reforzado', 'Estructuras', 'Construcción', 'Urbanismo', 'Taller de Diseño',
+        'Control Automático', 'Procesamiento', 'Sistemas de Comunicaciones', 'Electrónica',
+        'Tratamiento', 'Modelación', 'Simulación', 'Automatización', 'Robótica'
+    ];
+
+    // Materias básicas o introductorias (2-3 créditos)
+    $materiasBasicas = [
+        'Fundamentos', 'Introducción', 'Comunicación', 'Oral', 'Escrita', 'Ética',
+        'Emprendimiento', 'Inglés', 'Constitución', 'Metodología', 'Historia'
+    ];
+
+    // Materias matemáticas y de ciencias básicas (3-4 créditos)
+    $materiasMatematicas = [
+        'Cálculo', 'Álgebra', 'Matemáticas', 'Física', 'Química', 'Estadística',
+        'Probabilidad', 'Ecuaciones Diferenciales', 'Métodos Numéricos'
+    ];
+
+    // Verificar categoría de la materia
+    foreach ($materiasAvanzadas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return rand(4, 5);
+        }
+    }
+
+    foreach ($materiasBasicas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return rand(2, 3);
+        }
+    }
+
+    foreach ($materiasMatematicas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return rand(3, 4);
+        }
+    }
+
+    return rand(3, 4); // Materias regulares: 3-4 créditos
+}
+
+/**
+ * Calcula el tiempo presencial basado en los créditos y el nombre de la asignatura
+ */
+private function calcularTiempoPresencial($creditos, $nombre)
+{
+    // Verificar que $nombre sea string
+    if (!is_string($nombre)) {
+        return $creditos; // Valor por defecto
+    }
+
+    // Materias con mayor componente práctico necesitan más tiempo presencial
+    $componentePractico = [
+        'Laboratorio', 'Práctica', 'Proyecto', 'Taller', 'Desarrollo', 'Implementación',
+        'Diseño', 'Programación', 'DevOps', 'Construcción', 'Dibujo', 'Topografía',
+        'Instalaciones', 'Electrónica', 'Circuitos', 'Instrumentación', 'Control',
+        'Manufactura', 'Procesos', 'Sistemas', 'Redes', 'Base de Datos'
+    ];
+
+    // Materias principalmente teóricas
+    $componenteTeorico = [
+        'Historia', 'Teoría', 'Fundamentos', 'Introducción', 'Matemáticas', 'Cálculo',
+        'Álgebra', 'Física', 'Química', 'Ética', 'Administración', 'Economía', 'Gestión'
+    ];
+
+    foreach ($componentePractico as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return min($creditos + 1, 6); // Máximo 6 horas presenciales
+        }
+    }
+
+    foreach ($componenteTeorico as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return max($creditos - 1, 2); // Mínimo 2 horas presenciales
+        }
+    }
+
+    return $creditos; // Por defecto, créditos = horas presenciales
+}
+
+/**
+ * Determina la modalidad basado en el nombre de la asignatura
+ */
+private function determinarModalidad($nombre)
+{
+    // Verificar que $nombre sea string
+    if (!is_string($nombre)) {
+        return 'Teórico-Práctico'; // Valor por defecto
+    }
+
+    // Materias principalmente teóricas
+    $materiasTeoricas = [
+        'Historia', 'Teoría', 'Fundamentos', 'Introducción', 'Matemáticas', 'Cálculo',
+        'Álgebra Lineal', 'Física I', 'Física II', 'Química General', 'Ética',
+        'Administración', 'Economía', 'Gestión', 'Legislación', 'Normatividad',
+        'Probabilidad', 'Estadística', 'Metodología', 'Comunicación', 'Inglés'
+    ];
+
+    // Materias principalmente prácticas
+    $materiasPracticas = [
+        'Laboratorio', 'Taller', 'Práctica', 'Desarrollo', 'Implementación', 'Programación',
+        'Diseño', 'DevOps', 'Dibujo', 'Topografía', 'Construcción', 'Instalaciones',
+        'Proyecto', 'Trabajo de Grado', 'Seminario', 'Electrónica', 'Circuitos'
+    ];
+
+    // Verificar si es principalmente teórica
+    foreach ($materiasTeoricas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return 'Teórico';
+        }
+    }
+
+    // Verificar si es principalmente práctica
+    foreach ($materiasPracticas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return 'Práctico';
+        }
+    }
+
+    return 'Teórico-Práctico'; // Por defecto
+}
+
+/**
+ * Calcula las horas SENA basado en el nombre de la competencia
+ */
+private function calcularHorasSena($nombre)
+{
+    // Verificar que $nombre sea string
+    if (!is_string($nombre)) {
+        return 120; // Valor por defecto
+    }
+
+    // Competencias más complejas (200-280 horas)
+    $competenciasComplejas = [
+        'Desarrollar', 'Implementar', 'Gestionar', 'Diseñar', 'Administrar', 'Liderar',
+        'Construir', 'Planificar', 'Coordinar', 'Evaluar', 'Analizar', 'Modelar'
+    ];
+
+    // Competencias básicas (80-150 horas)
+    $competenciasBasicas = [
+        'Instalar', 'Configurar', 'Documentar', 'Monitorear', 'Reportar', 'Mantener',
+        'Asistir', 'Aplicar', 'Identificar', 'Participar', 'Realizar', 'Generar'
+    ];
+
+    // Competencias intermedias (160-220 horas)
+    $competenciasIntermedias = [
+        'Controlar', 'Verificar', 'Diagnosticar', 'Integrar', 'Publicar', 'Fomentar',
+        'Elaborar', 'Codificar', 'Ensamblar', 'Implantar'
+    ];
+
+    foreach ($competenciasComplejas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return rand(200, 280);
+        }
+    }
+
+    foreach ($competenciasBasicas as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return rand(80, 150);
+        }
+    }
+
+    foreach ($competenciasIntermedias as $palabra) {
+        if (stripos($nombre, $palabra) !== false) {
+            return rand(160, 220);
+        }
+    }
+
+    return rand(120, 200); // Por defecto
+}
+}
+
