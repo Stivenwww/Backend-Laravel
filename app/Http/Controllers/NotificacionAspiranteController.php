@@ -48,7 +48,7 @@ class NotificacionAspiranteController extends Controller
             ];
 
             // Envía el correo electrónico al usuario
-            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
 
             // Para propósitos de prueba, enviar también a una dirección conocida
             // Comentar o eliminar esta línea en producción si no es necesaria

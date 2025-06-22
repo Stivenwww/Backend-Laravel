@@ -183,7 +183,7 @@ class SolicitudControllerApi extends Controller
             // Envío de notificaciones a diferentes roles/departamentos
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new SecretariaMailable($datos, 'Nueva solicitud de homologación'));
             Mail::to('brayner.trochez.o@uniautonoma.edu.co')->send(new CoordinacionMailable($datos));
-            //Mail::to($usuario->email)->send(new AspiranteMailable($datos));
+            Mail::to($usuario->email)->send(new AspiranteMailable($datos));
 
             // Enviar notificación al aspirante usando el controlador especializado
             $notificacionController = app()->make(NotificacionAspiranteController::class);
