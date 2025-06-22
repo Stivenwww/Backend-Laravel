@@ -18,6 +18,7 @@ use App\Http\Controllers\DocumentoControllerApi;
 use App\Http\Controllers\FacultadControllerApi;
 use App\Http\Controllers\RolControllerApi;
 use App\Http\Controllers\ContenidoProgramaticoControllerApi;
+use App\Http\Controllers\ContactoApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -172,3 +173,7 @@ Route::get('contenidos-programaticos/asignatura/{asignatura_id}', [ContenidoProg
 // En routes/api.php
 Route::match(['post', 'put'], '/solicitud-actualizar', [SolicitudCompletaControllerApi::class, 'update']);
 Route::post('/solicitud-completa', [SolicitudCompletaControllerApi::class, 'store']);
+
+// Informacion de Contacto
+
+Route::post('/contacto', [ContactoApiController::class, 'enviar'])->middleware('throttle:3,1');
