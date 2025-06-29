@@ -103,52 +103,54 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'solicitud_id' => 'required|integer',
                 'asignaturas_origen' => 'required|array',
                 'asignaturas_origen.*' => 'required|integer',
-                'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240', // Máximo 10 MB
+                'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240',
+                'ruta_firma_imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
             ]);
 
-            // Obtenemos las asignaturas de origen del request
             $asignaturasOrigen = $request->asignaturas_origen;
 
-            // Creamos la estructura inicial de homologaciones sin asignaturas de destino asignadas
             $homologaciones = [];
             foreach ($asignaturasOrigen as $asignaturaOrigenId) {
                 $homologaciones[] = [
                     'asignatura_origen_id' => $asignaturaOrigenId,
-                    'asignatura_destino_id' => null, // Pendiente de asignar
-                    'nota_destino' => null,          // Pendiente de calificar
-                    'comentarios' => null            // Sin comentarios iniciales
+                    'asignatura_destino_id' => null,
+                    'nota_destino' => null,
+                    'comentarios' => null
                 ];
             }
 
-            // Convertimos el array de homologaciones a formato JSON para almacenar
             $homologacionesJson = json_encode($homologaciones);
 
-            // Manejar la carga del archivo PDF si está presente
+            // Carga del PDF
             $pdfPath = null;
             if ($request->hasFile('ruta_pdf_resolucion')) {
-                // Guardar el archivo PDF en el directorio 'resoluciones_homologaciones'
                 $pdfPath = $request->file('ruta_pdf_resolucion')->store('resoluciones_homologaciones', 'public');
             }
 
-            // Insertar mediante procedimiento almacenado
+            // Carga de imagen
+            $imagenPath = null;
+            if ($request->hasFile('ruta_firma_imagen')) {
+                $imagenPath = $request->file('ruta_firma_imagen')->store('imagenes_resoluciones', 'public');
+            }
+
             DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $homologacionesJson,
-                Carbon::now()->toDateString(), // Fecha actual
-                $pdfPath // Ruta del PDF guardado
+                Carbon::now()->toDateString(),
+                $pdfPath,
+                $imagenPath
             ]);
 
-            // Respuesta exitosa con los datos creados
             return response()->json([
                 'mensaje' => 'Homologación de asignatura insertada correctamente',
                 'datos' => [
                     'solicitud_id' => $request->solicitud_id,
                     'homologaciones' => $homologaciones,
-                    'ruta_pdf_resolucion' => $pdfPath
+                    'ruta_pdf_resolucion' => $pdfPath,
+                    'ruta_firma_imagen' => $imagenPath
                 ]
             ], 201);
         } catch (\Exception $e) {
-            // Manejo detallado de errores
             return response()->json([
                 'mensaje' => 'Error al insertar la homologación de asignatura',
                 'error' => $e->getMessage(),
@@ -158,6 +160,7 @@ class HomologacionAsignaturaControllerApi extends Controller
         }
     }
 
+
     /**
      * Método para actualizar una homologación de asignatura existente.
      * Permite asignar asignaturas destino, notas, comentarios y PDF de resolución.
@@ -166,105 +169,188 @@ class HomologacionAsignaturaControllerApi extends Controller
      * @param int $id ID de la homologación a actualizar
      * @return \Illuminate\Http\JsonResponse
      */
-    public function actualizarHomologacionAsignatura(Request $request, $id)
+    private function formatearDatosHomologacion($homologacion)
     {
         try {
-            // Validación de datos de entrada
-            $request->validate([
-                'homologaciones' => 'required|array',
-                'homologaciones.*.asignatura_origen_id' => 'required|integer',
-                'homologaciones.*.asignatura_destino_id' => 'nullable|integer',
-                'homologaciones.*.nota_destino' => 'nullable|numeric',
-                'homologaciones.*.comentarios' => 'nullable|string',
-                'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240', // Máximo 10 MB
-            ]);
+            // Obtener información relacionada de la solicitud
+            $solicitud = Solicitud::find($homologacion->solicitud_id);
+            $estudiante = User::find($solicitud->usuario_id ?? 0);
+            $programaDestino = Programa::find($solicitud->programa_destino_id ?? 0);
 
-            // Obtener la homologación actual de la base de datos
-            $homologacion = HomologacionAsignatura::findOrFail($id);
+            $resultado = [
+                'id_homologacion' => $homologacion->id_homologacion,
+                'solicitud_id' => $homologacion->solicitud_id,
+                'numero_radicado' => $homologacion->numero_radicado,
+                'estudiante' => $homologacion->estudiante,
+                'numero_identificacion' => $estudiante->numero_identificacion ?? 'No disponible',
+                'programa_destino' => $programaDestino->nombre ?? 'No disponible',
+                'estado_solicitud' => $solicitud->estado ?? 'No disponible',
+                'fecha' => $homologacion->fecha,
+                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion,
+                'ruta_firma_imagen' => $homologacion->ruta_firma_imagen, // <- NUEVO
+                'asignaturas_origen' => [],
+                'asignaturas_destino' => [],
+                'comentarios' => ''
+            ];
 
-            // Decodificar las homologaciones existentes (de JSON a array)
-            $homologacionesActuales = $homologacion->homologaciones;
+            // URL pública del PDF
+            $resultado['url_pdf_resolucion'] = $resultado['ruta_pdf_resolucion']
+                ? asset('storage/' . $resultado['ruta_pdf_resolucion'])
+                : null;
 
-            // Crear un mapeo para buscar rápidamente por ID de asignatura origen
-            $mapeoIndices = [];
-            foreach ($homologacionesActuales as $key => $homologacionItem) {
-                $mapeoIndices[$homologacionItem['asignatura_origen_id']] = $key;
+            // URL pública de la imagen
+            $resultado['url_firma_imagen'] = $resultado['ruta_firma_imagen']
+                ? asset('storage/' . $resultado['ruta_firma_imagen'])
+                : null;
+
+            // Decodificar homologaciones
+            $homologacionesArray = null;
+            if (is_string($homologacion->homologaciones)) {
+                $homologacionesArray = json_decode($homologacion->homologaciones, true);
+            } elseif (is_array($homologacion->homologaciones)) {
+                $homologacionesArray = $homologacion->homologaciones;
+            } elseif (is_object($homologacion->homologaciones)) {
+                $homologacionesArray = json_decode(json_encode($homologacion->homologaciones), true);
+            } else {
+                $homologacionesArray = [];
             }
 
-            // Arrays para seguimiento de cambios
-            $actualizadas = [];
-            $noEncontradas = [];
+            if (!is_array($homologacionesArray)) {
+                return $resultado;
+            }
 
-            // Procesar cada homologación del request
-            foreach ($request->homologaciones as $homologacionRequest) {
-                $origenId = $homologacionRequest['asignatura_origen_id'];
+            // Verificar si es homologación tipo SENA
+            try {
+                $solicitudAsignatura = SolicitudAsignatura::where('solicitud_id', $homologacion->solicitud_id)->first();
+                $esSena = false;
+                $asignaturasOrigen = [];
 
-                // Verificar si la asignatura origen existe en la homologación actual
-                if (isset($mapeoIndices[$origenId])) {
-                    $index = $mapeoIndices[$origenId];
+                if ($solicitud && $solicitudAsignatura) {
+                    if (is_string($solicitudAsignatura->asignaturas)) {
+                        $asignaturasOrigen = json_decode($solicitudAsignatura->asignaturas, true);
+                    } elseif (is_array($solicitudAsignatura->asignaturas)) {
+                        $asignaturasOrigen = $solicitudAsignatura->asignaturas;
+                    } elseif (is_object($solicitudAsignatura->asignaturas)) {
+                        $asignaturasOrigen = json_decode(json_encode($solicitudAsignatura->asignaturas), true);
+                    }
 
-                    // Actualizar solo los campos relacionados con el destino
-                    $homologacionesActuales[$index]['asignatura_destino_id'] = $homologacionRequest['asignatura_destino_id'];
-                    $homologacionesActuales[$index]['nota_destino'] = $homologacionRequest['nota_destino'];
-                    $homologacionesActuales[$index]['comentarios'] = $homologacionRequest['comentarios'] ?? null;
+                    if (is_array($asignaturasOrigen) && count($asignaturasOrigen) > 0) {
+                        foreach ($asignaturasOrigen as $asignatura) {
+                            if (isset($asignatura['horas_sena']) && $asignatura['horas_sena'] !== null) {
+                                $esSena = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $esSena = false;
+                $asignaturasOrigen = [];
+            }
 
-                    $actualizadas[] = $origenId;
+            // Recolectar comentarios
+            $comentariosRecolectados = [];
+
+            // Procesar cada ítem
+            foreach ($homologacionesArray as $homologacionItem) {
+                $asignaturaOrigenId = $homologacionItem['asignatura_origen_id'] ?? 0;
+                $asignaturaDestinoId = $homologacionItem['asignatura_destino_id'] ?? null;
+
+                $asignaturaOrigen = $this->obtenerInfoAsignatura($asignaturaOrigenId);
+                $asignaturaOrigen['contenido_programatico'] = $this->obtenerContenidoProgramatico($asignaturaOrigenId);
+
+                if (empty($resultado['universidad_origen']) && !empty($asignaturaOrigen['institucion']) && $asignaturaOrigen['institucion'] != 'No disponible') {
+                    $resultado['universidad_origen'] = $asignaturaOrigen['institucion'];
+                }
+
+                if (isset($asignaturasOrigen) && is_array($asignaturasOrigen)) {
+                    foreach ($asignaturasOrigen as $asignaturaSol) {
+                        if (isset($asignaturaSol['asignatura_id']) && $asignaturaSol['asignatura_id'] == $asignaturaOrigenId) {
+                            if ($esSena && isset($asignaturaSol['horas_sena'])) {
+                                $asignaturaOrigen['horas_sena'] = $asignaturaSol['horas_sena'];
+                            }
+
+                            if (isset($asignaturaSol['nota_origen'])) {
+                                $asignaturaOrigen['nota_origen'] = $asignaturaSol['nota_origen'];
+                            }
+
+                            if (isset($asignaturaSol['creditos'])) {
+                                $asignaturaOrigen['creditos'] = $asignaturaSol['creditos'];
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (!$esSena) {
+                    unset($asignaturaOrigen['horas_sena']);
+                }
+
+                $resultado['asignaturas_origen'][] = $asignaturaOrigen;
+
+                // Procesar asignatura destino
+                if ($asignaturaDestinoId) {
+                    $asignaturaDestino = $this->obtenerInfoAsignatura($asignaturaDestinoId);
+                    $asignaturaDestino['nota_destino'] = $homologacionItem['nota_destino'] ?? null;
+                    unset($asignaturaDestino['nota_origen']);
+                    $asignaturaDestino['contenido_programatico'] = $this->obtenerContenidoProgramatico($asignaturaDestinoId);
+
+                    if (!$esSena) {
+                        unset($asignaturaDestino['horas_sena']);
+                    }
                 } else {
-                    // Registrar las asignaturas que no se encontraron
-                    $noEncontradas[] = $origenId;
+                    $asignaturaDestino = [
+                        'id' => null,
+                        'nombre' => null,
+                        'codigo' => null,
+                        'semestre' => null,
+                        'programa' => null,
+                        'facultad' => null,
+                        'institucion' => null,
+                        'nota_destino' => null,
+                        'creditos' => null,
+                        'contenido_programatico' => null
+                    ];
+
+                    if ($esSena) {
+                        $asignaturaDestino['horas_sena'] = null;
+                    }
+                }
+
+                $resultado['asignaturas_destino'][] = $asignaturaDestino;
+
+                if (isset($homologacionItem['comentarios']) && !empty($homologacionItem['comentarios'])) {
+                    $nombreOrigen = $asignaturaOrigen['nombre'] ?? 'Asignatura origen';
+                    $nombreDestino = $asignaturaDestino['nombre'] ?? 'Asignatura destino';
+                    $comentariosRecolectados[] = "{$nombreOrigen} → {$nombreDestino}: {$homologacionItem['comentarios']}";
                 }
             }
 
-            // Si hay asignaturas no encontradas, devolvemos advertencia
-            if (!empty($noEncontradas)) {
-                return response()->json([
-                    'mensaje' => 'Algunas asignaturas de origen no fueron encontradas en esta homologación',
-                    'asignaturas_no_encontradas' => $noEncontradas,
-                    'asignaturas_actualizadas' => $actualizadas
-                ], 400);
+            if (!empty($comentariosRecolectados)) {
+                $resultado['comentarios'] = implode("\n", $comentariosRecolectados);
             }
 
-            // Convertir el array actualizado a JSON para almacenar
-            $homologacionesJson = json_encode($homologacionesActuales);
-
-            // Manejar la actualización del archivo PDF si está presente
-            $pdfPath = $homologacion->ruta_pdf_resolucion; // Mantener el valor actual por defecto
-            if ($request->hasFile('ruta_pdf_resolucion')) {
-                // Si ya existe un PDF anterior, eliminarlo del storage
-                if ($pdfPath && Storage::disk('public')->exists($pdfPath)) {
-                    Storage::disk('public')->delete($pdfPath);
-                }
-
-                // Guardar el nuevo archivo PDF
-                $pdfPath = $request->file('ruta_pdf_resolucion')->store('resoluciones_homologaciones', 'public');
-            }
-
-            // Actualizar mediante procedimiento almacenado
-            DB::statement('CALL ActualizarHomologacionAsignatura(?, ?, ?, ?, ?)', [
-                $id,
-                $homologacion->solicitud_id,
-                $homologacionesJson,
-                now()->toDateString(),
-                $pdfPath
-            ]);
-
-            // Respuesta exitosa con información de cambios
-            return response()->json([
-                'mensaje' => 'Homologación de asignaturas actualizada correctamente',
-                'asignaturas_actualizadas' => $actualizadas,
-                'total_actualizadas' => count($actualizadas),
-                'ruta_pdf_resolucion' => $pdfPath
-            ], 200);
+            return $resultado;
         } catch (\Exception $e) {
-            // Manejo detallado de errores
-            return response()->json([
-                'mensaje' => 'Error al actualizar la homologación de asignatura',
-                'error' => $e->getMessage(),
-                'linea' => $e->getLine(),
-                'archivo' => $e->getFile()
-            ], 500);
+            return [
+                'id_homologacion' => $homologacion->id_homologacion ?? 0,
+                'solicitud_id' => $homologacion->solicitud_id ?? 0,
+                'numero_radicado' => $homologacion->numero_radicado ?? 'No disponible',
+                'estudiante' => $homologacion->estudiante ?? 'No disponible',
+                'fecha' => $homologacion->fecha ?? null,
+                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null,
+                'url_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ? asset('storage/' . $homologacion->ruta_pdf_resolucion) : null,
+                'ruta_firma_imagen' => $homologacion->ruta_firma_imagen ?? null,
+                'url_firma_imagen' => $homologacion->ruta_firma_imagen ? asset('storage/' . $homologacion->ruta_firma_imagen) : null,
+                'error' => 'Error al formatear datos: ' . $e->getMessage(),
+                'asignaturas_origen' => [],
+                'asignaturas_destino' => [],
+                'comentarios' => ''
+            ];
         }
     }
+
+
 
     /**
      * Método para eliminar una homologación de asignatura.
@@ -275,13 +361,18 @@ class HomologacionAsignaturaControllerApi extends Controller
     public function eliminarHomologacionAsignatura($id)
     {
         try {
-            // Obtener la homologación primero para poder eliminar el archivo asociado
+            // Obtener la homologación para acceder a las rutas de archivos
             $homologacion = HomologacionAsignatura::find($id);
 
-            if ($homologacion && $homologacion->ruta_pdf_resolucion) {
-                // Eliminar el archivo PDF del storage si existe
-                if (Storage::disk('public')->exists($homologacion->ruta_pdf_resolucion)) {
+            if ($homologacion) {
+                // Eliminar el archivo PDF si existe
+                if ($homologacion->ruta_pdf_resolucion && Storage::disk('public')->exists($homologacion->ruta_pdf_resolucion)) {
                     Storage::disk('public')->delete($homologacion->ruta_pdf_resolucion);
+                }
+
+                // Eliminar la imagen de firma si existe
+                if ($homologacion->ruta_firma_imagen && Storage::disk('public')->exists($homologacion->ruta_firma_imagen)) {
+                    Storage::disk('public')->delete($homologacion->ruta_firma_imagen);
                 }
             }
 
@@ -292,7 +383,6 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'mensaje' => 'Homologación de asignatura eliminada correctamente'
             ], 200);
         } catch (\Exception $e) {
-            // Manejo detallado de errores
             return response()->json([
                 'mensaje' => 'Error al eliminar la homologación de asignatura',
                 'error' => $e->getMessage(),
@@ -301,6 +391,7 @@ class HomologacionAsignaturaControllerApi extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Método privado para dar formato a los datos de homologación.
@@ -1080,7 +1171,6 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'estado_actual' => $nuevoEstado,
                 'numero_radicado' => $solicitud->numero_radicado
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('Error al actualizar el estado de la homologación por usuario', [
                 'usuario_id' => $usuarioId,

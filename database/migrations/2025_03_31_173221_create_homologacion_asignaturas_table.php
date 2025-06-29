@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('homologaciones'); // Guardará un array con la estructura {asignatura_origen_id, asignatura_destino_id, nota_destino, comentarios}
             $table->timestamp('fecha')->useCurrent();
             $table->string('ruta_pdf_resolucion', 255)->nullable();
+            $table->string('ruta_firma_imagen', 255)->nullable();
             $table->timestamps();
 
             $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes')->onDelete('cascade');

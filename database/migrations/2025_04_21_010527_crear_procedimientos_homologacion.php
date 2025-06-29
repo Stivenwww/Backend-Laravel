@@ -794,63 +794,64 @@ return new class extends Migration {
                 );
             END;
 
+            -- OBTENER ASIGNATURAS (TODAS9)
             CREATE PROCEDURE ObtenerAsignaturas()
-BEGIN
-    SELECT a.id_asignatura,
-        a.nombre,
-        a.tipo,
-        a.codigo_asignatura,
-        a.creditos,
-        a.semestre,
-        a.horas_sena,
-        a.tiempo_presencial,
-        a.tiempo_independiente,
-        a.horas_totales_semanales,
-        a.modalidad,
-        a.metodologia,
-        a.created_at,
-        a.updated_at,
-        ps.anio AS año_pensum,
-        p.nombre AS programa,
-        i.nombre AS institucion
-    FROM asignaturas a
-    JOIN pensums ps ON a.pensum_id = ps.id_pensum  -- Cambiado de 'pensums' a 'pensum'
-    JOIN programas p ON ps.programa_id = p.id_programa
-    JOIN instituciones i ON p.institucion_id = i.id_institucion
-    ORDER BY a.nombre ASC;
-END;
+            BEGIN
+                SELECT a.id_asignatura,
+                    a.nombre,
+                    a.tipo,
+                    a.codigo_asignatura,
+                    a.creditos,
+                    a.semestre,
+                    a.horas_sena,
+                    a.tiempo_presencial,
+                    a.tiempo_independiente,
+                    a.horas_totales_semanales,
+                    a.modalidad,
+                    a.metodologia,
+                    a.created_at,
+                    a.updated_at,
+                    ps.anio AS año_pensum,
+                    p.nombre AS programa,
+                    i.nombre AS institucion
+                FROM asignaturas a
+                JOIN pensums ps ON a.pensum_id = ps.id_pensum  -- Cambiado de 'pensums' a 'pensum'
+                JOIN programas p ON ps.programa_id = p.id_programa
+                JOIN instituciones i ON p.institucion_id = i.id_institucion
+                ORDER BY a.nombre ASC;
+            END;
 
-          CREATE PROCEDURE ObtenerAsignaturaPorId(IN asignaturaId SMALLINT)
-BEGIN
-    SELECT a.id_asignatura,
-        a.nombre,
-        a.tipo,
-        a.codigo_asignatura,
-        a.creditos,
-        a.semestre,
-        a.horas_sena,
-        a.tiempo_presencial,
-        a.tiempo_independiente,
-        a.horas_totales_semanales,
-        a.modalidad,
-        a.metodologia,
-        a.created_at,
-        a.updated_at,
-        ps.anio AS año_pensum,
-        p.nombre AS programa,
-        i.nombre AS institucion
-    FROM asignaturas a
-    JOIN pensums ps ON a.pensum_id = ps.id_pensum  -- Cambiado de 'pensums' a 'pensum'
-    JOIN programas p ON ps.programa_id = p.id_programa
-    JOIN instituciones i ON p.institucion_id = i.id_institucion
-    WHERE a.id_asignatura = asignaturaId;
-END;
-
-
-
+            -- OBTENER TODAS LAS ASIGNATURAS POR ID
+            CREATE PROCEDURE ObtenerAsignaturaPorId(IN asignaturaId SMALLINT)
+            BEGIN
+                SELECT a.id_asignatura,
+                    a.nombre,
+                    a.tipo,
+                    a.codigo_asignatura,
+                    a.creditos,
+                    a.semestre,
+                    a.horas_sena,
+                    a.tiempo_presencial,
+                    a.tiempo_independiente,
+                    a.horas_totales_semanales,
+                    a.modalidad,
+                    a.metodologia,
+                    a.created_at,
+                    a.updated_at,
+                    ps.anio AS año_pensum,
+                    p.nombre AS programa,
+                    i.nombre AS institucion
+                FROM asignaturas a
+                JOIN pensums ps ON a.pensum_id = ps.id_pensum  -- Cambiado de 'pensums' a 'pensum'
+                JOIN programas p ON ps.programa_id = p.id_programa
+                JOIN instituciones i ON p.institucion_id = i.id_institucion
+                WHERE a.id_asignatura = asignaturaId;
+            END;
 
 
 
+
+            
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUDES)
             DROP PROCEDURE IF EXISTS ActualizarSolicitud;
             DROP PROCEDURE IF EXISTS EliminarSolicitud;
