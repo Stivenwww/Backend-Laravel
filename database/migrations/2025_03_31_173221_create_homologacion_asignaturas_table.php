@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('fecha')->useCurrent();
             $table->string('ruta_pdf_resolucion', 255)->nullable();
             $table->string('ruta_firma_imagen', 255)->nullable();
+            $table->string('comentarios')->nullable();
             $table->timestamps();
 
             $table->foreign('solicitud_id')->references('id_solicitud')->on('solicitudes')->onDelete('cascade');

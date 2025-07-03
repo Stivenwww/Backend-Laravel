@@ -105,6 +105,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'asignaturas_origen.*' => 'required|integer',
                 'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240',
                 'ruta_firma_imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+                'comentarios' => 'nullable|string|max:1000', // Agregado para comentarios
             ]);
 
             $asignaturasOrigen = $request->asignaturas_origen;
@@ -114,8 +115,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                 $homologaciones[] = [
                     'asignatura_origen_id' => $asignaturaOrigenId,
                     'asignatura_destino_id' => null,
-                    'nota_destino' => null,
-                    'comentarios' => null
+                    'nota_destino' => null
+                    // Removido 'comentarios' de aquí
                 ];
             }
 
@@ -133,12 +134,14 @@ class HomologacionAsignaturaControllerApi extends Controller
                 $imagenPath = $request->file('ruta_firma_imagen')->store('imagenes_resoluciones', 'public');
             }
 
-            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?)', [
+            // Llamada al procedimiento almacenado con comentarios como parámetro separado
+            DB::statement('CALL InsertarHomologacionAsignatura(?, ?, ?, ?, ?, ?)', [
                 $request->solicitud_id,
                 $homologacionesJson,
                 Carbon::now()->toDateString(),
                 $pdfPath,
-                $imagenPath
+                $imagenPath,
+                $request->comentarios ?? null // Comentarios como parámetro separado
             ]);
 
             return response()->json([
@@ -147,7 +150,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                     'solicitud_id' => $request->solicitud_id,
                     'homologaciones' => $homologaciones,
                     'ruta_pdf_resolucion' => $pdfPath,
-                    'ruta_firma_imagen' => $imagenPath
+                    'ruta_firma_imagen' => $imagenPath,
+                    'comentarios' => $request->comentarios
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -187,10 +191,10 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'estado_solicitud' => $solicitud->estado ?? 'No disponible',
                 'fecha' => $homologacion->fecha,
                 'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion,
-                'ruta_firma_imagen' => $homologacion->ruta_firma_imagen, // <- NUEVO
+                'ruta_firma_imagen' => $homologacion->ruta_firma_imagen,
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
-                'comentarios' => ''
+                'comentarios' => $homologacion->comentarios ?? '' // Obtener comentarios directamente del campo
             ];
 
             // URL pública del PDF
@@ -248,10 +252,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 $asignaturasOrigen = [];
             }
 
-            // Recolectar comentarios
-            $comentariosRecolectados = [];
-
-            // Procesar cada ítem
+            // Procesar cada ítem (removida la lógica de recolección de comentarios)
             foreach ($homologacionesArray as $homologacionItem) {
                 $asignaturaOrigenId = $homologacionItem['asignatura_origen_id'] ?? 0;
                 $asignaturaDestinoId = $homologacionItem['asignatura_destino_id'] ?? null;
@@ -318,16 +319,6 @@ class HomologacionAsignaturaControllerApi extends Controller
                 }
 
                 $resultado['asignaturas_destino'][] = $asignaturaDestino;
-
-                if (isset($homologacionItem['comentarios']) && !empty($homologacionItem['comentarios'])) {
-                    $nombreOrigen = $asignaturaOrigen['nombre'] ?? 'Asignatura origen';
-                    $nombreDestino = $asignaturaDestino['nombre'] ?? 'Asignatura destino';
-                    $comentariosRecolectados[] = "{$nombreOrigen} → {$nombreDestino}: {$homologacionItem['comentarios']}";
-                }
-            }
-
-            if (!empty($comentariosRecolectados)) {
-                $resultado['comentarios'] = implode("\n", $comentariosRecolectados);
             }
 
             return $resultado;
@@ -345,7 +336,7 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'error' => 'Error al formatear datos: ' . $e->getMessage(),
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
-                'comentarios' => ''
+                'comentarios' => $homologacion->comentarios ?? '' // También aquí en el catch
             ];
         }
     }
@@ -389,227 +380,6 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'linea' => $e->getLine(),
                 'archivo' => $e->getFile()
             ], 500);
-        }
-    }
-
-
-    /**
-     * Método privado para dar formato a los datos de homologación.
-     * Estructura la información completa incluyendo datos relacionados.
-     *
-     * @param object $homologacion Datos de la homologación a formatear
-     * @return array Datos formateados en la estructura requerida
-     */
-    private function formatearDatosHomologacion($homologacion)
-    {
-        try {
-            // Obtener información relacionada de la solicitud
-            $solicitud = Solicitud::find($homologacion->solicitud_id);
-
-            // Información del estudiante
-            $estudiante = User::find($solicitud->usuario_id ?? 0);
-
-            // Obtener programa de destino del estudiante
-            $programaDestino = Programa::find($solicitud->programa_destino_id ?? 0);
-
-            // Estructura base de la respuesta
-            $resultado = [
-                'id_homologacion' => $homologacion->id_homologacion,
-                'solicitud_id' => $homologacion->solicitud_id,
-                'numero_radicado' => $homologacion->numero_radicado,
-                'estudiante' => $homologacion->estudiante,
-                'numero_identificacion' => $estudiante->numero_identificacion ?? 'No disponible',
-                'programa_destino' => $programaDestino->nombre ?? 'No disponible',
-                'estado_solicitud' => $solicitud->estado ?? 'No disponible',
-                'fecha' => $homologacion->fecha,
-                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion, // Incluimos la ruta del PDF
-                'asignaturas_origen' => [],
-                'asignaturas_destino' => [],
-                'comentarios' => ''  // Comentario general inicializado como string vacío
-            ];
-
-            // Si hay una ruta de PDF, construir la URL completa para acceso
-            if ($resultado['ruta_pdf_resolucion']) {
-                $resultado['url_pdf_resolucion'] = asset('storage/' . $resultado['ruta_pdf_resolucion']);
-            } else {
-                $resultado['url_pdf_resolucion'] = null;
-            }
-
-            // Manejo de diferentes formatos de datos para las homologaciones
-            $homologacionesArray = null;
-            if (is_string($homologacion->homologaciones)) {
-                // Es una cadena JSON - decodificar
-                $homologacionesArray = json_decode($homologacion->homologaciones, true);
-            } elseif (is_array($homologacion->homologaciones)) {
-                // Ya es un array
-                $homologacionesArray = $homologacion->homologaciones;
-            } elseif (is_object($homologacion->homologaciones)) {
-                // Es un objeto - convertir a array
-                $homologacionesArray = json_decode(json_encode($homologacion->homologaciones), true);
-            } else {
-                // Valor desconocido - usar array vacío
-                $homologacionesArray = [];
-            }
-
-            // Validar que sea un array
-            if (!is_array($homologacionesArray)) {
-                return $resultado;
-            }
-
-            // Determinar si es una homologación SENA
-            try {
-                $solicitudAsignatura = SolicitudAsignatura::where('solicitud_id', $homologacion->solicitud_id)->first();
-                $esSena = false;
-                $asignaturasOrigen = [];
-
-                if ($solicitud && $solicitudAsignatura) {
-                    // Manejar diferentes formatos de datos para las asignaturas
-                    if (is_string($solicitudAsignatura->asignaturas)) {
-                        $asignaturasOrigen = json_decode($solicitudAsignatura->asignaturas, true);
-                    } elseif (is_array($solicitudAsignatura->asignaturas)) {
-                        $asignaturasOrigen = $solicitudAsignatura->asignaturas;
-                    } elseif (is_object($solicitudAsignatura->asignaturas)) {
-                        $asignaturasOrigen = json_decode(json_encode($solicitudAsignatura->asignaturas), true);
-                    }
-
-                    // Determinar si es SENA basado en la presencia de horas_sena
-                    if (is_array($asignaturasOrigen) && count($asignaturasOrigen) > 0) {
-                        foreach ($asignaturasOrigen as $asignatura) {
-                            if (isset($asignatura['horas_sena']) && $asignatura['horas_sena'] !== null) {
-                                $esSena = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (\Exception $e) {
-                // En caso de error, valores por defecto
-                $esSena = false;
-                $asignaturasOrigen = [];
-            }
-
-            // Recolector de comentarios
-            $comentariosRecolectados = [];
-
-            // Procesar cada par de homologación (origen-destino)
-            foreach ($homologacionesArray as $homologacionItem) {
-                // Obtener IDs de las asignaturas
-                $asignaturaOrigenId = $homologacionItem['asignatura_origen_id'] ?? 0;
-                $asignaturaDestinoId = $homologacionItem['asignatura_destino_id'] ?? null;
-
-                // Obtener información detallada de la asignatura origen
-                $asignaturaOrigen = $this->obtenerInfoAsignatura($asignaturaOrigenId);
-
-                // Añadir contenido programático de la asignatura origen
-                $asignaturaOrigen['contenido_programatico'] = $this->obtenerContenidoProgramatico($asignaturaOrigenId);
-
-                // Establecer universidad_origen en el resultado principal si aún no se ha establecido
-                if (empty($resultado['universidad_origen']) && !empty($asignaturaOrigen['institucion']) && $asignaturaOrigen['institucion'] != 'No disponible') {
-                    $resultado['universidad_origen'] = $asignaturaOrigen['institucion'];
-                }
-
-                // Buscar información adicional en la solicitud original (notas o horas SENA)
-                if (isset($asignaturasOrigen) && is_array($asignaturasOrigen)) {
-                    foreach ($asignaturasOrigen as $asignaturaSol) {
-                        if (isset($asignaturaSol['asignatura_id']) && $asignaturaSol['asignatura_id'] == $asignaturaOrigenId) {
-                            // Modificar esta parte para incluir siempre la nota_origen en ambos casos
-                            if ($esSena && isset($asignaturaSol['horas_sena'])) {
-                                $asignaturaOrigen['horas_sena'] = $asignaturaSol['horas_sena'];
-                            }
-
-                            // Siempre incluir la nota_origen si está disponible, independientemente de si es SENA o no
-                            if (isset($asignaturaSol['nota_origen'])) {
-                                $asignaturaOrigen['nota_origen'] = $asignaturaSol['nota_origen'];
-                            }
-
-                            // Añadir créditos si están disponibles
-                            if (isset($asignaturaSol['creditos'])) {
-                                $asignaturaOrigen['creditos'] = $asignaturaSol['creditos'];
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                // Eliminar campos innecesarios según el tipo de homologación
-                if (!$esSena) {
-                    unset($asignaturaOrigen['horas_sena']);
-                }
-
-                // Añadir asignatura origen al resultado
-                $resultado['asignaturas_origen'][] = $asignaturaOrigen;
-
-                // Procesar asignatura destino
-                $asignaturaDestino = null;
-                if ($asignaturaDestinoId) {
-                    // Si hay asignatura destino asignada, obtener su información
-                    $asignaturaDestino = $this->obtenerInfoAsignatura($asignaturaDestinoId);
-                    // Añadir nota de destino desde la homologación
-                    $asignaturaDestino['nota_destino'] = $homologacionItem['nota_destino'] ?? null;
-                    // Eliminar nota_origen que no aplica en destino
-                    unset($asignaturaDestino['nota_origen']);
-                    // Obtener contenido programático
-                    $asignaturaDestino['contenido_programatico'] = $this->obtenerContenidoProgramatico($asignaturaDestinoId);
-
-                    // Eliminar campos innecesarios según el tipo
-                    if (!$esSena) {
-                        unset($asignaturaDestino['horas_sena']);
-                    }
-                } else {
-                    // Si no hay asignatura destino, crear estructura vacía
-                    $asignaturaDestino = [
-                        'id' => null,
-                        'nombre' => null,
-                        'codigo' => null,
-                        'semestre' => null,
-                        'programa' => null,
-                        'facultad' => null,
-                        'institucion' => null,
-                        'nota_destino' => null,
-                        'creditos' => null,
-                        'contenido_programatico' => null
-                    ];
-
-                    // Añadir horas_sena solo si es SENA
-                    if ($esSena) {
-                        $asignaturaDestino['horas_sena'] = null;
-                    }
-                }
-
-                // Añadir asignatura destino al resultado
-                $resultado['asignaturas_destino'][] = $asignaturaDestino;
-
-                // Recolectar comentarios individuales
-                if (isset($homologacionItem['comentarios']) && !empty($homologacionItem['comentarios'])) {
-                    $nombreAsignaturaOrigen = $asignaturaOrigen['nombre'] ?? 'Asignatura origen';
-                    $nombreAsignaturaDestino = $asignaturaDestino['nombre'] ?? 'Asignatura destino';
-
-                    $comentarioFormateado = "{$nombreAsignaturaOrigen} → {$nombreAsignaturaDestino}: {$homologacionItem['comentarios']}";
-                    $comentariosRecolectados[] = $comentarioFormateado;
-                }
-            }
-
-            // Unir todos los comentarios en un solo string
-            if (!empty($comentariosRecolectados)) {
-                $resultado['comentarios'] = implode("\n", $comentariosRecolectados);
-            }
-
-            return $resultado;
-        } catch (\Exception $e) {
-            // En caso de error, devolver estructura mínima con información del error
-            return [
-                'id_homologacion' => $homologacion->id_homologacion ?? 0,
-                'solicitud_id' => $homologacion->solicitud_id ?? 0,
-                'numero_radicado' => $homologacion->numero_radicado ?? 'No disponible',
-                'estudiante' => $homologacion->estudiante ?? 'No disponible',
-                'fecha' => $homologacion->fecha ?? null,
-                'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null,
-                'url_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ? asset('storage/' . $homologacion->ruta_pdf_resolucion) : null,
-                'error' => 'Error al formatear datos: ' . $e->getMessage(),
-                'asignaturas_origen' => [],
-                'asignaturas_destino' => [],
-                'comentarios' => ''
-            ];
         }
     }
 
@@ -832,8 +602,6 @@ class HomologacionAsignaturaControllerApi extends Controller
                     $homologacionItem['asignatura_destino_id'] = null;
                     // Limpiar la nota de destino
                     $homologacionItem['nota_destino'] = null;
-                    // Limpiar comentarios
-                    $homologacionItem['comentarios'] = null;
 
                     $asignaturasLimpiadas++;
                 }
@@ -874,14 +642,6 @@ class HomologacionAsignaturaControllerApi extends Controller
             ], 500);
         }
     }
-    /**
-     * Método para eliminar completamente las asignaturas destino seleccionadas de una homologación.
-     * A diferencia de limpiarAsignaturasDestino, esta función elimina los registros completamente.
-     *
-     * @param int $id ID de la homologación
-     * @param Request $request Contiene los IDs de las asignaturas origen a eliminar
-     * @return \Illuminate\Http\JsonResponse
-     */
     /**
      * Método para eliminar completamente las asignaturas origen seleccionadas de una homologación.
      * Elimina por completo los registros de homologación para las asignaturas especificadas.

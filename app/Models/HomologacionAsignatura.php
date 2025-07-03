@@ -18,7 +18,8 @@ class HomologacionAsignatura extends Model
         'homologaciones', // Ahora es un campo JSON
         'fecha',
         'ruta_pdf_resolucion',
-        'ruta_firma_imagen'
+        'ruta_firma_imagen',
+        'comentarios'
     ];
 
     protected $casts = [

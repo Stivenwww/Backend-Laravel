@@ -851,7 +851,7 @@ return new class extends Migration {
 
 
 
-            
+
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (SOLICITUDES)
             DROP PROCEDURE IF EXISTS ActualizarSolicitud;
             DROP PROCEDURE IF EXISTS EliminarSolicitud;
@@ -1516,6 +1516,8 @@ return new class extends Migration {
                     ha.homologaciones, -- Devolvemos el JSON tal cual
                     ha.fecha,
                     ha.ruta_pdf_resolucion,
+                    ha.ruta_firma_imagen,
+                    ha.comentarios,
                     ha.created_at,
                     ha.updated_at
                 FROM homologacion_asignaturas ha
@@ -1540,6 +1542,8 @@ return new class extends Migration {
                     ha.homologaciones, -- Devolvemos el JSON tal cual
                     ha.fecha,
                     ha.ruta_pdf_resolucion,
+                    ha.ruta_firma_imagen,
+                    ha.comentarios,
                     ha.created_at,
                     ha.updated_at
                 FROM homologacion_asignaturas ha
@@ -1553,7 +1557,9 @@ return new class extends Migration {
                 IN p_solicitud_id INT,
                 IN p_homologaciones JSON,
                 IN p_fecha DATE,
-                IN p_ruta_pdf_resolucion VARCHAR(255)
+                IN p_ruta_pdf_resolucion VARCHAR(255),
+                IN p_ruta_firma_imagen VARCHAR(255),
+                IN p_comentarios VARCHAR(255)
             )
             BEGIN
                 -- Verificamos si ya existe un registro para esta solicitud
@@ -1570,10 +1576,10 @@ return new class extends Migration {
                 ELSE
                     -- Si no existe, insertamos nuevo
                     INSERT INTO homologacion_asignaturas (
-                        solicitud_id, homologaciones, fecha, ruta_pdf_resolucion, created_at, updated_at
+                        solicitud_id, homologaciones, fecha, ruta_pdf_resolucion,p_ruta_firma_imagen, p_comentarios created_at, updated_at
                     )
                     VALUES (
-                        p_solicitud_id, p_homologaciones, p_fecha, p_ruta_pdf_resolucion, NOW(), NOW()
+                        p_solicitud_id, p_homologaciones, p_fecha, p_ruta_pdf_resolucion, p_ruta_firma_imagen, p_comentarios NOW(), NOW()
                     );
                 END IF;
             END;
@@ -1584,7 +1590,9 @@ return new class extends Migration {
             IN p_solicitud_id INT,
             IN p_homologaciones JSON,
             IN p_fecha DATE,
-            IN p_ruta_pdf_resolucion VARCHAR(255)
+            IN p_ruta_pdf_resolucion VARCHAR(255),
+            IN p_ruta_firma_imagen VARCHAR(255),
+            IN p_comentarios VARCHAR(255)
             )
             BEGIN
                 UPDATE homologacion_asignaturas
@@ -1592,6 +1600,8 @@ return new class extends Migration {
                     homologaciones = p_homologaciones,
                     fecha = p_fecha,
                     ruta_pdf_resolucion = p_ruta_pdf_resolucion,
+                    ruta_firma_imagen = p_ruta_firma_imagen,
+                    comentarios = p_comentarios,
                     updated_at = NOW()
                 WHERE id_homologacion = p_id_homologacion;
             END;

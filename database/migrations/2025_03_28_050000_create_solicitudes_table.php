@@ -17,7 +17,16 @@ return new class extends Migration {
             $table->enum('finalizo_estudios', ['Si', 'No'])->default('No');
             $table->date('fecha_finalizacion_estudios')->nullable();
             $table->date('fecha_ultimo_semestre_cursado')->nullable();
-            $table->enum('estado', ['Radicado', 'En revisión', 'Aprobado', 'Rechazado', 'Cerrado'])->default('Radicado');
+            $table->enum('estado', [
+                'Radicado',
+                'En revisión',
+                'Aprobado',
+                'Rechazado - Documentación incompleta',
+                'Rechazado - Universidad sin convenio',
+                'Rechazado - Otro motivo',
+                'Cerrado'
+            ])->default('Radicado');
+
             $table->string('numero_radicado', 50)->unique();
             $table->timestamp('fecha_solicitud')->useCurrent();
 
