@@ -39,7 +39,8 @@ class User extends Authenticatable implements JWTSubject
         'departamento_id',
         'municipio_id',
         'rol_id',
-        'activo'
+        'activo',
+        'modo_visual'  // AÑADIDO
     ];
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'activo' => 'boolean',
+        'modo_visual' => 'string',  // AÑADIDO - Como es ENUM, se maneja como string
     ];
 
 

@@ -172,75 +172,76 @@ return new class extends Migration {
 
 
             -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (INSTITUCIONES)
-            DROP PROCEDURE IF EXISTS ActualizarInstitucion;
-            DROP PROCEDURE IF EXISTS EliminarInstitucion;
-            DROP PROCEDURE IF EXISTS InsertarInstitucion;
-            DROP PROCEDURE IF EXISTS ObtenerInstitucionPorId;
-            DROP PROCEDURE IF EXISTS ObtenerInstituciones;
+DROP PROCEDURE IF EXISTS ActualizarInstitucion;
+DROP PROCEDURE IF EXISTS EliminarInstitucion;
+DROP PROCEDURE IF EXISTS InsertarInstitucion;
+DROP PROCEDURE IF EXISTS ObtenerInstitucionPorId;
+DROP PROCEDURE IF EXISTS ObtenerInstituciones;
 
-            -- ACTUALIZAR INSTITUCION
-            CREATE PROCEDURE ActualizarInstitucion(
-                IN institucionId SMALLINT,
-                IN p_nombre VARCHAR(255),
-                IN p_codigo_ies VARCHAR(50),
-                IN p_municipio_id SMALLINT,
-                IN p_tipo VARCHAR(50)
-            )
-            BEGIN
-                UPDATE instituciones
-                SET nombre = p_nombre,
-                    codigo_ies = p_codigo_ies,
-                    municipio_id = p_municipio_id,
-                    tipo = p_tipo
-                WHERE id_institucion = institucionId;
-            END;
+-- ACTUALIZAR INSTITUCION
+CREATE PROCEDURE ActualizarInstitucion(
+    IN institucionId SMALLINT,
+    IN p_nombre VARCHAR(255),
+    IN p_codigo_ies VARCHAR(50),
+    IN p_municipio_id SMALLINT,
+    IN p_tipo VARCHAR(50)
+)
+BEGIN
+    UPDATE instituciones
+    SET nombre = p_nombre,
+        codigo_ies = p_codigo_ies,
+        municipio_id = p_municipio_id,
+        tipo = p_tipo
+    WHERE id_institucion = institucionId;
+END;
 
-            -- ELIMINAR INSTITUCION
-            CREATE PROCEDURE EliminarInstitucion(IN institucionId SMALLINT)
-            BEGIN
-                DELETE FROM instituciones WHERE id_institucion = institucionId;
-            END;
+-- ELIMINAR INSTITUCION
+CREATE PROCEDURE EliminarInstitucion(IN institucionId SMALLINT)
+BEGIN
+    DELETE FROM instituciones WHERE id_institucion = institucionId;
+END;
 
-            CREATE PROCEDURE InsertarInstitucion(
-                IN nombreInstitucion VARCHAR(255),
-                IN codigoIes VARCHAR(20),
-                IN municipioId SMALLINT,
-                IN tipoInstitucion VARCHAR(100)
-            )
-            BEGIN
-                INSERT INTO instituciones (nombre, codigo_ies, municipio_id, tipo)
-                VALUES (nombreInstitucion, codigoIes, municipioId, tipoInstitucion);
-            END;
+-- INSERTAR INSTITUCION
+CREATE PROCEDURE InsertarInstitucion(
+    IN nombreInstitucion VARCHAR(255),
+    IN codigoIes VARCHAR(20),
+    IN municipioId SMALLINT,
+    IN tipoInstitucion VARCHAR(100)
+)
+BEGIN
+    INSERT INTO instituciones (nombre, codigo_ies, municipio_id, tipo)
+    VALUES (nombreInstitucion, codigoIes, municipioId, tipoInstitucion);
+END;
 
-            -- OBTENER INSTITUCION POR ID
-            CREATE PROCEDURE ObtenerInstitucionPorId(IN institucionId SMALLINT)
-            BEGIN
-                SELECT i.id_institucion,
-                       i.nombre,
-                       i.codigo_ies,
-                       m.nombre AS municipio,
-                       d.nombre AS departamento,
-                       i.tipo
-                FROM instituciones i
-                JOIN municipios m ON i.municipio_id = m.id_municipio
-                JOIN departamentos d ON m.departamento_id = d.id_departamento
-                WHERE i.id_institucion = institucionId;
-            END;
+-- OBTENER INSTITUCION POR ID
+CREATE PROCEDURE ObtenerInstitucionPorId(IN institucionId SMALLINT)
+BEGIN
+    SELECT i.id_institucion,
+           i.nombre,
+           i.codigo_ies,
+           COALESCE(m.nombre, 'Sin municipio') AS municipio,
+           COALESCE(d.nombre, 'Sin departamento') AS departamento,
+           i.tipo
+    FROM instituciones i
+    LEFT JOIN municipios m ON i.municipio_id = m.id_municipio
+    LEFT JOIN departamentos d ON m.departamento_id = d.id_departamento
+    WHERE i.id_institucion = institucionId;
+END;
 
-            -- OBTENER TODAS LAS INSTITUCIONES
-            CREATE PROCEDURE ObtenerInstituciones()
-            BEGIN
-                SELECT i.id_institucion,
-                       i.nombre,
-                       i.codigo_ies,
-                       m.nombre AS municipio,
-                       d.nombre AS departamento,
-                       i.tipo
-                FROM instituciones i
-                JOIN municipios m ON i.municipio_id = m.id_municipio
-                JOIN departamentos d ON m.departamento_id = d.id_departamento
-                ORDER BY i.nombre ASC;
-            END;
+-- OBTENER TODAS LAS INSTITUCIONES
+CREATE PROCEDURE ObtenerInstituciones()
+BEGIN
+    SELECT i.id_institucion,
+           i.nombre,
+           i.codigo_ies,
+           COALESCE(m.nombre, 'Sin municipio') AS municipio,
+           COALESCE(d.nombre, 'Sin departamento') AS departamento,
+           i.tipo
+    FROM instituciones i
+    LEFT JOIN municipios m ON i.municipio_id = m.id_municipio
+    LEFT JOIN departamentos d ON m.departamento_id = d.id_departamento
+    ORDER BY i.nombre ASC;
+END;
 
 
 
@@ -487,8 +488,9 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
-                    r.nombre AS rol,               -- Nuevo: Nombre del rol
-                    u.activo,                     -- Nuevo: Estado activo/inactivo
+                    r.nombre AS rol,
+                    u.activo,
+                    u.modo_visual,                -- AÑADIDO
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -497,7 +499,7 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
-                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
+                LEFT JOIN roles r ON u.rol_id = r.id_rol
                 WHERE u.activo = 1
                 ORDER BY u.primer_nombre ASC;
             END;
@@ -522,8 +524,9 @@ return new class extends Migration {
                     p.nombre AS pais,
                     d.nombre AS departamento,
                     m.nombre AS municipio,
-                    r.nombre AS rol,               -- Nuevo: Nombre del rol
-                    u.activo,                     -- Nuevo: Estado activo/inactivo
+                    r.nombre AS rol,
+                    u.activo,
+                    u.modo_visual,                -- AÑADIDO
                     u.created_at,
                     u.updated_at
                 FROM users u
@@ -532,11 +535,10 @@ return new class extends Migration {
                 LEFT JOIN paises p ON u.pais_id = p.id_pais
                 LEFT JOIN departamentos d ON u.departamento_id = d.id_departamento
                 LEFT JOIN municipios m ON u.municipio_id = m.id_municipio
-                LEFT JOIN roles r ON u.rol_id = r.id_rol     -- Nuevo join
+                LEFT JOIN roles r ON u.rol_id = r.id_rol
                 WHERE u.id_usuario = usuarioId
                 AND u.activo = 1;
             END;
-
 
             CREATE PROCEDURE InsertarUsuario(
                 IN p_primer_nombre VARCHAR(50),
@@ -544,7 +546,7 @@ return new class extends Migration {
                 IN p_primer_apellido VARCHAR(50),
                 IN p_segundo_apellido VARCHAR(50),
                 IN p_email VARCHAR(100),
-                IN p_password VARCHAR(255), -- AÑADIDO
+                IN p_password VARCHAR(255),
                 IN p_tipo_identificacion ENUM('Tarjeta de Identidad', 'Cédula de Ciudadanía', 'Cédula de Extranjería'),
                 IN p_numero_identificacion VARCHAR(20),
                 IN p_institucion_origen_id SMALLINT,
@@ -555,23 +557,24 @@ return new class extends Migration {
                 IN p_departamento_id SMALLINT,
                 IN p_municipio_id SMALLINT,
                 IN p_rol_id SMALLINT,
-                IN p_activo BOOLEAN -- AÑADIDO
+                IN p_activo BOOLEAN,
+                IN p_modo_visual ENUM('0', '1')  -- CAMBIO: ENUM en lugar de TINYINT
             )
             BEGIN
                 INSERT INTO users
-                 (
+                (
                     primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
                     email, password, tipo_identificacion, numero_identificacion,
                     institucion_origen_id, facultad_id, telefono, direccion,
                     pais_id, departamento_id, municipio_id, rol_id,
-                    activo, created_at, updated_at
+                    activo, modo_visual, created_at, updated_at
                 )
                 VALUES (
                     p_primer_nombre, p_segundo_nombre, p_primer_apellido, p_segundo_apellido,
                     p_email, p_password, p_tipo_identificacion, p_numero_identificacion,
                     p_institucion_origen_id, p_facultad_id, p_telefono, p_direccion,
                     p_pais_id, p_departamento_id, p_municipio_id, p_rol_id,
-                    p_activo, NOW(), NOW()
+                    p_activo, p_modo_visual, NOW(), NOW()
                 );
             END;
 
@@ -594,11 +597,11 @@ return new class extends Migration {
                 IN p_departamento_id SMALLINT,
                 IN p_municipio_id SMALLINT,
                 IN p_rol_id SMALLINT,
-                IN p_activo BOOLEAN
+                IN p_activo BOOLEAN,
+                IN p_modo_visual ENUM('0', '1')  -- CAMBIO: ENUM en lugar de TINYINT
             )
             BEGIN
                 UPDATE users
-
                 SET primer_nombre = p_primer_nombre,
                     segundo_nombre = p_segundo_nombre,
                     primer_apellido = p_primer_apellido,
@@ -616,6 +619,7 @@ return new class extends Migration {
                     municipio_id = p_municipio_id,
                     rol_id = p_rol_id,
                     activo = p_activo,
+                    modo_visual = p_modo_visual,     -- AÑADIDO
                     updated_at = NOW()
                 WHERE id_usuario = usuarioId;
             END;
@@ -624,7 +628,7 @@ return new class extends Migration {
             CREATE PROCEDURE EliminarUsuario(IN usuarioId SMALLINT)
             BEGIN
                 DELETE FROM users
-                 WHERE id_usuario = usuarioId;
+                WHERE id_usuario = usuarioId;
             END;
 
 
@@ -1493,18 +1497,15 @@ return new class extends Migration {
 
 
 
-           -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
+          -- ELIMINAR PROCEDIMIENTOS SI EXISTEN (HOMOLOGACIÓN ASIGNATURAS)
 DROP PROCEDURE IF EXISTS ObtenerHomologacionesAsignaturas;
 DROP PROCEDURE IF EXISTS ObtenerHomologacionAsignaturaPorId;
 DROP PROCEDURE IF EXISTS InsertarHomologacionAsignatura;
 DROP PROCEDURE IF EXISTS ActualizarHomologacionAsignatura;
 DROP PROCEDURE IF EXISTS EliminarHomologacionAsignatura;
 
--- OBTENER TODAS LAS HOMOLOGACIONES (VERSIÓN SIMPLE)
-CREATE PROCEDURE ObtenerHomologacionesAsignaturas(
-    IN p_offset INT,  -- Paginación
-    IN p_limit INT    -- Paginación
-)
+-- OBTENER TODAS LAS HOMOLOGACIONES (SIN PAGINACIÓN)
+CREATE PROCEDURE ObtenerHomologacionesAsignaturas()
 BEGIN
     SELECT
         ha.id_homologacion,
@@ -1526,11 +1527,10 @@ BEGIN
     FROM homologacion_asignaturas ha
     JOIN solicitudes s ON ha.solicitud_id = s.id_solicitud
     JOIN users u ON s.usuario_id = u.id_usuario
-    ORDER BY ha.id_homologacion ASC
-    LIMIT p_limit OFFSET p_offset;
+    ORDER BY ha.id_homologacion ASC;
 END;
 
--- OBTENER UNA HOMOLOGACIÓN POR ID (VERSIÓN SIMPLE)
+-- OBTENER UNA HOMOLOGACIÓN POR ID
 CREATE PROCEDURE ObtenerHomologacionAsignaturaPorId(IN homologacionId INT)
 BEGIN
     SELECT
@@ -1556,7 +1556,7 @@ BEGIN
     WHERE ha.id_homologacion = homologacionId;
 END;
 
--- INSERTAR HOMOLOGACIÓN ASIGNATURA (solo para creación inicial, no actualiza)
+-- INSERTAR HOMOLOGACIÓN ASIGNATURA
 CREATE PROCEDURE InsertarHomologacionAsignatura(
     IN p_solicitud_id INT,
     IN p_homologaciones JSON,
@@ -1588,7 +1588,7 @@ BEGIN
     END IF;
 END;
 
--- ACTUALIZAR HOMOLOGACIÓN (mantiene las asignaturas de origen intactas)
+-- ACTUALIZAR HOMOLOGACIÓN
 CREATE PROCEDURE ActualizarHomologacionAsignatura(
     IN p_id_homologacion INT,
     IN p_solicitud_id INT,

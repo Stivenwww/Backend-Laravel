@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Institucion;
+use Exception;
 
 class InstitucionSeeder extends Seeder
 {
@@ -12,45 +13,31 @@ class InstitucionSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
+        $csvFile = fopen(base_path("database/data/instituciones.csv"), "r");
 
+        $firstline = true;
+        $insertados = 0;
 
-        Institucion::create([
-            'municipio_id' => 703,
-            'nombre' => 'Corporación Universitaria Autónoma del Cauca',
-            'codigo_ies' => '2849',
-            'tipo' => 'Universitaria',
-        ]);
+        while (($data = fgetcsv($csvFile, 2000, ",")) !== FALSE) {
+            if (!$firstline) {
+                try {
+                    Institucion::create([
+                        'codigo_ies' => $data[0],
+                        'nombre' => $data[1],
+                        'municipio_id' => null, // Forzamos null por ahora
+                        'tipo' => 'Universitaria'
+                    ]);
+                    $insertados++;
+                } catch (Exception $e) {
+                    dump("Error en registro:", $data[0], $data[1], $e->getMessage());
+                }
+            }
+            $firstline = false;
+        }
 
-        Institucion::create([
-            'municipio_id' => 703,
-            'nombre' => 'Servicio Nacional de Aprendizaje - SENA',
-            'codigo_ies' => null,
-            'tipo' => 'SENA',
-        ]);
-
-        Institucion::create([
-            'municipio_id' => 703,
-            'nombre' => 'Colegio Mayor del Cauca',
-            'codigo_ies' => '3104',
-            'tipo' => 'Mixta',
-        ]);
-
-        Institucion::create([
-            'municipio_id' => 703,
-            'nombre' => 'Fundación Universitaria de Popayán - FUP',
-            'codigo_ies' => '1055',
-            'tipo' => 'Mixta',
-        ]);
-
-        Institucion::create([
-            'municipio_id' => 703,
-            'nombre' => 'Universidad del Cauca',
-            'codigo_ies' => '1110',
-            'tipo' => 'Universitaria',
-        ]);
-
-
+        fclose($csvFile);
+        dump("Total insertados:", $insertados);
     }
 }

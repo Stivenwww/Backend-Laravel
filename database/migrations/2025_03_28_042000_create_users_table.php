@@ -35,6 +35,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('rol_id')->default(1);
 
             $table->boolean('activo')->default(true);
+            $table->enum('modo_visual', ['0', '1'])->default('0');
             $table->rememberToken();
 
             $table->foreign('pais_id')->references('id_pais')->on('paises');

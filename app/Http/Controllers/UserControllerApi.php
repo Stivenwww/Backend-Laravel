@@ -93,13 +93,14 @@ class UserControllerApi extends Controller
                'municipio_id' => 'nullable|exists:municipios,id_municipio',
                'rol_id' => 'nullable|exists:roles,id_rol',
                'activo' => 'boolean',
+               'modo_visual' => 'nullable|in:0,1',  // AÑADIDO
            ]);
 
            // Genera hash seguro para la contraseña
            $password = $request->password ? Hash::make($request->password) : null;
 
            // Ejecuta el procedimiento almacenado con todos los parámetros
-           DB::statement('CALL InsertarUsuario(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+           DB::statement('CALL InsertarUsuario(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
                $request->primer_nombre,
                $request->segundo_nombre,
                $request->primer_apellido,
@@ -116,7 +117,8 @@ class UserControllerApi extends Controller
                $request->departamento_id,
                $request->municipio_id,
                $request->rol_id ?? 1,            // Valor predeterminado para rol
-               $request->activo ?? true          // Valor predeterminado para estado
+               $request->activo ?? true,         // Valor predeterminado para estado
+               $request->modo_visual ?? '0'      // AÑADIDO - Valor predeterminado
            ]);
 
            // Respuesta de éxito con código 201 (Created)
@@ -161,6 +163,7 @@ class UserControllerApi extends Controller
                'municipio_id' => 'sometimes|nullable|exists:municipios,id_municipio',
                'rol_id' => 'sometimes|nullable|exists:roles,id_rol',
                'activo' => 'sometimes|boolean',
+               'modo_visual' => 'sometimes|nullable|in:0,1',  // AÑADIDO
            ]);
 
            // Solo genera hash de contraseña si se proporciona una nueva
@@ -170,7 +173,7 @@ class UserControllerApi extends Controller
            }
 
            // Ejecuta el procedimiento almacenado con todos los parámetros
-           DB::statement('CALL ActualizarUsuario(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+           DB::statement('CALL ActualizarUsuario(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
                $id,
                $request->primer_nombre,
                $request->segundo_nombre,
@@ -188,7 +191,8 @@ class UserControllerApi extends Controller
                $request->departamento_id,
                $request->municipio_id,
                $request->rol_id ?? 1,            // Valor predeterminado para rol
-               $request->activo ?? true          // Valor predeterminado para estado
+               $request->activo ?? true,         // Valor predeterminado para estado
+               $request->modo_visual ?? '0'      // AÑADIDO - Valor predeterminado
            ]);
 
            // Respuesta de éxito
