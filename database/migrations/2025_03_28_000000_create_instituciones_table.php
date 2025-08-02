@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('municipio_id')->nullable();
             $table->string('nombre', 255);
             $table->string('codigo_ies', 20)->nullable();
-            $table->enum('tipo', ['Universitaria', 'SENA','Mixta']);
+            $table->enum('tipo', ['Universitaria', 'SENA','Mixta', 'Técnica o Tecnóloga']);
             $table->timestamps();
 
            $table->foreign('municipio_id')->references('id_municipio')->on('municipios');

@@ -15,7 +15,7 @@ class ProgramaSeeder extends Seeder
     {
         // Universidad del Cauca
         Programa::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'facultad_id' => 2, // Facultad de Ingeniería Electrónica y Telecomunicaciones
             'nombre' => 'Ingeniería Electrónica y Telecomunicaciones',
             'codigo_snies' => '3104',
@@ -24,7 +24,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'facultad_id' => 1, // Facultad de Ingeniería Civil
             'nombre' => 'Ingeniería Civil',
             'codigo_snies' => '1105',
@@ -33,7 +33,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'facultad_id' => 1, // Facultad de Ingeniería Civil
             'nombre' => 'Ingeniería Ambiental',
             'codigo_snies' => '8704',
@@ -42,7 +42,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'facultad_id' => 2,
             'nombre' => 'Ingeniería de Sistemas',
             'codigo_snies' => '1050',
@@ -51,7 +51,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'facultad_id' => 2,
             'nombre' => 'Ingeniería en Automática Industrial',
             'codigo_snies' => '1106',
@@ -62,7 +62,7 @@ class ProgramaSeeder extends Seeder
 
         // Fundación Universitaria de Popayán (FUP)
         Programa::create([
-            'institucion_id' => 4,
+            'institucion_id' => 96,
             'facultad_id' => 3, // Facultad de Ingeniería y Arquitectura
             'nombre' => 'Ingeniería de Sistemas',
             'codigo_snies' => '2612',
@@ -71,7 +71,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 4,
+            'institucion_id' => 96,
             'facultad_id' => 3,
             'nombre' => 'Ingeniería Industrial',
             'codigo_snies' => '2555',
@@ -80,7 +80,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 4,
+            'institucion_id' => 96,
             'facultad_id' => 3,
             'nombre' => 'Arquitectura',
             'codigo_snies' => '3615',
@@ -92,7 +92,7 @@ class ProgramaSeeder extends Seeder
 
         // Institución Universitaria Colegio Mayor del Cauca (Unimayor)
         Programa::create([
-            'institucion_id' => 3,
+            'institucion_id' => 158,
             'facultad_id' => 4, // Facultad de Ingeniería
             'nombre' => 'Ingeniería Informática',
             'codigo_snies' => '106716',
@@ -101,7 +101,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 3,
+            'institucion_id' => 158,
             'facultad_id' => 4,
             'nombre' => 'Ingeniería Multimedia',
             'codigo_snies' => '116679',
@@ -110,7 +110,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 3,
+            'institucion_id' => 158,
             'facultad_id' => 4,
             'nombre' => 'Tecnología en Desarrollo de Software',
             'codigo_snies' => '1108',
@@ -122,7 +122,7 @@ class ProgramaSeeder extends Seeder
 
         // Corporación Universitaria Autónoma del Cauca (Uniautónoma)
         Programa::create([
-            'institucion_id' => 1,
+            'institucion_id' => 149,
             'facultad_id' => 5, // Facultad de Ingeniería
             'nombre' => 'Ingeniería de Software y Computación',
             'codigo_snies' => '110398',
@@ -131,7 +131,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 1,
+            'institucion_id' => 149,
             'facultad_id' => 5,
             'nombre' => 'Ingeniería Electrónica',
             'codigo_snies' => '20415',
@@ -140,7 +140,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 1,
+            'institucion_id' => 149,
             'facultad_id' => 5,
             'nombre' => 'Ingeniería Civil',
             'codigo_snies' => '111155',
@@ -149,7 +149,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 1,
+            'institucion_id' => 149,
             'facultad_id' => 5,
             'nombre' => 'Ingeniería Energética',
             'codigo_snies' => '110670',
@@ -158,7 +158,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
          Programa::create([
-            'institucion_id' => 1,
+            'institucion_id' => 149,
             'facultad_id' => 5,
             'nombre' => 'Ingeniería Ambiental y de Saneamiento',
             'codigo_snies' => '110683',
@@ -171,7 +171,7 @@ class ProgramaSeeder extends Seeder
 
         // SENA Regional Cauca
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Tecnólogo en Análisis y Desarrollo de Software',
             'codigo_snies' => null,
@@ -180,7 +180,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Técnico en Sistemas',
             'codigo_snies' => null,
@@ -189,7 +189,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Tecnólogo en Gestión de Redes de Datos',
             'codigo_snies' => null,
@@ -198,7 +198,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Tecnólogo en Producción Multimedia',
             'codigo_snies' => null,
@@ -207,7 +207,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Técnico en Programación de Software',
             'codigo_snies' => null,
@@ -216,7 +216,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Tecnólogo en Implementación de Infraestructura de Tecnologías de la Información y las Comunicaciones',
             'codigo_snies' => null,
@@ -225,7 +225,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Tecnólogo en Gestión de la Seguridad y Salud en el Trabajo',
             'codigo_snies' => null,
@@ -234,7 +234,7 @@ class ProgramaSeeder extends Seeder
         ]);
 
         Programa::create([
-            'institucion_id' => 2,
+            'institucion_id' => 256,
             'facultad_id' => null,
             'nombre' => 'Tecnólogo en Gestión de Proyectos de Desarrollo de Software',
             'codigo_snies' => null,

@@ -26,8 +26,8 @@ class InstitucionSeeder extends Seeder
                     Institucion::create([
                         'codigo_ies' => $data[0],
                         'nombre' => $data[1],
-                        'municipio_id' => null, // Forzamos null por ahora
-                        'tipo' => 'Universitaria'
+                        'municipio_id' => (int)$data[3],  // ← Era $data[4]
+                        'tipo' => trim($data[2])          // ← Era $data[3]
                     ]);
                     $insertados++;
                 } catch (Exception $e) {

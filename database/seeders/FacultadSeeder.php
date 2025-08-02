@@ -14,12 +14,12 @@ class FacultadSeeder extends Seeder
     {
         /* Facultad de universidad del cauca */
         Facultad::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'nombre' => 'Facultad de Ingeniería Civil',
         ]);
 
         Facultad::create([
-            'institucion_id' => 5,
+            'institucion_id' => 4,
             'nombre' => 'Facultad de Ingeniería Electrónica y Telecomunicaciones',
         ]);
 
@@ -41,7 +41,7 @@ class FacultadSeeder extends Seeder
         ]);
 
 
-        
+
         /* Uniautonoma */
 
         Facultad::create([
