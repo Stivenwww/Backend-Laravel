@@ -9,6 +9,7 @@ use App\Models\SolicitudAsignatura;
 use App\Models\User;
 use App\Models\Pensum;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SolicitudAsignaturaSeeder extends Seeder
 {
@@ -17,7 +18,6 @@ class SolicitudAsignaturaSeeder extends Seeder
      */
     public function run(): void
     {
-        // Limpiar la tabla antes de insertar nuevos datos
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         SolicitudAsignatura::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -25,35 +25,35 @@ class SolicitudAsignaturaSeeder extends Seeder
         $solicitudes = Solicitud::whereIn('usuario_id', [1, 2, 3, 4, 5, 6])->get();
 
         foreach ($solicitudes as $solicitud) {
-            // Obtener el usuario de la solicitud para determinar su institución de origen
             $usuario = User::find($solicitud->usuario_id);
             $institucionOrigenId = $usuario->institucion_origen_id;
+            $facultadId = $usuario->facultad_id ?? null;
 
-            // Determinar programa_id según la institución de origen
-            $programaOrigenId = $this->obtenerProgramaOrigen($institucionOrigenId, $usuario->facultad_id);
+            try {
+                $programaOrigenId = $this->obtenerProgramaOrigen($institucionOrigenId, $facultadId);
+            } catch (\Exception $e) {
+                // Log para que sepas quién está fallando
+                Log::warning("Error en programa origen: usuario_id {$usuario->id}, institucion_id {$institucionOrigenId}, facultad_id {$facultadId}");
+                continue; // Salta esta solicitud si no se puede determinar programa
+            }
 
-            // Array para almacenar todas las asignaturas para esta solicitud
             $asignaturasData = [];
 
-            // Obtener asignaturas de origen según institución
-            if ($institucionOrigenId == 2) { // SENA (usuario 6)
-                // Para SENA, usar competencias (programa_id entre 17-24)
+            if ($institucionOrigenId == 256) { // SENA
                 $pensumIds = Pensum::whereBetween('programa_id', [17, 24])->pluck('id_pensum');
                 $asignaturasOrigen = Asignatura::whereIn('pensum_id', $pensumIds)
                     ->inRandomOrder()
                     ->limit(6)
                     ->get();
 
-                // Preparar datos de asignaturas de origen del SENA (competencias)
                 foreach ($asignaturasOrigen as $asignatura) {
                     $asignaturasData[] = [
-                        'asignatura_id'  => $asignatura->id_asignatura,
-                        'nota_origen'    => 4.5,
-                        'horas_sena'     => $asignatura->horas_sena
+                        'asignatura_id' => $asignatura->id_asignatura,
+                        'nota_origen'   => 4.5,
+                        'horas_sena'    => $asignatura->horas_sena,
                     ];
                 }
             } else {
-                // Para universidades, usar materias del programa correspondiente
                 $pensum = Pensum::where('programa_id', $programaOrigenId)->first();
                 if ($pensum) {
                     $asignaturasOrigen = Asignatura::where('pensum_id', $pensum->id_pensum)
@@ -61,18 +61,16 @@ class SolicitudAsignaturaSeeder extends Seeder
                         ->limit(6)
                         ->get();
 
-                    // Preparar datos de asignaturas de origen universitarias (con notas)
                     foreach ($asignaturasOrigen as $asignatura) {
                         $asignaturasData[] = [
-                            'asignatura_id'  => $asignatura->id_asignatura,
-                            'nota_origen'    => $this->generarNotaAprobatoria(), // Nota superior a 3.5
-                            'horas_sena'     => null
+                            'asignatura_id' => $asignatura->id_asignatura,
+                            'nota_origen'   => $this->generarNotaAprobatoria(),
+                            'horas_sena'    => null,
                         ];
                     }
                 }
             }
 
-            // Crear un único registro para esta solicitud con todas sus asignaturas
             if (!empty($asignaturasData)) {
                 SolicitudAsignatura::create([
                     'solicitud_id' => $solicitud->id_solicitud,
@@ -85,57 +83,45 @@ class SolicitudAsignaturaSeeder extends Seeder
     }
 
     /**
-     * Obtiene el ID del programa correspondiente según la institución y facultad
+     * Retorna el programa según la institución y facultad
      */
     private function obtenerProgramaOrigen($institucionId, $facultadId)
     {
-        // Mapeo de institución y facultad a programa_id
         $programas = [
-            // Autónoma del Cauca (1) - Depende de la facultad
-            1 => [
-                5 => 12, // Facultad de Ingeniería (5) -> Ing. de Software (12)
+            149 => [ // Autónoma del Cauca
+                5 => 12, // Facultad de Ingeniería → Ing. de Software
             ],
-            // FUP (4) - Mapeo de facultades a programas
-            4 => [
-                3 => 6, // Ing. y Arquitectura (3) -> Ing. de Sistemas (6)
+            96 => [ // FUP
+                3 => 6, // Ing. y Arquitectura → Ing. de Sistemas
             ],
-            // Colegio Mayor del Cauca (3)
-            3 => [
-                4 => 9, // Ciencias Empresariales (4) -> Ing. Informática (9)
+            158 => [ // Colegio Mayor del Cauca
+                4 => 9, // Ciencias Empresariales → Ing. Informática
             ],
-            // UniCauca (5)
-            5 => [
-                2 => 1, // Ing. Electrónica y Telecomunicaciones (2) -> Mismo programa (1)
+            4 => [ // UniCauca
+                2 => 1, // Ing. Electrónica y Telecomunicaciones → mismo programa
             ],
-            // SENA (2) - Vamos a usar programa 17 como default
-            2 => [
-                null => 17, // Sin facultad -> Tecnólogo en Análisis y Desarrollo de Software (17)
+            256 => [ // SENA
+                null => 17, // Sin facultad → Tecnología en ADSO
+            ],
+
+            // 👇 Aquí puedes añadir más instituciones si es necesario:
+            1 => [ // Institución de prueba
+                5 => 99, // Por ejemplo: facultad 5 → programa 99 (ajusta según lo que tengas en tu DB)
             ],
         ];
 
-        // Si no existe el mapeo específico, retornar un valor por defecto según la institución
-        if (!isset($programas[$institucionId][$facultadId])) {
-            // Valores por defecto para cada institución
-            $defaults = [
-                1 => 12, // Autónoma -> Ing. Software
-                2 => 17, // SENA -> Tecnólogo en Análisis y Desarrollo
-                3 => 9,  // Colegio Mayor -> Ing. Informática
-                4 => 6,  // FUP -> Ing. de Sistemas
-                5 => 1,  // UniCauca -> Ing. Electrónica
-            ];
-
-            return $defaults[$institucionId] ?? 1; // Por defecto Ing. Electrónica en UniCauca
+        if (isset($programas[$institucionId][$facultadId])) {
+            return $programas[$institucionId][$facultadId];
         }
 
-        return $programas[$institucionId][$facultadId];
+        throw new \Exception("Programa no encontrado para institución $institucionId y facultad $facultadId");
     }
 
     /**
-     * Genera una nota aprobatoria aleatoria entre 3.5 y 5.0
+     * Genera una nota entre 3.5 y 5.0
      */
     private function generarNotaAprobatoria()
     {
-        // Generar nota entre 3.5 y 5.0 con un decimal
         return round(mt_rand(35, 50) / 10, 1);
     }
 }

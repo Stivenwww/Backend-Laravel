@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\SolicitudAsignatura;
 use App\Models\Asignatura;
 use App\Models\Programa;
@@ -147,8 +148,6 @@ class SolicitudAsignaturaControllerApi extends Controller
      * @param int $id Identificador de la solicitud a actualizar
      * @return \Illuminate\Http\JsonResponse Confirmación o error
      */
-
-// Aplicar cambio similar en actualizarSolicitudAsignatura
     public function actualizarSolicitudAsignatura(Request $request, $id)
     {
         try {
@@ -195,8 +194,6 @@ class SolicitudAsignaturaControllerApi extends Controller
         }
     }
 
-
-
     /**
      * Elimina una solicitud de asignatura de la base de datos
      *
@@ -224,7 +221,6 @@ class SolicitudAsignaturaControllerApi extends Controller
         }
     }
 
-
     /**
      * Da formato a los datos crudos de solicitud para presentación en API
      * Incluye detalles de asignaturas asociadas y su jerarquía académica
@@ -232,8 +228,6 @@ class SolicitudAsignaturaControllerApi extends Controller
      * @param object $solicitud Datos crudos de la solicitud
      * @return array Datos formateados con estructura jerárquica
      */
-
-    //sexooo
     private function formatearDatosSolicitud($solicitud)
     {
         // Preparar estructura base de datos de solicitud
@@ -316,7 +310,7 @@ class SolicitudAsignaturaControllerApi extends Controller
                 continue;
             }
 
-            // Obtiene información completa de la asignatura
+            // Obtiene información completa de la asignatura usando el mismo método que funciona
             $infoAsignatura = $this->obtenerInfoAsignatura($asignaturaId);
 
             // Añade información específica de esta relación solicitud-asignatura
@@ -340,7 +334,8 @@ class SolicitudAsignaturaControllerApi extends Controller
     }
 
     /**
-     * Recupera información detallada de una asignatura y su jerarquía académica
+     * Recupera información detallada de una asignatura usando el procedimiento almacenado
+     * que ya funciona correctamente en el controlador de asignaturas
      *
      * @param int $asignaturaId Identificador de la asignatura
      * @return array Datos completos de la asignatura con su contexto académico
@@ -361,47 +356,45 @@ class SolicitudAsignaturaControllerApi extends Controller
         ];
 
         try {
-            // Consulta el modelo de Asignatura
-            $asignatura = Asignatura::find($asignaturaId);
+            // Usar el mismo procedimiento almacenado que funciona en AsignaturaControllerApi
+            $asignatura = DB::select('CALL ObtenerAsignaturaPorId(?)', [$asignaturaId]);
 
-            if (!$asignatura) {
-                return $info;
-            }
+            if (!empty($asignatura)) {
+                $asignaturaData = $asignatura[0];
 
-            // Asigna datos básicos de la asignatura
-            $info['nombre'] = $asignatura->nombre ?? 'No disponible';
-            $info['codigo'] = $asignatura->codigo_asignatura ?? 'N/A';
-            $info['semestre'] = $asignatura->semestre ?? 0;
+                // Asignar datos de la asignatura desde el procedimiento almacenado
+                $info['nombre'] = $asignaturaData->nombre ?? 'No disponible';
+                $info['codigo'] = $asignaturaData->codigo_asignatura ?? 'N/A';
+                $info['semestre'] = $asignaturaData->semestre ?? 0;
+                $info['programa'] = $asignaturaData->programa ?? 'No disponible';
+                $info['institucion'] = $asignaturaData->institucion ?? 'No disponible';
 
-            // Obtiene jerarquía académica completa
-            try {
-                if ($asignatura->programa_id) {
-                    $programa = Programa::find($asignatura->programa_id);
-                    if ($programa) {
-                        $info['programa'] = $programa->nombre ?? 'No disponible';
+                // Intentar obtener la facultad si no está disponible en el procedimiento
+                if (!isset($asignaturaData->facultad) || empty($asignaturaData->facultad)) {
+                    try {
+                        // Consulta adicional para obtener la facultad
+                        $facultadData = DB::select('
+                            SELECT f.nombre as facultad
+                            FROM asignaturas a
+                            JOIN programas p ON a.pensum_id = p.id_programa
+                            JOIN facultades f ON p.facultad_id = f.id_facultad
+                            WHERE a.id_asignatura = ?
+                        ', [$asignaturaId]);
 
-                        // Obtiene facultad asociada al programa
-                        if ($programa->facultad_id) {
-                            $facultad = Facultad::find($programa->facultad_id);
-                            if ($facultad) {
-                                $info['facultad'] = $facultad->nombre ?? 'No disponible';
-                            }
+                        if (!empty($facultadData)) {
+                            $info['facultad'] = $facultadData[0]->facultad;
                         }
-
-                        // Obtiene institución asociada al programa
-                        if ($programa->institucion_id) {
-                            $institucion = Institucion::find($programa->institucion_id);
-                            if ($institucion) {
-                                $info['institucion'] = $institucion->nombre ?? 'No disponible';
-                            }
-                        }
+                    } catch (\Exception $e) {
+                        // Si falla, mantener "No disponible"
+                        Log::error("Error al obtener facultad: " . $e->getMessage());
                     }
+                } else {
+                    $info['facultad'] = $asignaturaData->facultad;
                 }
-            } catch (\Exception $e) {
-                // Silencia errores en consultas de jerarquía
             }
         } catch (\Exception $e) {
-            // Silencia errores en consulta principal
+            // Log del error pero continuar con valores por defecto
+            Log::error("Error al obtener información de asignatura {$asignaturaId}: " . $e->getMessage());
         }
 
         return $info;

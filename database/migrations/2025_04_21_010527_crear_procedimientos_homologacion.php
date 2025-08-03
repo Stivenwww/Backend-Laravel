@@ -1520,7 +1520,8 @@ BEGIN
         ha.homologaciones, -- Devolvemos el JSON tal cual
         ha.fecha,
         ha.ruta_pdf_resolucion,
-        ha.ruta_firma_imagen,
+        ha.ruta_firma_coordinador,
+        ha.ruta_firma_vicerrector,
         ha.comentarios,
         ha.created_at,
         ha.updated_at
@@ -1546,7 +1547,8 @@ BEGIN
         ha.homologaciones, -- Devolvemos el JSON tal cual
         ha.fecha,
         ha.ruta_pdf_resolucion,
-        ha.ruta_firma_imagen,
+        ha.ruta_firma_coordinador,
+        ha.ruta_firma_vicerrector,
         ha.comentarios,
         ha.created_at,
         ha.updated_at
@@ -1562,7 +1564,8 @@ CREATE PROCEDURE InsertarHomologacionAsignatura(
     IN p_homologaciones JSON,
     IN p_fecha DATE,
     IN p_ruta_pdf_resolucion VARCHAR(255),
-    IN p_ruta_firma_imagen VARCHAR(255),
+    IN p_ruta_firma_coordinador VARCHAR(255),
+    IN p_ruta_firma_vicerrector VARCHAR(255),
     IN p_comentarios VARCHAR(255)
 )
 BEGIN
@@ -1580,10 +1583,10 @@ BEGIN
     ELSE
         -- Si no existe, insertamos nuevo
         INSERT INTO homologacion_asignaturas (
-            solicitud_id, homologaciones, fecha, ruta_pdf_resolucion, ruta_firma_imagen, comentarios, created_at, updated_at
+            solicitud_id, homologaciones, fecha, ruta_pdf_resolucion, ruta_firma_coordinador, ruta_firma_vicerrector, comentarios, created_at, updated_at
         )
         VALUES (
-            p_solicitud_id, p_homologaciones, p_fecha, p_ruta_pdf_resolucion, p_ruta_firma_imagen, p_comentarios, NOW(), NOW()
+            p_solicitud_id, p_homologaciones, p_fecha, p_ruta_pdf_resolucion, p_ruta_firma_coordinador, p_ruta_firma_vicerrector, p_comentarios, NOW(), NOW()
         );
     END IF;
 END;
@@ -1595,7 +1598,8 @@ CREATE PROCEDURE ActualizarHomologacionAsignatura(
     IN p_homologaciones JSON,
     IN p_fecha DATE,
     IN p_ruta_pdf_resolucion VARCHAR(255),
-    IN p_ruta_firma_imagen VARCHAR(255),
+    IN p_ruta_firma_coordinador VARCHAR(255),
+    IN p_ruta_firma_vicerrector VARCHAR(255),
     IN p_comentarios VARCHAR(255)
 )
 BEGIN
@@ -1617,7 +1621,8 @@ BEGIN
             homologaciones = p_homologaciones,
             fecha = p_fecha,
             ruta_pdf_resolucion = p_ruta_pdf_resolucion,
-            ruta_firma_imagen = p_ruta_firma_imagen,
+            ruta_firma_coordinador = p_ruta_firma_coordinador,
+            ruta_firma_vicerrector = p_ruta_firma_vicerrector,
             comentarios = p_comentarios,
             updated_at = NOW()
         WHERE id_homologacion = p_id_homologacion;

@@ -27,7 +27,7 @@ class FacultadSeeder extends Seeder
 
         /* Facultades de la FUP */
         Facultad::create([
-            'institucion_id' => 4,
+            'institucion_id' => 96,
             'nombre' => 'Facultad de Ingeniería y Arquitectura',
         ]);
 
@@ -36,7 +36,7 @@ class FacultadSeeder extends Seeder
         /* Colegio mayor */
 
         Facultad::create([
-            'institucion_id' => 3,
+            'institucion_id' => 158,
             'nombre' => 'Facultad de Ingeniería',
         ]);
 
@@ -45,7 +45,7 @@ class FacultadSeeder extends Seeder
         /* Uniautonoma */
 
         Facultad::create([
-            'institucion_id' => 1,
+            'institucion_id' => 149,
             'nombre' => 'Facultad de Ingeniería',
         ]);
 

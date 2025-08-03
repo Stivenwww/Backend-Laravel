@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '1122334455',
-            'institucion_origen_id' => 5,
+            'institucion_origen_id' => 4,
             'facultad_id' => 2, // Facultad de Ingeniería
             'telefono' => '3113456789',
             'direccion' => 'Calle 10 #5-45',
@@ -44,7 +44,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '2233445566',
-            'institucion_origen_id' => 4,
+            'institucion_origen_id' => 96,
             'facultad_id' => 3, // Ingeniería y Arquitectura
             'telefono' => '3114567890',
             'direccion' => 'Carrera 15 #6-30',
@@ -65,7 +65,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '3344556677',
-            'institucion_origen_id' => 3,
+            'institucion_origen_id' => 158,
             'facultad_id' => 4, // Ciencias Empresariales
             'telefono' => null,
             'direccion' => 'Av. Panamericana #12-34',
@@ -86,7 +86,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '4455667788',
-            'institucion_origen_id' => 5,
+            'institucion_origen_id' => 4,
             'facultad_id' => 2, // Ingeniería Electrónica y Telecomunicaciones
             'telefono' => null,
             'direccion' => 'Cra 3 #20-60',
@@ -107,11 +107,11 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Extranjería',
             'numero_identificacion' => 'EX123456678',
-            'institucion_origen_id' => 5, // Consideramos aquí el ID genérico de extranjería
-            'facultad_id' => 1,
+            'institucion_origen_id' => 1, // Consideramos aquí el ID genérico de extranjería
+            'facultad_id' => null,
             'telefono' => '3007894561',
             'direccion' => 'Calle Internacional #99',
-            'pais_id' => 2, // País extranjero
+            'pais_id' => 2,
             'departamento_id' => null,
             'municipio_id' => null,
             'rol_id' => 1,
@@ -128,7 +128,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '5566778899',
-            'institucion_origen_id' => 2, // SENA
+            'institucion_origen_id' => 256, // SENA
             'facultad_id' => null,
             'telefono' => '3139876543',
             'direccion' => 'Mz H Casa 25',
@@ -149,7 +149,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '6677889900',
-            'institucion_origen_id' => 1,
+            'institucion_origen_id' => 149,
             'facultad_id' => 5, // Facultad de Ingeniería
             'telefono' => '3101122334',
             'direccion' => 'Calle 21 #7-12',
@@ -170,7 +170,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '7788990011',
-            'institucion_origen_id' => 1,
+            'institucion_origen_id' => 149,
             'facultad_id' => null,
             'telefono' => '3004567890',
             'direccion' => 'Calle 8 #12-34',
@@ -191,7 +191,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'tipo_identificacion' => 'Cédula de Ciudadanía',
             'numero_identificacion' => '8899001122',
-            'institucion_origen_id' => 1,
+            'institucion_origen_id' => 149,
             'facultad_id' => null,
             'telefono' => '30123456678',
             'direccion' => 'Cra 9 #15-20',

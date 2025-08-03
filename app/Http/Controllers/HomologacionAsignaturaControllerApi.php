@@ -104,7 +104,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'asignaturas_origen' => 'required|array',
                 'asignaturas_origen.*' => 'required|integer',
                 'ruta_pdf_resolucion' => 'nullable|file|mimes:pdf|max:10240',
-                'ruta_firma_imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+                'ruta_firma_coordinador' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+                'ruta_firma_vicerrector' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
                 'comentarios' => 'nullable|string|max:1000', // Agregado para comentarios
             ]);
 
@@ -130,8 +131,14 @@ class HomologacionAsignaturaControllerApi extends Controller
 
             // Carga de imagen
             $imagenPath = null;
-            if ($request->hasFile('ruta_firma_imagen')) {
-                $imagenPath = $request->file('ruta_firma_imagen')->store('imagenes_resoluciones', 'public');
+            if ($request->hasFile('ruta_firma_coordinador')) {
+                $imagenPath = $request->file('ruta_firma_coordinador')->store('imagenes_resoluciones', 'public');
+            }
+
+            // Carga de imagen
+            $imagenPath = null;
+            if ($request->hasFile('ruta_firma_vicerrector')) {
+                $imagenPath = $request->file('ruta_firma_vicerrector')->store('imagenes_resoluciones', 'public');
             }
 
             // Llamada al procedimiento almacenado con comentarios como parámetro separado
@@ -150,7 +157,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                     'solicitud_id' => $request->solicitud_id,
                     'homologaciones' => $homologaciones,
                     'ruta_pdf_resolucion' => $pdfPath,
-                    'ruta_firma_imagen' => $imagenPath,
+                    'ruta_firma_coordinador' => $imagenPath,
+                    'ruta_firma_vicerrector' => $imagenPath,
                     'comentarios' => $request->comentarios
                 ]
             ], 201);
@@ -191,7 +199,8 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'estado_solicitud' => $solicitud->estado ?? 'No disponible',
                 'fecha' => $homologacion->fecha,
                 'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion,
-                'ruta_firma_imagen' => $homologacion->ruta_firma_imagen,
+                'ruta_firma_coordinador' => $homologacion->ruta_firma_coordinador,
+                'ruta_firma_vicerrector' => $homologacion->ruta_firma_vicerrector,
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
                 'comentarios' => $homologacion->comentarios ?? '' // Obtener comentarios directamente del campo
@@ -203,8 +212,13 @@ class HomologacionAsignaturaControllerApi extends Controller
                 : null;
 
             // URL pública de la imagen
-            $resultado['url_firma_imagen'] = $resultado['ruta_firma_imagen']
-                ? asset('storage/' . $resultado['ruta_firma_imagen'])
+            $resultado['url_firma_coordinador'] = $resultado['ruta_firma_coordinador']
+                ? asset('storage/' . $resultado['ruta_firma_coordinador'])
+                : null;
+
+                // URL pública de la imagen
+            $resultado['url_firma_vicerrector'] = $resultado['ruta_firma_vicerrector']
+                ? asset('storage/' . $resultado['ruta_firma_vicerrector'])
                 : null;
 
             // Decodificar homologaciones
@@ -331,8 +345,10 @@ class HomologacionAsignaturaControllerApi extends Controller
                 'fecha' => $homologacion->fecha ?? null,
                 'ruta_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ?? null,
                 'url_pdf_resolucion' => $homologacion->ruta_pdf_resolucion ? asset('storage/' . $homologacion->ruta_pdf_resolucion) : null,
-                'ruta_firma_imagen' => $homologacion->ruta_firma_imagen ?? null,
-                'url_firma_imagen' => $homologacion->ruta_firma_imagen ? asset('storage/' . $homologacion->ruta_firma_imagen) : null,
+                'ruta_firma_coordinador' => $homologacion->ruta_firma_coordinador ?? null,
+                'url_firma_coordinador' => $homologacion->ruta_firma_coordinador ? asset('storage/' . $homologacion->ruta_firma_coordinador) : null,
+                'ruta_firma_vicerrector' => $homologacion->ruta_firma_vicerrector ?? null,
+                'url_firma_vicerrector' => $homologacion->ruta_firma_vicerrector ? asset('storage/' . $homologacion->ruta_firma_vicerrector) : null,
                 'error' => 'Error al formatear datos: ' . $e->getMessage(),
                 'asignaturas_origen' => [],
                 'asignaturas_destino' => [],
@@ -362,8 +378,13 @@ class HomologacionAsignaturaControllerApi extends Controller
                 }
 
                 // Eliminar la imagen de firma si existe
-                if ($homologacion->ruta_firma_imagen && Storage::disk('public')->exists($homologacion->ruta_firma_imagen)) {
-                    Storage::disk('public')->delete($homologacion->ruta_firma_imagen);
+                if ($homologacion->ruta_firma_coordinador && Storage::disk('public')->exists($homologacion->ruta_firma_coordinador)) {
+                    Storage::disk('public')->delete($homologacion->ruta_firma_coordinador);
+                }
+
+                // Eliminar la imagen de firma si existe
+                if ($homologacion->ruta_firma_vicerrector && Storage::disk('public')->exists($homologacion->ruta_firma_vicerrector)) {
+                    Storage::disk('public')->delete($homologacion->ruta_firma_vicerrector);
                 }
             }
 
